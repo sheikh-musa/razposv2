@@ -34,10 +34,20 @@ const orders: Order[] = [
     productId: 1,
     productType: "Donut",
     variant: { id: 1, name: "Chocolate", price: 5 },
-    quantity: 3,
-    price: 15,
+    quantity: 2,
+    price: 10,
     date: "2024-12-16",
-    time: "10:30:00",
+    time: "10:35:00",
+  },
+  {
+    id: 3,
+    productId: 1,
+    productType: "Donut",
+    variant: { id: 1, name: "Strawberry", price: 5 },
+    quantity: 4,
+    price: 20,
+    date: "2024-12-16",
+    time: "10:37:00",
   }
 ];
 
