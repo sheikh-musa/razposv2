@@ -25,7 +25,7 @@ export default function Inventory() {
       console.log(products);
     return (
         <div className="flex h-screen bg-white">
-            <h1 className="text-black">Inventory</h1>
+            <h1 className="text-2xl font-bold text-black">Inventory</h1>
             <div className='text-black'>
             <pre>{JSON.stringify(products, null, 2)}</pre>
             </div>
