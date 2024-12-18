@@ -19,6 +19,7 @@ type Order = {
     date: string; // Format: YYYY-MM-DD
     time: string; // Format: HH:mm:ss
     paymentBy: string;
+    completed: boolean;
 };
 
 const orders: Order[] = [
@@ -44,6 +45,7 @@ const orders: Order[] = [
       date: "2024-12-16",
       time: "10:30:00",
       paymentBy: "Paynow",
+      completed: true,
     },
     {
       id: 2,
@@ -60,6 +62,7 @@ const orders: Order[] = [
       date: "2024-12-18",
       time: "12:30:00",
       paymentBy: "Cash",
+      completed: true,
     },
     {
       id: 3,
@@ -77,6 +80,7 @@ const orders: Order[] = [
       date: "2024-12-19",
       time: "15:00:00",
       paymentBy: "Credit Card",
+      completed: true,
     },
     {
       id: 4,
@@ -100,6 +104,7 @@ const orders: Order[] = [
       date: "2024-12-20",
       time: "14:00:00",
       paymentBy: "Cash",
+      completed: false,
     },
     {
       id: 5,
@@ -116,6 +121,7 @@ const orders: Order[] = [
       date: "2024-12-21",
       time: "09:30:00",
       paymentBy: "Paynow",
+      completed: false,
     },
   ];
   
