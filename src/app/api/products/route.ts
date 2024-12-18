@@ -73,3 +73,61 @@ const products: Product[] = [
 export async function GET() {
   return NextResponse.json(products);
 }
+
+// POST method (Add a new product)
+export async function POST(req: Request) {
+  const body = await req.json(); // Parse the request body
+  const { type, variants } = body;
+
+  if (!type || !variants) {
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  const newProduct: Product = {
+    id: products.length + 1,
+    type,
+    variants,
+  };
+
+  products.push(newProduct); // Add to the in-memory list
+  return NextResponse.json(newProduct, { status: 201 });
+}
+
+// PUT method (Update a product by ID)
+export async function PUT(req: Request) {
+  const body = await req.json();
+  const { id, type, variants } = body;
+
+  if (!id || (!type && !variants)) {
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  const product = products.find((p) => p.id === id);
+  if (!product) {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+
+  // Update fields
+  if (type) product.type = type;
+  if (variants) product.variants = variants;
+
+  return NextResponse.json(product, { status: 200 });
+}
+
+// DELETE method (Delete a product by ID)
+export async function DELETE(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const id = parseInt(searchParams.get("id") || "0", 10);
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing required product ID" }, { status: 400 });
+  }
+
+  const productIndex = products.findIndex((p) => p.id === id);
+  if (productIndex === -1) {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+
+  products.splice(productIndex, 1); // Remove the product
+  return NextResponse.json({ message: "Product deleted successfully" }, { status: 200 });
+}
