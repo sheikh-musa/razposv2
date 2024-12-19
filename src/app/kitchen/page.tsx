@@ -25,6 +25,7 @@ export default function Kitchen() {
         completed: boolean;
     };
     const [incompleteOrder, setIncompleteOrder] = useState<Order[]>([]);
+    const [itemSummary, setItemSummary] = useState<Record<string, number>>({});
 
     useEffect(() => {
       fetch("/api/orders")
@@ -33,6 +34,18 @@ export default function Kitchen() {
         // Filter orders that are not completed
         const incompleteOrders = data.filter((order) => !order.completed);
         setIncompleteOrder(incompleteOrders); // Store only incomplete orders
+
+        const summary: Record<string, number> = {};
+        incompleteOrders.forEach((order) => {
+          order.product.forEach((product) => {
+            product.variants.forEach((variant) => {
+              const key = `${product.type} (${variant.name})`;
+              summary[key] = (summary[key] || 0) + variant.orderQuantity;
+            });
+          });
+        });
+
+        setItemSummary(summary);
       })
       }, [])
 
@@ -44,6 +57,16 @@ export default function Kitchen() {
             </div>
             <div className='mt-2 bg-slate-200 pl-4 py-2 rounded-md'>
                 <h3 className='font-semibold'>Summary item count</h3>
+                    <div className='flex'>
+                    {Object.entries(itemSummary).map(([key, count]) => (
+                        <div key={key} className="flex flex-col bg-gray-100 m-2 rounded-md p-2 items-center"> 
+                            <span className='font-semibold'>{key.split(" ")[0]}</span>
+                            <span>{key.split(" ").slice(1).join(" ")}</span>
+                            <span>{count}</span>
+
+                        </div>
+                    ))}
+                </div>
             </div>
             <div className='flex'>
                 {incompleteOrder.map((order) => 
