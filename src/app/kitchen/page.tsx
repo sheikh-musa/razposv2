@@ -38,9 +38,23 @@ export default function Kitchen() {
 
 
     return (
-        <div className="flex h-screen bg-white text-black">
+        <div className="flex flex-col h-screen bg-white text-black">
+            <div>
             <h1 className="text-2xl font-bold ">Kitchen</h1>
-            <pre>{JSON.stringify(incompleteOrder, null, 2)}</pre>
+            </div>
+            <div className='mt-2 bg-slate-200 pl-4 py-2 rounded-md'>
+                <h3 className='font-semibold'>Summary item count</h3>
+            </div>
+            <div className='flex'>
+                {incompleteOrder.map((order) => 
+                    <div key={order.id} className='mr-2 my-5 flex flex-col border-2 p-2 rounded-md'>
+                        <div>
+                            <p className='font-bold'>Order No: #{order.id}</p>
+                        </div>
+                    </div>
+                )}
+            </div>
+                <p>{JSON.stringify(incompleteOrder)}</p>
         </div>
     )
 }

@@ -29,7 +29,7 @@ export default function RootLayout({
       <body>
       <div className="flex h-screen bg-white">
       <Navbar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto m-5">
         {children}
         </div>
       </div>
