@@ -59,7 +59,7 @@ export default function Kitchen() {
                 <h3 className='font-semibold'>Summary item count</h3>
                     <div className='flex overflow-x-auto'>
                     {Object.entries(itemSummary).map(([key, count]) => (
-                        <div key={key} className="flex-shrink-0 flex flex-col bg-gray-100 m-2 rounded-md p-2 items-center w-60"> 
+                        <div key={key} className="flex-shrink-0 flex flex-col bg-gray-100 m-2 rounded-md p-2 items-center min-w-[150px] w-[200px]"> 
                             <span className='font-semibold'>{key.split(" ")[0]}</span>
                             <span>{key.split(" ").slice(1).join(" ")}</span>
                             <span>{count}</span>
