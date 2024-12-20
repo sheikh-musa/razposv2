@@ -80,7 +80,7 @@ const orders: Order[] = [
       date: "2024-12-19",
       time: "15:00:00",
       paymentBy: "Credit Card",
-      completed: true,
+      completed: false,
     },
     {
       id: 4,
