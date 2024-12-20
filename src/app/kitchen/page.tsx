@@ -55,11 +55,11 @@ export default function Kitchen() {
             <div>
             <h1 className="text-2xl font-bold ">Kitchen</h1>
             </div>
-            <div className='mt-2 bg-slate-200 pl-4 py-2 rounded-md'>
+            <div className='mt-2 bg-slate-100 pl-4 py-2 rounded-md shadow-lg'>
                 <h3 className='font-semibold'>Summary item count</h3>
                     <div className='flex overflow-x-auto'>
                     {Object.entries(itemSummary).map(([key, count]) => (
-                        <div key={key} className="flex-shrink-0 flex flex-col bg-gray-100 m-2 rounded-md p-2 items-center min-w-[150px] w-[200px]"> 
+                        <div key={key} className="shadow-lg flex-shrink-0 flex flex-col bg-slate-50 m-2 rounded-md p-2 items-center min-w-[150px] w-[200px]"> 
                             <span className='font-semibold'>{key.split(" ")[0]}</span>
                             <span>{key.split(" ").slice(1).join(" ")}</span>
                             <span>{count}</span>
@@ -69,7 +69,7 @@ export default function Kitchen() {
             </div>
             <div className='flex'>
                 {incompleteOrder.map((order) => 
-                    <div key={order.id} className='mr-2 my-5 flex flex-col border-2 p-2 rounded-md'>
+                    <div key={order.id} className='shadow-lg bg-slate-100 mr-2 my-5 flex flex-col border-2 p-2 rounded-md'>
                         <div>
                             <p className='font-bold'>Order No: #{order.id}</p>
                         </div>
