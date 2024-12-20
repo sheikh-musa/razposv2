@@ -51,7 +51,7 @@ export default function Kitchen() {
 
 
     return (
-        <div className="flex flex-col h-screen bg-white text-black">
+        <div className="flex flex-col h-screen bg-white text-black font-sans">
             <div>
             <h1 className="text-2xl font-bold ">Kitchen</h1>
             </div>
@@ -69,9 +69,14 @@ export default function Kitchen() {
             </div>
             <div className='flex'>
                 {incompleteOrder.map((order) => 
-                    <div key={order.id} className='shadow-lg bg-slate-100 mr-2 my-5 flex flex-col border-2 p-2 rounded-md'>
+                    <div key={order.id} className='shadow-lg bg-slate-100 mr-2 my-5 flex flex-col border-2 p-4 rounded-md'>
                         <div>
-                            <p className='font-bold'>Order No: #{order.id}</p>
+                            <p className='font-bold text-xl'>Order No: #{order.id}</p>
+                            <p className='text-xs my-2 font-bold'>Order placed <span className='text-slate-500'>{order.time}</span></p>
+                        </div>
+                        <div className='flex flex-col'>
+                            <button type="button" className="focus:outline-none text-white bg-green-700 hover:bg-green-800 text-xs rounded-lg px-5 py-2.5 me-2 my-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Payment received</button>
+                            
                         </div>
                     </div>
                 )}
