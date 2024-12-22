@@ -64,7 +64,7 @@ const orders: Order[] = [
       date: "2024-12-18",
       time: "12:30:00",
       paymentBy: "Cash",
-      completed: true,
+      completed: false,
       remarks: "more chilli",
     },
     {

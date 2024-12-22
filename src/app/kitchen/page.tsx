@@ -69,9 +69,9 @@ export default function Kitchen() {
                     ))}
                 </div>
             </div>
-            <div className='flex'>
+            <div className='flex overflow-x-auto'>
                 {incompleteOrder.map((order) => 
-                    <div key={order.id} className='shadow-lg bg-slate-100 mr-2 my-5 flex flex-col border-2 p-4 rounded-md min-w-[300px]'>
+                    <div key={order.id} className='shadow-lg bg-slate-100 mr-2 my-5 flex flex-col border-2 p-4 rounded-md min-w-[300px] overflow-y-auto'>
                         <div className='border-b pb-3'>
                             <p className='font-bold text-xl'>Order No: #{order.id}</p>
                             <p className='text-sm my-2'>Order placed <span className='text-slate-500'>{order.time}</span></p>
@@ -116,7 +116,7 @@ export default function Kitchen() {
                     </div>
                 )}
             </div>
-                <p>{JSON.stringify(incompleteOrder)}</p>
+                {/* <p>{JSON.stringify(incompleteOrder)}</p> */}
         </div>
     )
 }
