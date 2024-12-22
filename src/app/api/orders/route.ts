@@ -20,6 +20,7 @@ type Order = {
     time: string; // Format: HH:mm:ss
     paymentBy: string;
     completed: boolean;
+    remarks: string;
 };
 
 const orders: Order[] = [
@@ -46,6 +47,7 @@ const orders: Order[] = [
       time: "10:30:00",
       paymentBy: "Paynow",
       completed: true,
+      remarks: "more chilli",
     },
     {
       id: 2,
@@ -63,6 +65,7 @@ const orders: Order[] = [
       time: "12:30:00",
       paymentBy: "Cash",
       completed: true,
+      remarks: "more chilli",
     },
     {
       id: 3,
@@ -81,6 +84,7 @@ const orders: Order[] = [
       time: "15:00:00",
       paymentBy: "Credit Card",
       completed: false,
+      remarks: "",
     },
     {
       id: 4,
@@ -105,6 +109,7 @@ const orders: Order[] = [
       time: "14:00:00",
       paymentBy: "Cash",
       completed: false,
+      remarks: "more chilli",
     },
     {
       id: 5,
@@ -122,6 +127,7 @@ const orders: Order[] = [
       time: "09:30:00",
       paymentBy: "Paynow",
       completed: false,
+      remarks: "none",
     },
   ];
   

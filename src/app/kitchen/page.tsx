@@ -24,6 +24,7 @@ export default function Kitchen() {
         time: string; // Format: HH:mm:ss
         completed: boolean;
         paymentBy: string;
+        remarks: string;
     };
     const [incompleteOrder, setIncompleteOrder] = useState<Order[]>([]);
     const [itemSummary, setItemSummary] = useState<Record<string, number>>({});
@@ -110,7 +111,7 @@ export default function Kitchen() {
                         </div>
                         <div className='pt-3 border-t'>
                             <p className='text-red-500 font-medium'>Remarks:</p>
-                            <p className='text-slate-600'>More gravy</p>
+                            <p className='text-slate-600'>{order.remarks}</p>
                         </div>
                     </div>
                 )}
