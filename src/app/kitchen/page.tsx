@@ -18,6 +18,7 @@ export default function Kitchen() {
     type Order = {
         id: number;
         itemsType: number;
+        variantType: number,
         product: Product[];
         totalPrice: number;
         date: string; // Format: YYYY-MM-DD
@@ -69,27 +70,28 @@ export default function Kitchen() {
                     ))}
                 </div>
             </div>
-            <div className='flex overflow-x-auto'>
+            <div className='flex overflow-x-auto mt-2 h-2/3'>
                 {incompleteOrder.map((order) => 
-                    <div key={order.id} className='shadow-lg bg-slate-100 mr-2 my-5 flex flex-col border-2 p-4 rounded-md min-w-[300px] overflow-y-auto'>
+                    <div key={order.id} className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[300px] overflow-y-auto'>
                         <div className='border-b pb-3'>
                             <p className='font-bold text-xl'>Order No: #{order.id}</p>
                             <p className='text-sm my-2'>Order placed <span className='text-slate-500'>{order.time}</span></p>
                             <div className='flex gap-2 mt-4'>
-                            <button className='px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600'>
+                            <button className='text-sm px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600'>
                                 Payment Received
                             </button>
-                            <button className='px-4 py-2 bg-slate-200 rounded-md hover:bg-slate-300'>
+                            <button className='text-sm px-4 py-2 bg-slate-200 rounded-md hover:bg-slate-300'>
                                 {order.paymentBy}
                             </button>
                         </div>
                         </div>
-                        <div className='py-3 border-b'>
+                        <div className='py-3 border-b text-sm'>
                             {/* <p>Order No: <span className='font-medium'>#{order.id}</span></p> */}
-                            <p>Total: <span className='font-medium'>${order.totalPrice.toFixed(2)}</span></p>
+                            <p className='font-medium'>Total: <span className='font-light'>${order.totalPrice.toFixed(2)}</span></p>
+                            <p className='font-medium'>Items: <span className='font-light'>{order.variantType}</span></p>
                         </div>
                         <div className='py-3'>
-                            <p className='font-bold mb-3'>Remaining food to be cook</p>
+                            <p className='font-bold mb-3'>Remaining order:</p>
                             {order.product.map((product) =>
                                 product.variants.map((variant, idx) => (
                                     <div key={idx} className='flex items-center justify-between mb-2'>

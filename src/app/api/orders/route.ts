@@ -14,6 +14,7 @@ type Product = {
 type Order = {
     id: number;
     itemsType: number;
+    variantType: number;
     product: Product[];
     totalPrice: number;
     date: string; // Format: YYYY-MM-DD
@@ -27,6 +28,7 @@ const orders: Order[] = [
     {
       id: 1,
       itemsType: 2,
+      variantType: 3,
       product: [
         {
           type: "Croissant",
@@ -52,6 +54,7 @@ const orders: Order[] = [
     {
       id: 2,
       itemsType: 1,
+      variantType: 1,
       product: [
         {
           type: "Pastries",
@@ -69,7 +72,8 @@ const orders: Order[] = [
     },
     {
       id: 3,
-      itemsType: 3,
+      itemsType: 2,
+      variantType: 2,
       product: [
         {
           type: "Bagels",
@@ -88,7 +92,8 @@ const orders: Order[] = [
     },
     {
       id: 4,
-      itemsType: 2,
+      itemsType: 3,
+      variantType: 5,
       product: [
         {
           type: "Muffins",
@@ -103,6 +108,13 @@ const orders: Order[] = [
             { name: "Peanut Butter", price: 2.5, productId: 3, orderQuantity: 6 },
           ],
         },
+        {
+          type: "Bagels",
+          variants: [
+            { name: "Blueberry", price: 4, productId: 1, orderQuantity: 4 },
+            { name: "Sesame", price: 4.5, productId: 3, orderQuantity: 3 },
+          ],
+        },
       ],
       totalPrice: 42.5,
       date: "2024-12-20",
@@ -114,6 +126,7 @@ const orders: Order[] = [
     {
       id: 5,
       itemsType: 1,
+      variantType: 1,
       product: [
         {
           type: "Donut",
