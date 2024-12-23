@@ -72,6 +72,66 @@ export default function Kitchen() {
         });
     };
 
+    const handleAddQty = (orderId: number, variantId: number) => {
+        setIncompleteOrder(prevOrders => 
+            prevOrders.map(order => {
+                if (order.id === orderId) {
+                    return {
+                        ...order,
+                        product: order.product.map(product => ({
+                            ...product,
+                            variants: product.variants.map(variant => 
+                                variant.productId === variantId
+                                    ? { ...variant, orderQuantity: variant.orderQuantity + 1 }
+                                    : variant
+                            )
+                        }))
+                    };
+                }
+                return order;
+            })
+        );
+
+        // Optional: Update the backend
+        fetch(`/api/orders/${orderId}/variant/${variantId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ increment: 1 }),
+        });
+    };
+
+    const handleMinusQty = (orderId: number, variantId: number) => {
+        setIncompleteOrder(prevOrders => 
+            prevOrders.map(order => {
+                if (order.id === orderId) {
+                    return {
+                        ...order,
+                        product: order.product.map(product => ({
+                            ...product,
+                            variants: product.variants.map(variant => 
+                                variant.productId === variantId && variant.orderQuantity > 0
+                                    ? { ...variant, orderQuantity: variant.orderQuantity - 1 }
+                                    : variant
+                            )
+                        }))
+                    };
+                }
+                return order;
+            })
+        );
+
+        // Optional: Update the backend
+        fetch(`/api/orders/${orderId}/variant/${variantId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ increment: -1 }),
+        });
+    };
+
     return (
         <div className="flex flex-col h-screen bg-white text-black font-sans">
             <div>
@@ -134,9 +194,20 @@ export default function Kitchen() {
                                             </div>
                                         </div>
                                         <div className='flex items-center gap-2'>
-                                            <button className='w-8 h-8 bg-slate-200 rounded-md'>-</button>
+                                            <button
+                                                onClick={() => handleMinusQty(order.id, variant.productId)} 
+                                                className='w-8 h-8 bg-slate-200 rounded-md disabled:opacity-50'
+                                                disabled={variant.orderQuantity <= 0}
+                                            >
+                                                -
+                                            </button>
                                             <span className='w-8 text-center'>{variant.orderQuantity}</span>
-                                            <button className='w-8 h-8 bg-slate-200 rounded-md'>+</button>
+                                            <button 
+                                                onClick={() => handleAddQty(order.id, variant.productId)}
+                                                className='w-8 h-8 bg-slate-200 rounded-md'
+                                            >
+                                                +
+                                            </button>
                                         </div>
                                     </div>
                                 ))
@@ -149,7 +220,7 @@ export default function Kitchen() {
                     </div>
                 )}
             </div>
-                {/* <p>{JSON.stringify(incompleteOrder)}</p> */}
+                <p>{JSON.stringify(incompleteOrder)}</p>
         </div>
     )
 }
