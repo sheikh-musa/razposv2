@@ -20,6 +20,7 @@ type Order = {
     date: string; // Format: YYYY-MM-DD
     time: string; // Format: HH:mm:ss
     paymentBy: string;
+    paymentReceived: boolean;
     completed: boolean;
     remarks: string;
 };
@@ -48,6 +49,7 @@ const orders: Order[] = [
       date: "2024-12-16",
       time: "10:30:00",
       paymentBy: "Paynow",
+      paymentReceived: true,
       completed: true,
       remarks: "more chilli",
     },
@@ -67,6 +69,7 @@ const orders: Order[] = [
       date: "2024-12-18",
       time: "12:30:00",
       paymentBy: "Cash",
+      paymentReceived: true,
       completed: false,
       remarks: "more chilli",
     },
@@ -87,6 +90,7 @@ const orders: Order[] = [
       date: "2024-12-19",
       time: "15:00:00",
       paymentBy: "Credit Card",
+      paymentReceived: true,
       completed: false,
       remarks: "",
     },
@@ -120,6 +124,7 @@ const orders: Order[] = [
       date: "2024-12-20",
       time: "14:00:00",
       paymentBy: "Cash",
+      paymentReceived: false,
       completed: false,
       remarks: "more chilli",
     },
@@ -139,6 +144,7 @@ const orders: Order[] = [
       date: "2024-12-21",
       time: "09:30:00",
       paymentBy: "Paynow",
+      paymentReceived: true,
       completed: false,
       remarks: "none",
     },

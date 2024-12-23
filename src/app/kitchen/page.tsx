@@ -25,6 +25,7 @@ export default function Kitchen() {
         time: string; // Format: HH:mm:ss
         completed: boolean;
         paymentBy: string;
+        paymentReceived: boolean,
         remarks: string;
     };
     const [incompleteOrder, setIncompleteOrder] = useState<Order[]>([]);
@@ -52,6 +53,24 @@ export default function Kitchen() {
       })
       }, [])
 
+    const handlePaymentToggle = (orderId: number, paymentReceived: boolean) => {
+        setIncompleteOrder(prevOrders => 
+            prevOrders.map(order => 
+                order.id === orderId 
+                    ? { ...order, paymentReceived: paymentReceived }
+                    : order
+            )
+        );
+
+        // Optional: Update the backend
+        fetch(`/api/orders/${orderId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ paymentReceived }),
+        });
+    };
 
     return (
         <div className="flex flex-col h-screen bg-white text-black font-sans">
@@ -77,13 +96,25 @@ export default function Kitchen() {
                             <p className='font-bold text-xl'>Order No: #{order.id}</p>
                             <p className='text-sm my-2'>Order placed <span className='text-slate-500'>{order.time}</span></p>
                             <div className='flex gap-2 mt-4'>
-                            <button className='text-sm px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600'>
-                                Payment Received
-                            </button>
-                            <button className='text-sm px-4 py-2 bg-slate-200 rounded-md hover:bg-slate-300'>
-                                {order.paymentBy}
-                            </button>
-                        </div>
+                                {order.paymentReceived ? (
+                                    <button 
+                                        onClick={() => handlePaymentToggle(order.id, false)}
+                                        className='text-sm px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600'
+                                    >
+                                        Payment Received
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={() => handlePaymentToggle(order.id, true)}
+                                        className='text-sm px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600'
+                                    >
+                                        Payment Pending
+                                    </button>
+                                )}
+                                <button className='text-sm px-4 py-2 bg-slate-200 rounded-md hover:bg-slate-300'>
+                                    {order.paymentBy}
+                                </button>
+                            </div>
                         </div>
                         <div className='py-3 border-b text-sm'>
                             {/* <p>Order No: <span className='font-medium'>#{order.id}</span></p> */}
