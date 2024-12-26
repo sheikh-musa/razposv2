@@ -24,6 +24,9 @@ export default function Inventory() {
           .then((data) => setProducts(data));
     }, []);
 
+    const handleDelete = (productId: number, variant: number) => {
+
+    } 
     return (
         <div className="p-6 bg-white min-h-screen">
             <div className="flex justify-between items-center mb-6">
@@ -127,7 +130,7 @@ export default function Inventory() {
                     <tbody>
                         {products.map((product) => 
                             product.variants.map((variant) => (
-                                <tr key={`${product.id}-${variant.id}`} className="border-b hover:bg-gray-50">
+                                <tr key={`${product.id}-${variant.id}`} className="border-b hover:bg-gray-50 text-sm">
                                     <td className="px-6 py-4">
                                         <input type="checkbox" className="rounded" />
                                     </td>
@@ -138,7 +141,10 @@ export default function Inventory() {
                                     <td className="px-6 py-4">${variant.price.toFixed(2)}</td>
                                     <td className="px-6 py-4">
                                         <div className="flex gap-2">
-                                            <button className="text-gray-500 hover:text-gray-700">
+                                            <button 
+                                                onClick={() => handleDelete(product.id, variant.id)}
+                                                className="text-gray-500 hover:text-gray-700"
+                                            >
                                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
