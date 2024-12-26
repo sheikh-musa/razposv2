@@ -193,17 +193,17 @@ export default function Kitchen() {
         );
 
         // Optional: Update the backend
-        fetch(`/api/orders/${orderId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                variantType: checked ? -1 : 1,
-                orderQuantity: 0,
-                completed: checked 
-            }),
-        });
+        // fetch(`/api/orders/${orderId}`, {
+        //     method: 'PATCH',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ 
+        //         variantType: checked ? -1 : 1,
+        //         orderQuantity: 0,
+        //         completed: checked 
+        //     }),
+        // });
     };
 
     return (
@@ -225,7 +225,7 @@ export default function Kitchen() {
             </div>
             <div className='flex overflow-x-auto mt-2 h-2/3'>
                 {incompleteOrder.map((order) => 
-                    <div key={order.id} className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[300px] overflow-y-auto'>
+                    <div key={order.id} className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[320px] overflow-y-auto'>
                         <div className='border-b pb-3'>
                             <p className='font-bold text-xl'>Order No: #{order.id}</p>
                             <p className='text-sm my-2'>Order placed <span className='text-slate-500'>{order.time}</span></p>
