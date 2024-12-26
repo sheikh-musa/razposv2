@@ -61,7 +61,7 @@ const orders: Order[] = [
         {
           type: "Pastries",
           variants: [
-            { name: "Chicken ham and cheese", price: 5.5, productId: 1, orderQuantity: 3 },
+            { name: "Chicken ham & cheese", price: 5.5, productId: 1, orderQuantity: 3 },
           ],
         },
       ],

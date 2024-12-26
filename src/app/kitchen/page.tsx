@@ -30,6 +30,9 @@ export default function Kitchen() {
     };
     const [incompleteOrder, setIncompleteOrder] = useState<Order[]>([]);
     const [itemSummary, setItemSummary] = useState<Record<string, number>>({});
+    const [isDropdownOpen, setIsDropdownOpen] = useState<Record<number, boolean>>({});
+
+    const paymentOptions = ["Cash", "Paynow", "Credit Card"];
 
     useEffect(() => {
       fetch("/api/orders")
@@ -93,13 +96,13 @@ export default function Kitchen() {
         );
 
         // Optional: Update the backend
-        fetch(`/api/orders/${orderId}/variant/${variantId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ increment: 1 }),
-        });
+        // fetch(`/api/orders/${orderId}/variant/${variantId}`, {
+        //     method: 'PATCH',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ increment: 1 }),
+        // });
     };
 
     const handleMinusQty = (orderId: number, variantId: number) => {
@@ -123,12 +126,32 @@ export default function Kitchen() {
         );
 
         // Optional: Update the backend
-        fetch(`/api/orders/${orderId}/variant/${variantId}`, {
+        // fetch(`/api/orders/${orderId}/variant/${variantId}`, {
+        //     method: 'PATCH',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ increment: -1 }),
+        // });
+    };
+
+    const handlePaymentMethodChange = (orderId: number, paymentMethod: string) => {
+        setIncompleteOrder(prevOrders => 
+            prevOrders.map(order => 
+                order.id === orderId 
+                    ? { ...order, paymentBy: paymentMethod }
+                    : order
+            )
+        );
+        setIsDropdownOpen(prev => ({...prev, [orderId]: false}));
+
+        // Optional: Update the backend
+        fetch(`/api/orders/${orderId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ increment: -1 }),
+            body: JSON.stringify({ paymentBy: paymentMethod }),
         });
     };
 
@@ -159,21 +182,42 @@ export default function Kitchen() {
                                 {order.paymentReceived ? (
                                     <button 
                                         onClick={() => handlePaymentToggle(order.id, false)}
-                                        className='text-sm px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600'
+                                        className='text-xs px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600'
                                     >
                                         Payment Received
                                     </button>
                                 ) : (
                                     <button 
                                         onClick={() => handlePaymentToggle(order.id, true)}
-                                        className='text-sm px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600'
+                                        className='text-xs px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600'
                                     >
                                         Payment Pending
                                     </button>
                                 )}
-                                <button className='text-sm px-4 py-2 bg-slate-200 rounded-md hover:bg-slate-300'>
-                                    {order.paymentBy}
-                                </button>
+                                <div className="relative">
+                                    <button 
+                                        onClick={() => setIsDropdownOpen(prev => ({...prev, [order.id]: !prev[order.id]}))}
+                                        className='text-xs px-4 py-2 bg-slate-200 rounded-md hover:bg-slate-300 flex items-center gap-2'
+                                    >
+                                        {order.paymentBy}
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                    {isDropdownOpen[order.id] && (
+                                        <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg">
+                                            {paymentOptions.map((option) => (
+                                                <button
+                                                    key={option}
+                                                    onClick={() => handlePaymentMethodChange(order.id, option)}
+                                                    className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-slate-100 first:rounded-t-md last:rounded-b-md"
+                                                >
+                                                    {option}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         <div className='py-3 border-b text-sm'>
