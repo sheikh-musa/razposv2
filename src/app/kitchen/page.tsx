@@ -31,6 +31,7 @@ export default function Kitchen() {
     const [incompleteOrder, setIncompleteOrder] = useState<Order[]>([]);
     const [itemSummary, setItemSummary] = useState<Record<string, number>>({});
     const [isDropdownOpen, setIsDropdownOpen] = useState<Record<number, boolean>>({});
+    const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
 
     const paymentOptions = ["Cash", "Paynow", "Credit Card"];
 
@@ -155,6 +156,56 @@ export default function Kitchen() {
         });
     };
 
+    const handleCheckboxChange = (orderId: number, variantId: number, checked: boolean) => {
+        const key = `${orderId}-${variantId}`;
+        setCompletedItems(prev => ({...prev, [key]: checked}));
+        
+        setIncompleteOrder(prevOrders => 
+            prevOrders.map(order => {
+                if (order.id === orderId) {
+                    // Find current quantity before updating
+                    const currentVariant = order.product
+                        .flatMap(p => p.variants)
+                        .find(v => v.productId === variantId);
+                    
+                    const quantityToSubtract = currentVariant?.orderQuantity || 0;
+
+                    return {
+                        ...order,
+                        variantType: checked 
+                            ? order.variantType - 1 
+                            : order.variantType + 1,
+                        product: order.product.map(product => ({
+                            ...product,
+                            variants: product.variants.map(variant => 
+                                variant.productId === variantId
+                                    ? { 
+                                        ...variant, 
+                                        orderQuantity: checked ? 0 : variant.orderQuantity 
+                                      }
+                                    : variant
+                            )
+                        }))
+                    };
+                }
+                return order;
+            })
+        );
+
+        // Optional: Update the backend
+        fetch(`/api/orders/${orderId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                variantType: checked ? -1 : 1,
+                orderQuantity: 0,
+                completed: checked 
+            }),
+        });
+    };
+
     return (
         <div className="flex flex-col h-screen bg-white text-black font-sans">
             <div>
@@ -231,8 +282,13 @@ export default function Kitchen() {
                                 product.variants.map((variant, idx) => (
                                     <div key={idx} className='flex items-center justify-between mb-2'>
                                         <div className='flex items-center gap-3'>
-                                            <input type="checkbox" className='w-4 h-4' />
-                                            <div>
+                                            <input 
+                                                type="checkbox" 
+                                                className='w-4 h-4'
+                                                checked={completedItems[`${order.id}-${variant.productId}`]}
+                                                onChange={(e) => handleCheckboxChange(order.id, variant.productId, e.target.checked)}
+                                            />
+                                            <div className={completedItems[`${order.id}-${variant.productId}`] ? 'line-through text-gray-400' : ''}>
                                                 <p className='font-medium'>{product.type}</p>
                                                 <p className='text-slate-600'>{variant.name}</p>
                                             </div>
@@ -241,14 +297,15 @@ export default function Kitchen() {
                                             <button
                                                 onClick={() => handleMinusQty(order.id, variant.productId)} 
                                                 className='w-8 h-8 bg-slate-200 rounded-md disabled:opacity-50'
-                                                disabled={variant.orderQuantity <= 0}
+                                                disabled={variant.orderQuantity <= 0 || completedItems[`${order.id}-${variant.productId}`]}
                                             >
                                                 -
                                             </button>
                                             <span className='w-8 text-center'>{variant.orderQuantity}</span>
                                             <button 
                                                 onClick={() => handleAddQty(order.id, variant.productId)}
-                                                className='w-8 h-8 bg-slate-200 rounded-md'
+                                                className='w-8 h-8 bg-slate-200 rounded-md disabled:opacity-50'
+                                                disabled={completedItems[`${order.id}-${variant.productId}`]}
                                             >
                                                 +
                                             </button>
@@ -264,7 +321,7 @@ export default function Kitchen() {
                     </div>
                 )}
             </div>
-                <p>{JSON.stringify(incompleteOrder)}</p>
+                {/* <p>{JSON.stringify(incompleteOrder)}</p> */}
         </div>
     )
 }

@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 
 // Define types
 type Variant = {
+    productId: number;
     name: string;
     price: number;
-    productId: number;
     orderQuantity: number;
 };
 type Product = {
@@ -34,14 +34,14 @@ const orders: Order[] = [
         {
           type: "Croissant",
           variants: [
-            { name: "Chocolate", price: 5, productId: 1, orderQuantity: 3 },
-            { name: "Plain", price: 3, productId: 2, orderQuantity: 2 },
+            {  productId: 1, name: "Chocolate", price: 5, orderQuantity: 3 },
+            { productId: 2, name: "Plain", price: 3, orderQuantity: 2 },
           ],
         },
         {
           type: "Donut",
           variants: [
-            { name: "Plain", price: 3, productId: 3, orderQuantity: 5 },
+            { productId: 3, name: "Plain", price: 3, orderQuantity: 5 },
           ],
         },
       ],
@@ -61,7 +61,7 @@ const orders: Order[] = [
         {
           type: "Pastries",
           variants: [
-            { name: "Chicken ham & cheese", price: 5.5, productId: 1, orderQuantity: 3 },
+            { productId: 1, name: "Chicken ham & cheese", price: 5.5, orderQuantity: 3 },
           ],
         },
       ],
@@ -81,8 +81,8 @@ const orders: Order[] = [
         {
           type: "Bagels",
           variants: [
-            { name: "Blueberry", price: 4, productId: 1, orderQuantity: 4 },
-            { name: "Sesame", price: 4.5, productId: 3, orderQuantity: 3 },
+            { productId: 1, name: "Blueberry", price: 4, orderQuantity: 4 },
+            { productId: 2, name: "Sesame", price: 4.5, orderQuantity: 3 },
           ],
         },
       ],
@@ -102,21 +102,21 @@ const orders: Order[] = [
         {
           type: "Muffins",
           variants: [
-            { name: "Chocolate Chip", price: 4, productId: 1, orderQuantity: 5 },
-            { name: "Banana Walnut", price: 4.5, productId: 2, orderQuantity: 3 },
+            { productId: 1, name: "Chocolate Chip", price: 4, orderQuantity: 5 },
+            { productId: 2, name: "Banana Walnut", price: 4.5, orderQuantity: 3 },
           ],
         },
         {
           type: "Cookies",
           variants: [
-            { name: "Peanut Butter", price: 2.5, productId: 3, orderQuantity: 6 },
+            { productId: 3, name: "Peanut Butter", price: 2.5, orderQuantity: 6 },
           ],
         },
         {
           type: "Bagels",
           variants: [
-            { name: "Blueberry", price: 4, productId: 1, orderQuantity: 4 },
-            { name: "Sesame", price: 4.5, productId: 3, orderQuantity: 3 },
+            {  productId: 4, name: "Blueberry", price: 4, orderQuantity: 4 },
+            { productId: 5, name: "Sesame", price: 4.5, orderQuantity: 3 },
           ],
         },
       ],
@@ -136,7 +136,7 @@ const orders: Order[] = [
         {
           type: "Donut",
           variants: [
-            { name: "Strawberry", price: 5, productId: 2, orderQuantity: 6 },
+            {  productId: 1, name: "Strawberry", price: 5, orderQuantity: 6 },
           ],
         },
       ],
