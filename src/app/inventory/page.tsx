@@ -19,6 +19,7 @@ export default function Inventory() {
     const [showOptions, setShowOptions] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [productToDelete, setProductToDelete] = useState<{productId: number, variantId: number} | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetch("/api/products")
@@ -47,14 +48,21 @@ export default function Inventory() {
             );
 
             // Optional: Update the backend
-            fetch(`/api/products/${productToDelete.productId}/variants/${productToDelete.variantId}`, {
-                method: 'DELETE',
-            });
+            // fetch(`/api/products/${productToDelete.productId}/variants/${productToDelete.variantId}`, {
+            //     method: 'DELETE',
+            // });
 
             setShowDeleteModal(false);
             setProductToDelete(null);
         }
     };
+
+    const filteredProducts = products.map(product => ({
+        ...product,
+        variants: product.variants.filter(variant => 
+            `${product.type} - ${variant.name}`.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    })).filter(product => product.variants.length > 0);
 
     return (
         <div className="p-6 bg-white min-h-screen">
@@ -66,6 +74,8 @@ export default function Inventory() {
                         <input 
                             type="text" 
                             placeholder="Search..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             className="pl-10 pr-4 py-2 border text-black rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
                         />
                         <div className="absolute left-3 top-1/2 -translate-y-1/2">
@@ -157,7 +167,7 @@ export default function Inventory() {
                         </tr>
                     </thead>
                     <tbody>
-                        {products.map((product) => 
+                        {filteredProducts.map((product) => 
                             product.variants.map((variant) => (
                                 <tr key={`${product.id}-${variant.id}`} className="border-b hover:bg-gray-50 text-sm">
                                     <td className="px-6 py-4">
