@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation';
 
 type Variant = {
     id: number;
@@ -15,6 +16,7 @@ type Product = {
 };
   
 export default function Inventory() {
+    const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
     const [showOptions, setShowOptions] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -94,7 +96,10 @@ export default function Inventory() {
                     </button>
 
                     {/* Add Inventory Button */}
-                    <button className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-600">
+                    <button 
+                        onClick={() => router.push('/inventory/add')}
+                        className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-600"
+                    >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                         </svg>
