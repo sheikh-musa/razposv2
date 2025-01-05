@@ -30,7 +30,37 @@ export default function AddInventory() {
     };
 
     const handleSubmit = async () => {
-        // Add your submit logic here
+        // Check if item name is empty
+        if (!itemName.trim()) {
+            toast.error('Please enter an item name', {
+                duration: 3000,
+                position: 'top-center',
+                style: {
+                    background: '#F44336',
+                    color: '#fff',
+                }
+            });
+            return;
+        }
+
+        // Check if at least one variant has a name
+        const hasVariantName = variants.some(variant => variant.name.trim() !== '');
+        if (!hasVariantName) {
+            toast.error('Please add at least one variant name', {
+                duration: 3000,
+                position: 'top-center',
+                style: {
+                    background: '#F44336',
+                    color: '#fff',
+                }
+            });
+            return;
+        }
+
+        // Filter out variants with empty names before submission
+        const validVariants = variants.filter(variant => variant.name.trim() !== '');
+
+        // Add your submit logic here with validVariants
         // After successful submission:
         router.push('/inventory');
     };
