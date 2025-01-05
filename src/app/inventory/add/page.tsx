@@ -27,14 +27,14 @@ export default function AddInventory() {
             
             <div className="max-w-2xl">
                 <div className="mb-6">
-                    <label className="block text-sm text-gray-700 mb-2">
+                    <label className="block text-sm text-gray-700 mb-2 ">
                         Item name <span className="text-red-500">*</span>
                     </label>
                     <input 
                         type="text"
                         value={itemName}
                         onChange={(e) => setItemName(e.target.value)}
-                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 border-slate-400"
                         placeholder="Enter item name"
                     />
                 </div>
@@ -70,15 +70,15 @@ export default function AddInventory() {
                                         newVariants[index].name = e.target.value;
                                         setVariants(newVariants);
                                     }}
-                                    className="w-full p-2 border rounded-md"
+                                    className="w-full p-2 border rounded-md border-slate-400"
                                     placeholder="Variation name"
                                 />
                             </div>
                             
                             <div className="w-40">
-                                <div className="flex border rounded-md">
+                                <div className="flex border rounded-md border-slate-400">
                                     <button 
-                                        className="px-3 py-2 border-r"
+                                        className="px-3 py-2 border-r border-slate-400"
                                         onClick={() => {
                                             const newVariants = [...variants];
                                             newVariants[index].inventory = Math.max(0, variant.inventory - 1);
@@ -95,11 +95,11 @@ export default function AddInventory() {
                                             newVariants[index].inventory = Math.max(0, parseInt(e.target.value) || 0);
                                             setVariants(newVariants);
                                         }}
-                                        className="w-full p-2 text-center"
+                                        className="w-full p-2 text-center text-black"
                                         placeholder="0"
                                     />
                                     <button 
-                                        className="px-3 py-2 border-l"
+                                        className="px-3 py-2 border-l border-slate-400"
                                         onClick={() => {
                                             const newVariants = [...variants];
                                             newVariants[index].inventory = variant.inventory + 1;
@@ -112,9 +112,9 @@ export default function AddInventory() {
                             </div>
 
                             <div className="w-40">
-                                <div className="flex border rounded-md">
+                                <div className="flex border rounded-md border-slate-400">
                                     <button 
-                                        className="px-3 py-2 border-r"
+                                        className="px-3 py-2 border-r border-slate-400"
                                         onClick={() => {
                                             const newVariants = [...variants];
                                             newVariants[index].price = Math.max(0, variant.price - 1);
@@ -131,11 +131,11 @@ export default function AddInventory() {
                                             newVariants[index].price = Math.max(0, parseFloat(e.target.value) || 0);
                                             setVariants(newVariants);
                                         }}
-                                        className="w-full p-2 text-center"
+                                        className="w-full p-2 text-center text-black"
                                         placeholder="0"
                                     />
                                     <button 
-                                        className="px-3 py-2 border-l"
+                                        className="px-3 py-2 border-l border-slate-400"
                                         onClick={() => {
                                             const newVariants = [...variants];
                                             newVariants[index].price = variant.price + 1;
@@ -148,7 +148,7 @@ export default function AddInventory() {
                             </div>
                             <button 
                                 onClick={handleAddVariant}
-                                className="text-black text-sm px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                                className="text-black text-sm px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 border-slate-400"
                             >
                                 Add variant
                             </button>
@@ -157,11 +157,11 @@ export default function AddInventory() {
                     
                     
                 </div>
-                
+                <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-300"></hr>
                 <div className="flex justify-end gap-4">
                     <button 
                         onClick={handleCancel}
-                        className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                        className="px-4 py-2 border border-black rounded-md hover:bg-gray-50 text-black"
                     >
                         Cancel
                     </button>
