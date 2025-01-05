@@ -56,6 +56,7 @@ export default function AddInventory() {
                                 Price ($) SGD
                             </label>
                         </div>
+                        <div className="w-[104px]"></div>
                     </div>
 
                     {variants.map((variant, index) => (
@@ -145,17 +146,18 @@ export default function AddInventory() {
                                     </button>
                                 </div>
                             </div>
+                            <button 
+                                onClick={handleAddVariant}
+                                className="text-black text-sm px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                            >
+                                Add variant
+                            </button>
                         </div>
                     ))}
                     
-                    <button 
-                        onClick={handleAddVariant}
-                        className="text-sm px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                    >
-                        Add variant
-                    </button>
+                    
                 </div>
-
+                
                 <div className="flex justify-end gap-4">
                     <button 
                         onClick={handleCancel}
