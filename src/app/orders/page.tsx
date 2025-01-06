@@ -99,8 +99,8 @@ export default function Orders() {
       {/* Product Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {products.map((product) => (
-          <div key={product.id} className="bg-white p-6 rounded-lg shadow-sm text-black border-solid border mb-2 ">
-            <h2 className="text-xl font-semibold mb-4">{product.type}</h2>
+          <div key={product.id} className="bg-white p-3 rounded-lg shadow-sm text-black border-solid border mb-2 ">
+            <h2 className="text-md text-gray-500 font-semibold mb-4">{product.type}</h2>
             <div className="space-y-4">
               {product.variants.map((variant) => (
                 <div key={variant.id} className="flex items-center gap-4">
@@ -115,7 +115,7 @@ export default function Orders() {
                     />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-medium">{variant.name}</h3>
+                    <h3 className="font-semibold">{variant.name}</h3>
                     <p className="text-gray-600">${variant.price.toFixed(2)}</p>
                     <div className="flex items-center gap-2 mt-2">
                       <div className="flex items-center border rounded-md">
