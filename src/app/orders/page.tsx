@@ -54,7 +54,7 @@ export default function Orders() {
   };
 
   return (
-    <div className="min-h-screen text-black">
+    <div className="min-h-screen text-black mt-1">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Orders</h1>
