@@ -54,7 +54,7 @@ export default function Orders() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 text-black">
+    <div className="min-h-screen text-black">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Orders</h1>
@@ -97,19 +97,21 @@ export default function Orders() {
       </div>
   
       {/* Product Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {products.map((product) => (
-          <div key={product.id} className="bg-white p-6 rounded-lg shadow-sm text-black">
+          <div key={product.id} className="bg-white p-6 rounded-lg shadow-sm text-black border-solid border mb-2 ">
             <h2 className="text-xl font-semibold mb-4">{product.type}</h2>
             <div className="space-y-4">
               {product.variants.map((variant) => (
                 <div key={variant.id} className="flex items-center gap-4">
-                  <div className="w-24 h-24 relative rounded-lg overflow-hidden">
+                  <div className="w-32 h-24 relative rounded-lg overflow-hidden">
                     <Image
-                      src={variant.image}
+                      // src={variant.image}
+                      src="https://www.spatuladesserts.com/wp-content/uploads/2024/03/Chocolate-Puff-Pastry-00418.jpg"
                       alt={variant.name}
                       fill
                       className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
                   <div className="flex-1">
