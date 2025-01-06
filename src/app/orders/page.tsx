@@ -116,7 +116,7 @@ export default function Orders() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold">{variant.name}</h3>
-                    <p className="text-gray-600">${variant.price.toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">${variant.price.toFixed(2)}</p>
                     <div className="flex items-center gap-2 mt-2">
                       <div className="flex items-center border rounded-md">
                         <button
@@ -135,7 +135,7 @@ export default function Orders() {
                       </div>
                       <button
                         onClick={() => handleAddToOrder(product.id, variant.id)}
-                        className="px-4 py-1 bg-green-500 text-white rounded-md hover:bg-green-600"
+                        className="px-4 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600"
                       >
                         Add
                       </button>
