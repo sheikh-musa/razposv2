@@ -53,6 +53,15 @@ export default function Orders() {
     // Add your order logic here
   };
 
+  // Filter products based on search query
+  const filteredProducts = products.map(product => ({
+    ...product,
+    variants: product.variants.filter(variant =>
+      variant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.type.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })).filter(product => product.variants.length > 0);
+
   return (
     <div className="min-h-screen text-black mt-1">
       {/* Header */}
@@ -98,8 +107,8 @@ export default function Orders() {
   
       {/* Product Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {products.map((product) => (
-          <div key={product.id} className="bg-white p-3 rounded-lg shadow-sm text-black border-solid border mb-2 ">
+        {filteredProducts.map((product) => (
+          <div key={product.id} className="bg-white p-3 rounded-lg shadow-md text-black border-solid border mb-2 ">
             <h2 className="text-md text-gray-500 font-semibold mb-4">{product.type}</h2>
             <div className="space-y-4">
               {product.variants.map((variant) => (
