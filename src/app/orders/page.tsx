@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
+import OrderSummary from './summary/page';
 
 type Variant = {
   id: number;
@@ -20,6 +21,7 @@ export default function Orders() {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [showOrderSummary, setShowOrderSummary] = useState(false);
 
   useEffect(() => {
     fetch("/api/products")
@@ -156,6 +158,7 @@ export default function Orders() {
           </div>
         ))}
       </div>
+      <OrderSummary/>
     </div>
   );
 }  
