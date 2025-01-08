@@ -174,8 +174,8 @@ export default function Orders() {
 
         {/* Order Summary Side Panel */}
         {showOrderSummary && (
-          <div className="w-96 flex-shrink-0">
-            <OrderSummary />
+          <div className="w-80 flex-shrink-0">
+            <OrderSummary onClose={() => setShowOrderSummary(false)} />
           </div>
         )}
       </div>
