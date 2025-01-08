@@ -62,6 +62,7 @@ export default function Orders() {
       quantity: variant.quantity || 1,
       type: product.type
     });
+    setShowOrderSummary(true);
   };
 
   const handleOrderSummary = () => {
