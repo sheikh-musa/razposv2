@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import OrderSummary from './summary/page';
+import { useCart } from '../context/CartContext';
 
 type Variant = {
   id: number;
@@ -22,6 +23,7 @@ export default function Orders() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
+  const { addItem } = useCart();
 
   useEffect(() => {
     fetch("/api/products")
@@ -51,8 +53,15 @@ export default function Orders() {
     );
   };
 
-  const handleAddToOrder = (productId: number, variantId: number) => {
-    // Add your order logic here
+  const handleAddToOrder = (product: Product, variant: Variant) => {
+    addItem({
+      productId: product.id,
+      variantId: variant.id,
+      name: variant.name,
+      price: variant.price,
+      quantity: variant.quantity || 1,
+      type: product.type
+    });
   };
 
   const handleOrderSummary = () => {
@@ -158,7 +167,7 @@ export default function Orders() {
                           </button>
                         </div>
                         <button
-                          onClick={() => handleAddToOrder(product.id, variant.id)}
+                          onClick={() => handleAddToOrder(product, variant)}
                           className="px-4 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600"
                         >
                           Add
