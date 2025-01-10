@@ -37,15 +37,32 @@ export default function Home() {
   }, [selectedRange]);
 
   const processDataForRange = (data: any[], range: TimeRange) => {
-    // Process data based on selected time range
-    // This is a simplified example
     switch (range) {
       case '12 months':
         return data.map(month => ({
           name: new Date(2024, month.month - 1).toLocaleString('default', { month: 'short' }),
           value: month.totalSales
         }));
-      // Add other cases for different time ranges
+      case '30 days':
+        // Get last 30 days from the most recent month
+        const last30Days = data[data.length - 1].dailySales.slice(-30);
+        return last30Days.map(day => ({
+          name: new Date(day.date).getDate().toString(),
+          value: day.totalSales
+        }));
+      case '7 days':
+        // Get last 7 days from the most recent month
+        const last7Days = data[data.length - 1].dailySales.slice(-7);
+        return last7Days.map(day => ({
+          name: new Date(day.date).getDate().toString(),
+          value: day.totalSales
+        }));
+      case '24 hours':
+        // For demo, generate 24 hour data points
+        return Array.from({ length: 24 }, (_, i) => ({
+          name: `${i}:00`,
+          value: Math.floor(Math.random() * 1000) + 500
+        }));
       default:
         return data;
     }
@@ -85,52 +102,68 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-row w-full gap-4">
         {/* Left side - Graph */}
-        <div className="flex flex-row w-full">
+        <div>
           {/* Total Income */}
           <div className="mb-6">
             <h3 className="text-gray-600 text-sm mb-1">Total Income</h3>
             {/* <div className="flex items-baseline gap-2"> */}
               <span className="text-2xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
-              <span className="text-green-500 text-xs">↑ 7.4%</span>
+              <span className="text-green-500 text-xs ml-1">↑ 7.4%</span>
             {/* </div> */}
           </div>
-
+        </div>
+        <div className='flex-1'>
           {/* Graph */}
-          <div className="bg-white text-gray-600 rounded-lg h-[240px] p-4 text-xs">
+          <div className="bg-white text-gray-600 rounded-lg h-[240px] pt-10 text-xs">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={salesData}>
+              <LineChart 
+                data={salesData}
+                margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+              >
                 <XAxis 
                   dataKey="name" 
                   axisLine={false}
                   tickLine={false}
                   dy={10}
+                  fontSize={12}
+                  tick={{ fill: '#666' }}
                 />
                 <YAxis 
                   axisLine={false}
                   tickLine={false}
                   dx={-10}
+                  fontSize={12}
+                  tick={{ fill: '#666' }}
                 />
-                <Tooltip />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'white',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    fontSize: '12px'
+                  }}
+                />
                 <Line
                   type="monotone"
                   dataKey="value"
                   stroke="#8884d8"
                   strokeWidth={2}
                   dot={false}
+                  activeDot={{ r: 4, fill: '#8884d8' }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
-
+        
+          </div>
         {/* Right side - Stats */}
-        <div className="w-64 space-y-6">
+        <div className="w-60 space-y-6 pl-3">
           <div>
             <h3 className="text-gray-600 text-sm mb-1">Current Revenue</h3>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
+              <span className="text-xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
               <span className="text-green-500 text-sm">↑ 9.2%</span>
             </div>
           </div>
@@ -138,7 +171,7 @@ export default function Home() {
           <div>
             <h3 className="text-gray-600 text-sm mb-1">Last Month Revenue</h3>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-black">${lastRevenue.toLocaleString()}</span>
+              <span className="text-xl font-bold text-black">${lastRevenue.toLocaleString()}</span>
               <span className="text-green-500 text-sm">↑ 6.6%</span>
             </div>
           </div>
@@ -146,7 +179,7 @@ export default function Home() {
           <div>
             <h3 className="text-gray-600 text-sm mb-1">Percentage increase</h3>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
+              <span className="text-xl font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
               <span className="text-green-500 text-sm">↑ 8.1%</span>
             </div>
           </div>
@@ -154,19 +187,19 @@ export default function Home() {
       </div>
 
       {/* Transaction History and Recent Activity */}
-      <div className="grid grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-3 mt-8">
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Transaction history</h2>
+          <div className="flex justify-between items-center mb-4 mt-1">
+            <h2 className="text-md text-gray-500 font-semibold">Transaction history</h2>
           </div>
           {/* Add transaction list here */}
         </div>
-        <div>
+        <div className='col-span-2'>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Recent activity</h2>
+            <h2 className="text-md text-gray-500 font-semibold">Recent activity</h2>
             <div className="flex gap-2">
-              <button className="px-4 py-2 text-sm border rounded-md">Download</button>
-              <button className="px-4 py-2 text-sm bg-purple-600 text-white rounded-md">View all</button>
+              <button className="px-3 py-2 text-xs text-gray-600 border rounded-md">Download</button>
+              <button className="px-3 py-2 text-xs bg-purple-600 text-white rounded-md">View all</button>
             </div>
           </div>
           {/* Add activity list here */}
