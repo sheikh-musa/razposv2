@@ -12,10 +12,10 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
   const [buzzerNumber, setBuzzerNumber] = useState('');
   const [remark, setRemark] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
-  const shippingFee = 3.99;
+//   const shippingFee = 3.99;
 
   return (
-    <div className="bg-white border-solid border p-4 rounded-lg shadow-md h-[calc(100vh-8rem)] sticky top-4 relative">
+    <div className="bg-white border-solid border p-4 rounded-lg shadow-md h-[calc(100vh-7rem)] sticky top-4 relative">
       {/* Scrollable content */}
       <div className="overflow-y-auto h-[calc(100%-8rem)]">
         {/* Header */}
@@ -156,13 +156,13 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       {/* Fixed bottom section */}
       <div className="absolute bottom-0 left-0 right-0 bg-white p-4 border-t">
         <div className="space-y-2 mb-4">
-          <div className="flex justify-between text-sm">
+          {/* <div className="flex justify-between text-sm">
             <span>Express shipping</span>
             <span>${shippingFee.toFixed(2)}</span>
-          </div>
+          </div> */}
           <div className="flex justify-between">
             <span>Subtotal</span>
-            <span className="font-medium">${(total + shippingFee).toFixed(2)}</span>
+            <span className="font-medium">${(total).toFixed(2)}</span>
           </div>
         </div>
         <button className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700">

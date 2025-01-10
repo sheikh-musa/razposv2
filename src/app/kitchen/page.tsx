@@ -147,13 +147,13 @@ export default function Kitchen() {
         setIsDropdownOpen(prev => ({...prev, [orderId]: false}));
 
         // Optional: Update the backend
-        fetch(`/api/orders/${orderId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ paymentBy: paymentMethod }),
-        });
+        // fetch(`/api/orders/${orderId}`, {
+        //     method: 'PATCH',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ paymentBy: paymentMethod }),
+        // });
     };
 
     const handleCheckboxChange = (orderId: number, variantId: number, checked: boolean) => {
