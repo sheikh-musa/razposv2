@@ -159,35 +159,42 @@ export default function Home() {
         
           </div>
         {/* Right side - Stats */}
-        <div className="w-60 space-y-6 pl-3">
-          <div>
-            <h3 className="text-gray-600 text-sm mb-1">Current Revenue</h3>
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
-              <span className="text-green-500 text-sm">↑ 9.2%</span>
+        <div className="w-64 flex flex-col pl-3 h-4/6">
+          <div className="space-y-6">
+            {/* Stats content */}
+            <div>
+              <h3 className="text-gray-600 text-sm mb-1">Current Revenue</h3>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
+                <span className="text-green-500 text-sm">↑ 9.2%</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-gray-600 text-sm mb-1">Last Month Revenue</h3>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold text-black">${lastRevenue.toLocaleString()}</span>
+                <span className="text-green-500 text-sm">↑ 6.6%</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-gray-600 text-sm mb-1">Percentage increase</h3>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
+                <span className="text-green-500 text-sm">↑ 8.1%</span>
+              </div>
             </div>
           </div>
-
-          <div>
-            <h3 className="text-gray-600 text-sm mb-1">Last Month Revenue</h3>
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold text-black">${lastRevenue.toLocaleString()}</span>
-              <span className="text-green-500 text-sm">↑ 6.6%</span>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-gray-600 text-sm mb-1">Percentage increase</h3>
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
-              <span className="text-green-500 text-sm">↑ 8.1%</span>
-            </div>
+          <div className="flex gap-2 mt-10">
+              <button className="px-3 py-2 text-xs text-gray-600 border border-gray-400 rounded-md">Download</button>
+              <button className="px-3 py-2 text-xs bg-purple-600 text-white rounded-md">View all</button>
           </div>
         </div>
       </div>
 
       {/* Transaction History and Recent Activity */}
-      <div className="grid grid-cols-3 mt-8">
+      <div className="grid grid-cols-3 -mt-6">
         <div>
           <div className="flex justify-between items-center mb-4 mt-1">
             <h2 className="text-md text-gray-500 font-semibold">Transaction history</h2>
@@ -197,10 +204,7 @@ export default function Home() {
         <div className='col-span-2'>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-md text-gray-500 font-semibold">Recent activity</h2>
-            <div className="flex gap-2">
-              <button className="px-3 py-2 text-xs text-gray-600 border rounded-md">Download</button>
-              <button className="px-3 py-2 text-xs bg-purple-600 text-white rounded-md">View all</button>
-            </div>
+            
           </div>
           {/* Add activity list here */}
         </div>
