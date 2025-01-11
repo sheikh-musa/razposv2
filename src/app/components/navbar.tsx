@@ -45,11 +45,11 @@ export default function Navbar() {
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100"
           >
             <div className="flex flex-col items-center md:flex-row md:items-start w-full">
-              <svg className="w-5 h-5 stroke-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 stroke-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon} />
               </svg>
-              <span className="text-xs text-black block md:hidden">{item.text}</span>
-              <span className="text-black hidden md:block md:ml-3">{item.text}</span>
+              <span className="text-xs text-gray-600 block md:hidden">{item.text}</span>
+              <span className="text-gray-600 hidden md:block md:ml-3">{item.text}</span>
             </div>
           </Link>
         ))}
@@ -66,8 +66,8 @@ export default function Navbar() {
               </svg>
               <span className="text-xs text-black block md:hidden">Reporting</span>
               <div className="hidden md:flex items-center justify-between w-full">
-                <span className="text-black md:ml-3">Reporting</span>
-                <svg className={`w-4 h-4 transition-transform ${isReportingOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span className="text-gray-600 md:ml-3">Reporting</span>
+                <svg className={`w-4 h-4 text-gray-600 transition-transform ${isReportingOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -84,11 +84,11 @@ export default function Navbar() {
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100"
                 >
                   <div className="flex flex-col items-center md:flex-row md:items-start w-full">
-                    <svg className="w-4 h-4 stroke-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 stroke-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon} />
                     </svg>
-                    <span className="text-xs text-black block md:hidden">{item.text}</span>
-                    <span className="text-black hidden md:block md:ml-3 text-sm">{item.text}</span>
+                    <span className="text-xs text-gray-600 block md:hidden">{item.text}</span>
+                    <span className="text-gray-600 hidden md:block md:ml-3 text-sm">{item.text}</span>
                   </div>
                 </Link>
               ))}
