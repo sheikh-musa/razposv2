@@ -27,6 +27,39 @@ export default function Analytics() {
     { name: 'Other', value: 48.44, color: '#F3E8FF' },
   ];
 
+  // Add useEffect for data fetching
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/sales');
+        const data = await response.json();
+        setSalesData(data);
+        
+        // Calculate revenues and percentage
+        const currentMonth = data[data.length - 1];
+        const lastMonth = data[data.length - 2];
+        
+        setCurrentRevenue(currentMonth.totalSales);
+        setLastRevenue(lastMonth.totalSales);
+        
+        const increase = ((currentMonth.totalSales - lastMonth.totalSales) / lastMonth.totalSales) * 100;
+        setPercentageIncrease(increase);
+      } catch (error) {
+        console.error('Error fetching sales data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Add data processing function
+  const processDataForChart = (data: any[]) => {
+    return data.map(month => ({
+      name: new Date(2024, month.month - 1).toLocaleString('default', { month: 'short' }),
+      value: month.totalSales
+    }));
+  };
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -62,55 +95,101 @@ export default function Analytics() {
       <div className="grid grid-cols-3 gap-6">
         {/* Sales Graph */}
         <div className="col-span-2">
-          <h2 className="text-md text-gray-500 font-semibold mb-2">Sales over time</h2>
-          <p className="text-gray-500 text-sm mb-4">Track how your sales over time.</p>
-          <div className="mb-6">
-            <span className="text-3xl font-bold text-black">$8,880</span>
+          <h2 className="text-sm text-gray-500 font-semibold mb-2">Sales over time</h2>
+          <p className="text-gray-500 text-xs mb-4">Track how your sales over time.</p>
+          <div className="mb-3">
+            <span className="text-xl font-bold text-black">$8,880</span>
             <span className="text-green-500 text-sm ml-2">↑ 7.4%</span>
           </div>
-          <div className="bg-white rounded-lg h-[240px] p-4">
-            {/* Line Chart Component */}
+          <div className="bg-white rounded-lg font-semibold h-[240px] ">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={processDataForChart(salesData)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false}
+                  tickLine={false}
+                  dy={10}
+                  fontSize={12}
+                  tick={{ fill: '#666' }}
+                />
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  dx={-10}
+                  fontSize={12}
+                  tick={{ fill: '#666' }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'white',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: 'black'
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#8884d8"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 4, fill: '#8884d8' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
         {/* Payment Methods Pie Chart */}
-        <div className="bg-white border border-gray-300 mb-2 p-6 rounded-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg text-gray-500 font-semibold">Payment Method</h2>
+        <div className="bg-white border border-gray-300 p-2 rounded-lg">
+          {/* Header with title and button */}
+          <div className="flex justify-between items-center">
+            <h2 className="text-sm text-gray-500 font-semibold ml-2">Payment Method</h2>
             <button className="p-2 hover:bg-gray-100 rounded-full">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
               </svg>
             </button>
           </div>
-          <div className="h-[200px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={paymentMethodData}
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {paymentMethodData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
+
+          {/* Content container */}
+          <div className='flex flex-row justify-between'>
+            {/* Chart */}
+            <div className="h-[200px] flex-1">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={paymentMethodData}
+                    innerRadius={35}
+                    outerRadius={80}
+                    dataKey="value"
+                  >
+                    {paymentMethodData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Legend */}
+            <div className="flex flex-col justify-center">
+              {paymentMethodData.map((method, index) => (
+                <div key={index} className="flex items-center gap-2 text-xs mb-2 text-gray-500">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: method.color }}></div>
+                  <span>{method.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="mt-4">
-            {paymentMethodData.map((method, index) => (
-              <div key={index} className="flex items-center gap-2 text-sm mb-2 text-black">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: method.color }}></div>
-                <span>{method.name}</span>
-              </div>
-            ))}
+
+          {/* View full report button */}
+          <div className='w-full relative border'>
+            <button className="w-3/6 mt-4 text-gray-600 text-xs font-semibold absolute top-0 right-0 py-2 border border-gray-500 rounded-lg">
+              View full report
+            </button>
           </div>
-          <button className="w-full mt-4 text-gray-600 text-sm py-2 border border-gray-500 rounded-lg">
-            View full report
-          </button>
         </div>
       </div>
     
