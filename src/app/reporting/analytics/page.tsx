@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Area } from 'recharts';
 
 export default function Analytics() {
   const [salesData, setSalesData] = useState<any[]>([]);
@@ -61,7 +61,7 @@ export default function Analytics() {
   };
 
   return (
-    <div className="p-6">
+    <div className="pt-6 pl-2">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl text-black font-bold">Analytics</h1>
@@ -92,52 +92,98 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        {/* Sales Graph */}
+      <div className="grid grid-cols-3 gap-2">
+        {/* Sales Graph Section */}
         <div className="col-span-2">
           <h2 className="text-sm text-gray-500 font-semibold mb-2">Sales over time</h2>
           <p className="text-gray-500 text-xs mb-4">Track how your sales over time.</p>
           <div className="mb-3">
-            <span className="text-xl font-bold text-black">$8,880</span>
+            <span className="text-2xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
             <span className="text-green-500 text-sm ml-2">↑ 7.4%</span>
           </div>
-          <div className="bg-white rounded-lg font-semibold h-[240px] ">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={processDataForChart(salesData)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false}
-                  tickLine={false}
-                  dy={10}
-                  fontSize={12}
-                  tick={{ fill: '#666' }}
-                />
-                <YAxis 
-                  axisLine={false}
-                  tickLine={false}
-                  dx={-10}
-                  fontSize={12}
-                  tick={{ fill: '#666' }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    color: 'black'
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#8884d8"
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, fill: '#8884d8' }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+
+          <div className="flex gap-1">
+            {/* Graph */}
+            <div className="w-4/5">
+              <div className="bg-white rounded-lg h-[240px] p-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={processDataForChart(salesData)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                    <defs>
+                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.1}/>
+                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false}
+                      tickLine={false}
+                      dy={10}
+                      fontSize={12}
+                      tick={{ fill: '#666' }}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      dx={-10}
+                      fontSize={12}
+                      tick={{ fill: '#666' }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        color: 'black'
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#8884d8"
+                      fillOpacity={10}
+                      fill="url(#colorValue)"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#8884d8"
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4, fill: '#8884d8' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="w-auto space-y-6 justify-end">
+              <div>
+                <h3 className="text-gray-500 text-xs font-semibold mb-1">Current Revenue</h3>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg font-bold text-black">${currentRevenue.toLocaleString()}</span>
+                  <span className="text-green-500 text-sm">↑ 9.2%</span>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-gray-500 text-xs font-semibold mb-1">Last Month Revenue</h3>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg font-bold text-black">${lastRevenue.toLocaleString()}</span>
+                  <span className="text-green-500 text-sm">↑ 6.6%</span>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-gray-500 text-xs font-semibold mb-1">Percentage increase</h3>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
+                  <span className="text-green-500 text-sm">↑ 8.1%</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
