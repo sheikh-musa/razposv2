@@ -95,9 +95,9 @@ export default function Analytics() {
       <div className="grid grid-cols-3 gap-2">
         {/* Sales Graph Section */}
         <div className="col-span-2">
-          <h2 className="text-sm text-gray-500 font-semibold mb-2">Sales over time</h2>
-          <p className="text-gray-500 text-xs mb-4">Track how your sales over time.</p>
-          <div className="mb-3">
+          <h2 className="text-sm text-gray-500 font-semibold mb-1">Sales over time</h2>
+          <p className="text-gray-500 text-xs mb-2">Track how your sales over time.</p>
+          <div className="mb-2">
             <span className="text-2xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
             <span className="text-green-500 text-sm ml-2">↑ 7.4%</span>
           </div>
@@ -242,53 +242,64 @@ export default function Analytics() {
       {/* Monthly Revenue by Item */}
       <div className="mt-8">
         <div className='flex justify-between'>
-        <h2 className="text-md font-semibold mb-4 text-gray-500">Monthly revenue of item</h2>
-        <div className="flex gap-4 mb-3">
-          <button className="px-4 py-2 bg-purple-100 text-purple-600 rounded-full text-sm">
-            This month
-          </button>
-          <button className="px-4 py-2 text-gray-600 rounded-full text-sm">
-            Last month
-          </button>
-          <button className="px-4 py-2 text-gray-600 rounded-full text-sm flex items-center gap-2">
-            Custom
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-          </button>
+          <h2 className="text-md font-semibold mb-4 text-gray-500">Monthly revenue of item</h2>
+          <div className="flex gap-4 mb-3">
+            <button className="px-4 py-2 bg-purple-100 text-purple-600 rounded-full text-sm">
+              This month
+            </button>
+            <button className="px-4 py-2 text-gray-600 rounded-full text-sm">
+              Last month
+            </button>
+            <button className="px-4 py-2 text-gray-600 rounded-full text-sm flex items-center gap-2">
+              Custom
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </button>
+          </div>
         </div>
-        </div>
-        <hr/>
-        <div className="grid grid-cols-4 gap-6 mt-3">
-          <div className="bg-white p-6 rounded-lg">
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={itemRevenue}
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {itemRevenue.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="text-center mt-4">
-              <p className="text-sm text-gray-500">Total</p>
-              <p className="text-2xl font-bold">$2,280</p>
+        <hr className="mb-6"/>
+        
+        <div className="flex gap-8">
+          {/* Radial Graph */}
+          <div className="w-1/4">
+            <div className="relative">
+              <ResponsiveContainer width="100%" aspect={1}>
+                <PieChart>
+                  <Pie
+                    data={itemRevenue}
+                    innerRadius={80}
+                    outerRadius={120}
+                    startAngle={90}
+                    endAngle={-270}
+                    dataKey="value"
+                  >
+                    {itemRevenue.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.color}
+                        strokeWidth={0}
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                <p className="text-sm text-gray-500">Total</p>
+                <p className="text-2xl text-black font-bold">$2,280</p>
+              </div>
             </div>
           </div>
-          <div className="col-span-3 space-y-4">
+
+          {/* Revenue Figures */}
+          <div className="flex-1 grid grid-cols-3 gap-y-6 items-start content-start">
             {itemRevenue.map((item, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                  <span>{item.name}</span>
+              <div key={index} className="flex flex-col">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
+                  <span className="text-gray-600 text-sm">{item.name}</span>
                 </div>
-                <span className="font-semibold">${item.value.toFixed(2)}</span>
+                <span className="text-base font-bold text-black">${item.value.toFixed(2)}</span>
               </div>
             ))}
           </div>
