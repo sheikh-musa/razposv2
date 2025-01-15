@@ -24,7 +24,11 @@ type Order = {
     completed: boolean;
     remarks: string;
 };
-
+// type Order = {
+//     date: string; // Format: YYYY-MM-DD
+//     time: string; // Format: HH:mm:ss
+//     order: Details[];
+// }
 const orders: Order[] = [
     {
       id: 1,
@@ -70,7 +74,7 @@ const orders: Order[] = [
       time: "12:30:00",
       paymentBy: "Cash",
       paymentReceived: true,
-      completed: false,
+      completed: true,
       remarks: "more chilli",
     },
     {
