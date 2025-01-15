@@ -137,9 +137,12 @@ export default function TransactionHistory() {
                   <div>{order.date}</div>
                   <div className="text-sm text-gray-500">{order.time}</div>
                 </td>
-                <td className="p-3">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    order.paymentBy === 'Credit' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
+                <td className="p-2 w-[100px]">
+                   <span className={`px-2 py-1 rounded-full text-xs ${
+                    order.paymentBy === 'Credit Card' ? 'bg-blue-100 text-blue-600' : 
+                    order.paymentBy === 'Cash' ? 'bg-green-100 text-green-600' :
+                    order.paymentBy === 'PayNow' ? 'bg-red-100 text-red-600' :
+                    'bg-gray-100 text-gray-600'
                   }`}>
                     {order.paymentBy}
                   </span>
@@ -161,7 +164,7 @@ export default function TransactionHistory() {
                   </div>
                 </td>
                 <td className="p-3">
-                  <div className="flex gap-2 text-sm">
+                  <div className="flex gap-1 text-sm">
                     <button className="text-gray-600">Open</button>
                     <button className="text-purple-600">Edit</button>
                   </div>
