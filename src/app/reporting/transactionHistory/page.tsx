@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
+import OrderDetails from './orderDetails/page';
 
 type Variant = {
   name: string;
@@ -30,6 +31,8 @@ type Order = {
 export default function TransactionHistory() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [timeRange, setTimeRange] = useState('Today');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [showOrderDetails, setShowOrderDetails] = useState(false);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -163,9 +166,17 @@ export default function TransactionHistory() {
                     )}
                   </div>
                 </td>
-                <td className="p-3">
-                  <div className="flex gap-1 text-sm">
-                    <button className="text-gray-600">Open</button>
+                <td className="p-4">
+                  <div className="flex gap-2 text-sm">
+                    <button 
+                      className="text-gray-600" 
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        setShowOrderDetails(true);
+                      }}
+                    >
+                      Open
+                    </button>
                     <button className="text-purple-600">Edit</button>
                   </div>
                 </td>
@@ -202,6 +213,15 @@ export default function TransactionHistory() {
           </svg>
         </button>
       </div>
+      {showOrderDetails && (
+        <OrderDetails 
+          order={selectedOrder} 
+          onClose={() => {
+            setShowOrderDetails(false);
+            setSelectedOrder(null);
+          }}
+        />
+      )}
     </div>
   );
 }
