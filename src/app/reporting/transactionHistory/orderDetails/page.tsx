@@ -39,12 +39,13 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
             prod.variants.map((variant, varIndex) => (
               variant.orderQuantity > 0 && (
                 <div key={`${prodIndex}-${varIndex}`}>
-                  <div className="flex justify-between items-start mb-2 h-8">
-                    <div>
+                  <div className="flex items-start mb-2 h-8">
+                    <div className='w-1/3'>
                       <h3 className="font-semibold text-sm text-black">{prod.type}</h3>
                       <p className="text-xs text-gray-600">{variant.name}</p>
                     </div>
-                    <div className='flex h-full items-center border rounded-md'>
+                    <div className='flex h-full items-center justify-center w-1/3'>
+                    <div className='border rounded-md'>
                     <button className="p-1 hover:bg-gray-200 text-black border-r">
                       <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
@@ -57,7 +58,8 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                       </svg>
                     </button>
                     </div>
-                    <div className="text-right">
+                    </div>
+                    <div className="text-right w-1/3">
                       <p className="text-sm text-black">${variant.price.toFixed(2)}/ea</p>
                       <button className="ml-auto text-black">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
