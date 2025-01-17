@@ -58,17 +58,16 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-black">${variant.price.toFixed(2)}/ea</p>
-                    <p className="text-sm text-gray-600">${(variant.price * variant.orderQuantity).toFixed(2)}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2 text-black">
-                  
-                  <button className="ml-auto">
+                    <button className="ml-auto text-black">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
                     </svg>
                   </button>
+                  </div>
                 </div>
+                    <div className="items-center bg-gray-50 rounded-lg py-2 text-end">
+                    <p className="text-sm text-gray-600">${(variant.price * variant.orderQuantity).toFixed(2)}</p>
+                    </div>
               </div>
             )
           ))
@@ -76,14 +75,14 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
       </div>
 
       {/* Payment Section */}
-      <div className="absolute bottom-0 left-0 right-0 border-t bg-white p-4">
+      <div className="absolute bottom-0 left-0 right-0 border-t bg-white p-3">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Payment*</label>
+            <label className="block text-xs text-gray-600 mb-1 font-semibold">Payment</label>
             <select 
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
-              className="w-full p-2 border rounded-lg"
+              className="w-full p-2 border rounded-lg text-xs text-black"
             >
               <option>Cash</option>
               <option>Credit Card</option>
@@ -92,17 +91,17 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
             </select>
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Payment status</label>
+            <label className="block text-xs text-gray-600 mb-1 font-semibold">Payment status</label>
             <select 
               value={paymentStatus}
               onChange={(e) => setPaymentStatus(e.target.value)}
-              className="w-full p-2 border rounded-lg"
+              className="w-full p-2 border rounded-lg text-black text-xs"
             >
               <option>Paid</option>
               <option>Unpaid</option>
             </select>
           </div>
-          <button className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+          <button className="w-full py-3 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
             Save
           </button>
         </div>
