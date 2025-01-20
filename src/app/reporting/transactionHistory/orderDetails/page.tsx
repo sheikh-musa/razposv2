@@ -62,14 +62,14 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                     <div className="text-right w-1/3">
                       <p className="text-sm text-black">${variant.price.toFixed(2)}/ea</p>
                       <button className="ml-auto text-black">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
                     </div>
                   </div>
                       <div className="items-center bg-gray-50 rounded-lg py-2 text-end">
-                      <p className="text-sm text-gray-600">${(variant.price * variant.orderQuantity).toFixed(2)}</p>
+                      <p className="text-sm text-gray-600 font-semibold">${(variant.price * variant.orderQuantity).toFixed(2)}</p>
                       </div>
                 </div>
               )
