@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import Transaction from './transaction/page';
 
 type TimeRange = '12 months' | '30 days' | '7 days' | '24 hours';
 type Transaction = {
@@ -196,9 +197,7 @@ export default function Home() {
       {/* Transaction History and Recent Activity */}
       <div className="grid grid-cols-3 -mt-6">
         <div>
-          <div className="flex justify-between items-center mb-4 mt-1">
-            <h2 className="text-md text-gray-500 font-semibold">Transaction history</h2>
-          </div>
+          <Transaction />
           {/* Add transaction list here */}
         </div>
         <div className='col-span-2'>
