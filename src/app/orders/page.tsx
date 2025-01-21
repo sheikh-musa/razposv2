@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import OrderSummary from './summary/page';
 import { useCart } from '../context/CartContext';
+import OrderConfirmationModal from '../components/modals/OrderConfirmationModal';
 
 type Variant = {
   id: number;
@@ -23,7 +24,12 @@ export default function Orders() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
-  const { addItem } = useCart();
+  const { addItem, items } = useCart();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingOrder, setPendingOrder] = useState<{
+    product: Product;
+    variant: Variant;
+  } | null>(null);
 
   useEffect(() => {
     fetch("/api/products")
@@ -54,15 +60,43 @@ export default function Orders() {
   };
 
   const handleAddToOrder = (product: Product, variant: Variant) => {
-    addItem({
-      productId: product.id,
-      variantId: variant.id,
-      name: variant.name,
-      price: variant.price,
-      quantity: variant.quantity || 1,
-      type: product.type
-    });
-    setShowOrderSummary(true);
+    // Check if item already exists in cart
+    const existingItem = items.find(
+      item => item.productId === product.id && item.variantId === variant.id
+    );
+
+    if (existingItem) {
+      // Store the pending order and show confirmation modal
+      setPendingOrder({ product, variant });
+      setShowConfirmModal(true);
+    } else {
+      // Add new item directly
+      addItem({
+        productId: product.id,
+        variantId: variant.id,
+        name: variant.name,
+        price: variant.price,
+        quantity: variant.quantity || 1,
+        type: product.type
+      });
+      setShowOrderSummary(true);
+    }
+  };
+
+  const handleConfirmAdd = () => {
+    if (pendingOrder) {
+      const { product, variant } = pendingOrder;
+      addItem({
+        productId: product.id,
+        variantId: variant.id,
+        name: variant.name,
+        price: variant.price,
+        quantity: variant.quantity || 1,
+        type: product.type
+      });
+      setShowOrderSummary(true);
+      setPendingOrder(null);
+    }
   };
 
   const handleOrderSummary = () => {
@@ -159,7 +193,7 @@ export default function Orders() {
                           >
                             -
                           </button>
-                          <span className="px-4 py-1 text-black">{variant.quantity || 0}</span>
+                          <span className="px-4 py-1 text-black">{variant.quantity || 1}</span>
                           <button
                             onClick={() => handleQuantityChange(product.id, variant.id, 1)}
                             className="px-3 py-1 border-l hover:bg-gray-50 text-black"
@@ -189,6 +223,17 @@ export default function Orders() {
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      <OrderConfirmationModal
+        isOpen={showConfirmModal}
+        onClose={() => {
+          setShowConfirmModal(false);
+          setPendingOrder(null);
+        }}
+        onConfirm={handleConfirmAdd}
+        itemName={pendingOrder?.variant.name || ''}
+      />
     </div>
   );
 }  
