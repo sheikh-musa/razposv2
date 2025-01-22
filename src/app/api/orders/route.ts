@@ -115,7 +115,7 @@ const generateOrders = (): Order[] => {
 const latestDate = "2024-12-31"; // Latest date for the additional orders
 const latestTimes = ["18:30:00", "19:00:00", "19:30:00", "20:00:00"];
 
-for (let i = 0; i < 4; i++) {
+for (let i = 0; i < 2; i++) {
     orders.push({
         id: orderId++,
         itemsType: 2,
@@ -131,8 +131,8 @@ for (let i = 0; i < 4; i++) {
             {
                 type: "Muffin",
                 variants: [
-                    { productId: 1, name: "Blueberry", price: 4, orderQuantity: 3 },
-                    { productId: 2, name: "Banana Nut", price: 5, orderQuantity: 2 }
+                    { productId: 3, name: "Blueberry", price: 4, orderQuantity: 3 },
+                    { productId: 4, name: "Banana Nut", price: 5, orderQuantity: 2 }
                 ]
             }
         ],
@@ -145,6 +145,28 @@ for (let i = 0; i < 4; i++) {
         remarks: "Pending confirmation"
     });
 }
+
+orders.push({
+  id: orderId++,
+  itemsType: 2,
+  variantType: 4,
+  product: [
+      {
+          type: "Donut",
+          variants: [
+              { productId: 1, name: "Chocolate", price: 5, orderQuantity: 2 },
+              { productId: 2, name: "Almond", price: 6, orderQuantity: 1 }
+          ]
+      },
+  ],
+  totalPrice: 37,
+  date: latestDate,
+  time: latestTimes[0],
+  paymentBy: "Credit Card",
+  paymentReceived: false,
+  completed: false,
+  remarks: "Pending confirmation"
+});
     // Sort orders by date and time
     return orders.sort((a, b) => {
         const dateA = new Date(`${a.date} ${a.time}`);
