@@ -193,13 +193,13 @@ export default function AddInventory() {
                     <div className="flex justify-end gap-4">
                         <button 
                             onClick={handleCancel}
-                            className="px-4 py-2 border border-black rounded-md hover:bg-gray-50 text-black"
+                            className="px-4 py-2 border border-black rounded-md hover:bg-gray-50 text-black text-sm"
                         >
                             Cancel
                         </button>
                         <button 
                             onClick={handleSubmit}
-                            className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600"
+                            className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 text-sm"
                         >
                             Add item
                         </button>
