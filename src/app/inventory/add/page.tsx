@@ -25,6 +25,10 @@ export default function AddInventory() {
         setVariants([...variants, { name: '', inventory: 0, price: 0 }]);
     };
 
+    const handleRemoveVariant = (index: number) => {
+        setVariants(variants.filter((_, i) => i !== index));
+    };
+
     const handleCancel = () => {
         router.back();
     };
@@ -86,7 +90,7 @@ export default function AddInventory() {
                     </div>
 
                     <div className="mb-6">
-                        <div className="flex gap-4 mb-2">
+                        {/* <div className="flex gap-4 mb-2">
                             <div className="flex-1">
                                 <label className="block text-sm text-gray-700">
                                     Variations
@@ -103,37 +107,34 @@ export default function AddInventory() {
                                 </label>
                             </div>
                             <div className="w-[104px]"></div>
-                        </div>
+                        </div> */}
 
-                        {variants.map((variant, index) => (
-                            <div key={index} className="flex gap-4 mb-4">
-                                <div className="flex-1">
-                                    <input 
-                                        type="text"
-                                        value={variant.name}
-                                        onChange={(e) => {
-                                            const newVariants = [...variants];
-                                            newVariants[index].name = e.target.value;
-                                            setVariants(newVariants);
-                                        }}
-                                        className="w-full p-2 border rounded-md border-slate-400 text-black"
-                                        placeholder="Variation name"
-                                    />
-                                </div>
-                                
-                                <div className="w-40">
-                                    <div className="flex border rounded-md border-slate-400">
-                                        <button 
-                                            className="px-3 py-2 border-r border-slate-400"
-                                            onClick={() => {
+                        <div className="space-y-4 mt-4 text-black">
+                            {variants.map((variant, index) => (
+                                <div key={index} className="flex gap-4 items-start">
+                                    <div className="flex-1">
+                                    <label className="block text-sm text-gray-700">
+                                    Variations
+                                </label>
+                                        <input
+                                            type="text"
+                                            value={variant.name}
+                                            onChange={(e) => {
                                                 const newVariants = [...variants];
-                                                newVariants[index].inventory = Math.max(0, variant.inventory - 1);
+                                                newVariants[index].name = e.target.value;
                                                 setVariants(newVariants);
                                             }}
-                                        >
-                                            -
-                                        </button>
-                                        <input 
+                                            placeholder="Variant name"
+                                            className="w-full p-2 border rounded-md text-sm"
+                                        />
+                                    </div>
+                                    <div className="w-32">
+
+                                <label className="block text-sm text-gray-700">
+                                    Inventory
+                                </label>
+
+                                        <input
                                             type="number"
                                             value={variant.inventory}
                                             onChange={(e) => {
@@ -141,35 +142,15 @@ export default function AddInventory() {
                                                 newVariants[index].inventory = Math.max(0, parseInt(e.target.value) || 0);
                                                 setVariants(newVariants);
                                             }}
-                                            className="w-full p-2 text-center text-black"
-                                            placeholder="0"
+                                            placeholder="Stock"
+                                            className="w-full p-2 border rounded-md text-sm"
                                         />
-                                        <button 
-                                            className="px-3 py-2 border-l border-slate-400"
-                                            onClick={() => {
-                                                const newVariants = [...variants];
-                                                newVariants[index].inventory = variant.inventory + 1;
-                                                setVariants(newVariants);
-                                            }}
-                                        >
-                                            +
-                                        </button>
                                     </div>
-                                </div>
-
-                                <div className="w-40">
-                                    <div className="flex border rounded-md border-slate-400">
-                                        <button 
-                                            className="px-3 py-2 border-r border-slate-400"
-                                            onClick={() => {
-                                                const newVariants = [...variants];
-                                                newVariants[index].price = Math.max(0, variant.price - 1);
-                                                setVariants(newVariants);
-                                            }}
-                                        >
-                                            -
-                                        </button>
-                                        <input 
+                                    <div className="w-32">
+                                        <label className="block text-sm text-gray-700">
+                                        Price ($) SGD
+                                        </label>
+                                        <input
                                             type="number"
                                             value={variant.price}
                                             onChange={(e) => {
@@ -177,31 +158,36 @@ export default function AddInventory() {
                                                 newVariants[index].price = Math.max(0, parseFloat(e.target.value) || 0);
                                                 setVariants(newVariants);
                                             }}
-                                            className="w-full p-2 text-center text-black"
-                                            placeholder="0"
+                                            placeholder="Price"
+                                            className="w-full p-2 border rounded-md text-sm"
                                         />
+                                    </div>
+                                    <div className='mt-5'>
+                                    {index === variants.length - 1 ? (
                                         <button 
-                                            className="px-3 py-2 border-l border-slate-400"
-                                            onClick={() => {
-                                                const newVariants = [...variants];
-                                                newVariants[index].price = variant.price + 1;
-                                                setVariants(newVariants);
-                                            }}
+                                            onClick={handleAddVariant}
+                                            className="text-black text-sm px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 border-slate-400 flex items-center gap-2"
                                         >
-                                            +
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Add variant
                                         </button>
+                                    ) : (
+                                        <button 
+                                            onClick={() => handleRemoveVariant(index)}
+                                            className="text-red-600 text-sm px-3 py-2 border border-red-200 rounded-md hover:bg-red-50 flex items-center gap-2"
+                                        >
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            Remove variant
+                                        </button>
+                                    )}
                                     </div>
                                 </div>
-                                <button 
-                                    onClick={handleAddVariant}
-                                    className="text-black text-sm px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 border-slate-400"
-                                >
-                                    Add variant
-                                </button>
-                            </div>
-                        ))}
-                        
-                        
+                            ))}
+                        </div>
                     </div>
                     <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-300"></hr>
                     <div className="flex justify-end gap-4">
