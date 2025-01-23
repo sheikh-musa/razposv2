@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import DeleteItemModal from '@/app/components/modals/DeleteItemModal';
+import DeleteMultipleItemsModal from '@/app/components/modals/DeleteMultipleItemsModal';
+import { set } from 'react-datepicker/dist/date_utils';
 
 type Variant = {
     id: number;
@@ -30,6 +32,12 @@ export default function Inventory() {
         variantId: number;
         name: string;
     } | null>(null);
+    const [selectedItems, setSelectedItems] = useState<{
+        productId: number;
+        variantId: number;
+        name: string;
+    }[]>([]);
+    const [showMultiDeleteModal, setShowMultiDeleteModal] = useState(false);
 
     useEffect(() => {
         fetch("/api/products")
@@ -102,6 +110,61 @@ export default function Inventory() {
             }
         }
         return pages;
+    };
+
+    // Add checkbox handling
+    const handleCheckboxChange = (
+        productId: number, 
+        variantId: number, 
+        itemName: string, 
+        checked: boolean
+    ) => {
+        if (checked) {
+            setSelectedItems(prev => [...prev, { productId, variantId, name: itemName }]);
+        } else {
+            setSelectedItems(prev => 
+                prev.filter(item => 
+                    !(item.productId === productId && item.variantId === variantId)
+                )
+            );
+        }
+    };
+
+    // Handle "select all" checkbox
+    const handleSelectAll = (checked: boolean) => {
+        if (checked) {
+            const allItems = currentItems.map(({ product, variant }) => ({
+                productId: product.id,
+                variantId: variant.id,
+                name: `${product.type} - ${variant.name}`
+            }));
+            setSelectedItems(allItems);
+        } else {
+            setSelectedItems([]);
+        }
+    };
+
+    // Add bulk delete handler
+    const handleBulkDelete = async () => {
+        try {
+            await Promise.all(
+                selectedItems.map(item =>
+                    fetch(`/api/products/${item.productId}/variants/${item.variantId}`, {
+                        method: 'DELETE',
+                    })
+                )
+            );
+            
+            // Refresh products list
+            fetch("/api/products")
+                .then((res) => res.json())
+                .then((data) => setProducts(data));
+                
+            // Clear selection
+            setSelectedItems([]);
+        } catch (error) {
+            console.error('Error deleting items:', error);
+        }
     };
 
     return (
@@ -182,6 +245,7 @@ export default function Inventory() {
                                     className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full"
                                     onClick={() => {
                                         // Handle delete
+                                        setShowMultiDeleteModal(true);
                                         setShowOptions(false);
                                     }}
                                 >
@@ -193,6 +257,7 @@ export default function Inventory() {
                             </div>
                         )}
                     </div>
+
                 </div>
             </div>
 
@@ -201,7 +266,12 @@ export default function Inventory() {
                     <thead>
                         <tr className="border-b">
                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-                                <input type="checkbox" className="rounded" />
+                                <input 
+                                    type="checkbox" 
+                                    className="rounded"
+                                    checked={selectedItems.length === currentItems.length && currentItems.length > 0}
+                                    onChange={(e) => handleSelectAll(e.target.checked)}
+                                />
                             </th>
                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Item Name</th>
                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Stock</th>
@@ -213,7 +283,19 @@ export default function Inventory() {
                         {currentItems.map(({ product, variant }) => (
                             <tr key={`${product.id}-${variant.id}`} className="border-b hover:bg-gray-50 text-sm">
                                 <td className="px-6 py-4">
-                                    <input type="checkbox" className="rounded" />
+                                    <input 
+                                        type="checkbox"
+                                        className="rounded"
+                                        checked={selectedItems.some(
+                                            item => item.productId === product.id && item.variantId === variant.id
+                                        )}
+                                        onChange={(e) => handleCheckboxChange(
+                                            product.id,
+                                            variant.id,
+                                            `${product.type} - ${variant.name}`,
+                                            e.target.checked
+                                        )}
+                                    />
                                 </td>
                                 <td className="px-6 py-4">
                                     {product.type} - {variant.name}
@@ -284,12 +366,20 @@ export default function Inventory() {
                 </button>
             </div>
 
-            {/* Delete Modal */}
+            {/* Single Delete Modal */}
             <DeleteItemModal 
                 isOpen={!!itemToDelete}
                 onClose={() => setItemToDelete(null)}
                 onConfirm={confirmDelete}
                 itemName={itemToDelete?.name}
+            />
+
+            {/* Multiple Delete Modal */}
+            <DeleteMultipleItemsModal
+                isOpen={showMultiDeleteModal}
+                onClose={() => setShowMultiDeleteModal(false)}
+                onConfirm={handleBulkDelete}
+                itemCount={selectedItems.length}
             />
         </div>
     )
