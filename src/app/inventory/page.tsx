@@ -3,85 +3,105 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import DeleteItemModal from '@/app/components/modals/DeleteItemModal';
 import DeleteMultipleItemsModal from '@/app/components/modals/DeleteMultipleItemsModal';
-import { set } from 'react-datepicker/dist/date_utils';
+import { useApi } from '../context/ApiContext';
 
-type Variant = {
-    id: number;
+// Updated types to match ERPNext structure
+type ItemBasic = {
     name: string;
-    price: number;
-    stock: number;
+    item_name: string;
+    item_code: string;
+    description: string;
+    stock_uom: string;
+    valuation_rate: number;
+    item_group: string;
+    actual_qty: number;
+    warehouse: string;
 };
-  
-type Product = {
-    id: number;
-    type: string;
-    variants: Variant[];
-};
-  
+
 export default function Inventory() {
     const router = useRouter();
-    const [products, setProducts] = useState<Product[]>([]);
+    const { fetchItems, fetchItemDetails } = useApi();
+    const [items, setItems] = useState<ItemBasic[]>([]);
     const [showOptions, setShowOptions] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [productToDelete, setProductToDelete] = useState<{productId: number, variantId: number} | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
-    const [itemToDelete, setItemToDelete] = useState<{
-        productId: number;
-        variantId: number;
-        name: string;
-    } | null>(null);
     const [selectedItems, setSelectedItems] = useState<{
-        productId: number;
-        variantId: number;
         name: string;
+        item_name: string;
     }[]>([]);
     const [showMultiDeleteModal, setShowMultiDeleteModal] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<{
+        name: string;
+        item_name: string;
+    } | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
+    // Load items with their details
     useEffect(() => {
-        fetch("/api/products")
-          .then((res) => res.json())
-          .then((data) => setProducts(data));
+        const loadItems = async () => {
+            try {
+                setLoading(true);
+                const basicItems = await fetchItems();
+                
+                // Fetch details for each item
+                const itemsWithDetails = await Promise.all(
+                    basicItems.map(async (item) => {
+                        const details = await fetchItemDetails(item.name);
+                        return details;
+                    })
+                );
+                
+                setItems(itemsWithDetails);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'An error occurred');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadItems();
     }, []);
 
-    const handleDelete = (productId: number, variantId: number, itemName: string) => {
-        setItemToDelete({ productId, variantId, name: itemName });
+    const handleDelete = (name: string, itemName: string) => {
+        setItemToDelete({ name, item_name: itemName });
     };
 
     const confirmDelete = async () => {
         if (!itemToDelete) return;
 
         try {
-            const response = await fetch(`/api/products/${itemToDelete.productId}/variants/${itemToDelete.variantId}`, {
+            // Implement ERPNext delete API call here
+            const response = await fetch(`http://localhost:8080/api/resource/Item/${itemToDelete.name}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+                }
             });
 
             if (response.ok) {
-                // Refresh products list
-                fetchProducts();
+                // Refresh items list
+                const updatedItems = await fetchItems();
+                setItems(updatedItems);
             }
         } catch (error) {
             console.error('Error deleting item:', error);
         }
     };
 
-    const filteredProducts = products.map(product => ({
-        ...product,
-        variants: product.variants.filter(variant => 
-            `${product.type} - ${variant.name}`.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-    })).filter(product => product.variants.length > 0);
-
-    // Calculate pagination values
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredProducts.flatMap(product => 
-        product.variants.map(variant => ({ product, variant }))
-    ).slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(
-        filteredProducts.reduce((acc, product) => acc + product.variants.length, 0) / itemsPerPage
+    // Filter items based on search query
+    const filteredItems = items.filter(item => 
+        item.item_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.item_code.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    // Pagination
+    const currentItems = filteredItems.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
     // Reuse the page numbers generation logic
     const getPageNumbers = () => {
@@ -114,17 +134,16 @@ export default function Inventory() {
 
     // Add checkbox handling
     const handleCheckboxChange = (
-        productId: number, 
-        variantId: number, 
+        name: string, 
         itemName: string, 
         checked: boolean
     ) => {
         if (checked) {
-            setSelectedItems(prev => [...prev, { productId, variantId, name: itemName }]);
+            setSelectedItems(prev => [...prev, { name, item_name: itemName }]);
         } else {
             setSelectedItems(prev => 
                 prev.filter(item => 
-                    !(item.productId === productId && item.variantId === variantId)
+                    !(item.name === name)
                 )
             );
         }
@@ -133,10 +152,9 @@ export default function Inventory() {
     // Handle "select all" checkbox
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
-            const allItems = currentItems.map(({ product, variant }) => ({
-                productId: product.id,
-                variantId: variant.id,
-                name: `${product.type} - ${variant.name}`
+            const allItems = currentItems.map((item) => ({
+                name: item.name,
+                item_name: item.item_name
             }));
             setSelectedItems(allItems);
         } else {
@@ -149,16 +167,18 @@ export default function Inventory() {
         try {
             await Promise.all(
                 selectedItems.map(item =>
-                    fetch(`/api/products/${item.productId}/variants/${item.variantId}`, {
+                    fetch(`http://localhost:8080/api/resource/Item/${item.name}`, {
                         method: 'DELETE',
+                        headers: {
+                            'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+                        }
                     })
                 )
             );
             
-            // Refresh products list
-            fetch("/api/products")
-                .then((res) => res.json())
-                .then((data) => setProducts(data));
+            // Refresh items list
+            const updatedItems = await fetchItems();
+            setItems(updatedItems);
                 
             // Clear selection
             setSelectedItems([]);
@@ -280,36 +300,29 @@ export default function Inventory() {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentItems.map(({ product, variant }) => (
-                            <tr key={`${product.id}-${variant.id}`} className="border-b hover:bg-gray-50 text-sm">
+                        {currentItems.map((item) => (
+                            <tr key={item.name} className="border-b hover:bg-gray-50 text-sm">
                                 <td className="px-6 py-4">
                                     <input 
                                         type="checkbox"
                                         className="rounded"
                                         checked={selectedItems.some(
-                                            item => item.productId === product.id && item.variantId === variant.id
+                                            selected => selected.name === item.name
                                         )}
                                         onChange={(e) => handleCheckboxChange(
-                                            product.id,
-                                            variant.id,
-                                            `${product.type} - ${variant.name}`,
+                                            item.name,
+                                            item.item_name,
                                             e.target.checked
                                         )}
                                     />
                                 </td>
-                                <td className="px-6 py-4">
-                                    {product.type} - {variant.name}
-                                </td>
-                                <td className="px-6 py-4">{variant.stock}</td>
-                                <td className="px-6 py-4">${variant.price.toFixed(2)}</td>
+                                <td className="px-6 py-4">{item.item_name}</td>
+                                <td className="px-6 py-4">{item.actual_qty} {item.stock_uom}</td>
+                                <td className="px-6 py-4">${item.valuation_rate.toFixed(2)}</td>
                                 <td className="px-6 py-4">
                                     <div className="flex gap-2">
                                         <button 
-                                            onClick={() => handleDelete(
-                                                product.id, 
-                                                variant.id, 
-                                                `${product.type} - ${variant.name}`
-                                            )}
+                                            onClick={() => handleDelete(item.name, item.item_name)}
                                             className="text-gray-500 hover:text-gray-700"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -371,7 +384,7 @@ export default function Inventory() {
                 isOpen={!!itemToDelete}
                 onClose={() => setItemToDelete(null)}
                 onConfirm={confirmDelete}
-                itemName={itemToDelete?.name}
+                itemName={itemToDelete?.item_name}
             />
 
             {/* Multiple Delete Modal */}
