@@ -20,7 +20,7 @@ type ItemBasic = {
 
 export default function Inventory() {
     const router = useRouter();
-    const { fetchItems, fetchItemDetails } = useApi();
+    const { fetchItems, fetchItemDetails, disableItem } = useApi();
     const [items, setItems] = useState<ItemBasic[]>([]);
     const [showOptions, setShowOptions] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -72,21 +72,29 @@ export default function Inventory() {
         if (!itemToDelete) return;
 
         try {
-            // Implement ERPNext delete API call here
-            const response = await fetch(`http://localhost:8080/api/resource/Item/${itemToDelete.name}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
-                }
-            });
+            setLoading(true);
+            const response = await disableItem(itemToDelete.name);
 
             if (response.ok) {
-                // Refresh items list
-                const updatedItems = await fetchItems();
-                setItems(updatedItems);
+                // Fetch basic items first
+                const basicItems = await fetchItems();
+                
+                // Then fetch details for each item
+                const itemsWithDetails = await Promise.all(
+                    basicItems.map(async (item) => {
+                        const details = await fetchItemDetails(item.name);
+                        return details;
+                    })
+                );
+                
+                setItems(itemsWithDetails);
             }
         } catch (error) {
+            setError('Failed to delete item');
             console.error('Error deleting item:', error);
+        } finally {
+            setLoading(false);
+            setItemToDelete(null);
         }
     };
 
@@ -165,27 +173,56 @@ export default function Inventory() {
     // Add bulk delete handler
     const handleBulkDelete = async () => {
         try {
+            setLoading(true);
             await Promise.all(
                 selectedItems.map(item =>
-                    fetch(`http://localhost:8080/api/resource/Item/${item.name}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
-                        }
-                    })
+                    disableItem(item.name)
                 )
             );
             
-            // Refresh items list
-            const updatedItems = await fetchItems();
-            setItems(updatedItems);
-                
-            // Clear selection
+            // Fetch basic items first
+            const basicItems = await fetchItems();
+            
+            // Then fetch details for each item
+            const itemsWithDetails = await Promise.all(
+                basicItems.map(async (item) => {
+                    const details = await fetchItemDetails(item.name);
+                    return details;
+                })
+            );
+            
+            setItems(itemsWithDetails);
             setSelectedItems([]);
+            setShowMultiDeleteModal(false);
         } catch (error) {
+            setError('Failed to delete items');
             console.error('Error deleting items:', error);
+        } finally {
+            setLoading(false);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="p-6">
+                <div className="animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-6">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    <p>{error}</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-6 bg-white min-h-screen">
@@ -317,7 +354,7 @@ export default function Inventory() {
                                     />
                                 </td>
                                 <td className="px-6 py-4">{item.item_name}</td>
-                                <td className="px-6 py-4">{item.actual_qty} {item.stock_uom}</td>
+                                <td className="px-6 py-4">{item.actual_qty}</td>
                                 <td className="px-6 py-4">${item.valuation_rate.toFixed(2)}</td>
                                 <td className="px-6 py-4">
                                     <div className="flex gap-2">

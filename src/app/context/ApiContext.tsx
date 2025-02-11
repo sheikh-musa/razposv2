@@ -22,6 +22,7 @@ type ItemDetailed = {
 interface ApiContextType {
     fetchItems: () => Promise<ItemBasic[]>;
     fetchItemDetails: (itemName: string) => Promise<ItemDetailed>;
+    disableItem: (itemName: string) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -106,8 +107,36 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const disableItem = async (itemName: string) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/resource/Item/${itemName}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    disabled: 1
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to disable item');
+            }
+
+            return response;
+        } catch (error) {
+            console.error('Error disabling item:', error);
+            throw error;
+        }
+    };
+
     return (
-        <ApiContext.Provider value={{ fetchItems, fetchItemDetails }}>
+        <ApiContext.Provider value={{ 
+            fetchItems, 
+            fetchItemDetails,
+            disableItem
+        }}>
             {children}
         </ApiContext.Provider>
     );
