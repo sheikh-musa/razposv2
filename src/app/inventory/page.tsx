@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import DeleteItemModal from '@/app/components/modals/DeleteItemModal';
 import DeleteMultipleItemsModal from '@/app/components/modals/DeleteMultipleItemsModal';
 import { useApi } from '../context/ApiContext';
+import InventoryTable from '@/app/components/inventory/InventoryTable';
 
 // Updated types to match ERPNext structure
 type ItemBasic = {
@@ -37,12 +38,15 @@ export default function Inventory() {
     } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
+    const [filterOptions, setFilterOptions] = useState(false);
+    const [showDeletedItems, setShowDeletedItems] = useState(false);
 
     const fetchItemWithDetails = async () => {
-        const basicItems = await fetchItems();
+        const basicItems = await fetchItems(showDeletedItems);
+        console.log("delete", showDeletedItems)
         const itemsWithDetails = await Promise.all(
             basicItems.map(async (item) => {
+                console.log(item)
                 const details = await fetchItemDetails(item.name);
                 return details;
             })
@@ -65,7 +69,7 @@ export default function Inventory() {
         };
 
         loadItems();
-    }, []);
+    }, [showDeletedItems]);
 
     const handleDelete = (name: string, itemName: string) => {
         setItemToDelete({ name, item_name: itemName });
@@ -229,12 +233,34 @@ export default function Inventory() {
                     </div>
 
                     {/* Filters Button */}
-                    <button className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                        </svg>
-                        Filters
-                    </button>
+                    <div className="relative">
+                        <button 
+                            className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50" 
+                            onClick={() => setFilterOptions(!filterOptions)}
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            Filters
+                        </button>
+
+                        {filterOptions && (
+                            <div className="absolute mt-2 w-64 bg-white rounded-md shadow-lg z-10 p-4">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="showDeleted"
+                                        checked={showDeletedItems}
+                                        onChange={(e) => setShowDeletedItems(e.target.checked)}
+                                        className="rounded"
+                                    />
+                                    <label htmlFor="showDeleted" className="text-sm text-gray-700">
+                                        Show deleted items
+                                    </label>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     {/* Add Inventory Button */}
                     <button 
@@ -300,67 +326,14 @@ export default function Inventory() {
 
                 </div>
             </div>
-
-            <div className="bg-white rounded-lg shadow text-black">
-                <table className="min-w-full">
-                    <thead>
-                        <tr className="border-b">
-                            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-                                <input 
-                                    type="checkbox" 
-                                    className="rounded"
-                                    checked={selectedItems.length === currentItems.length && currentItems.length > 0}
-                                    onChange={(e) => handleSelectAll(e.target.checked)}
-                                />
-                            </th>
-                            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Item Name</th>
-                            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Stock</th>
-                            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Price (SGD)</th>
-                            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentItems.map((item) => (
-                            <tr key={item.name} className="border-b hover:bg-gray-50 text-sm">
-                                <td className="px-6 py-4">
-                                    <input 
-                                        type="checkbox"
-                                        className="rounded"
-                                        checked={selectedItems.some(
-                                            selected => selected.name === item.name
-                                        )}
-                                        onChange={(e) => handleCheckboxChange(
-                                            item.name,
-                                            item.item_name,
-                                            e.target.checked
-                                        )}
-                                    />
-                                </td>
-                                <td className="px-6 py-4">{item.item_name}</td>
-                                <td className="px-6 py-4">{item.actual_qty}</td>
-                                <td className="px-6 py-4">${item.valuation_rate.toFixed(2)}</td>
-                                <td className="px-6 py-4">
-                                    <div className="flex gap-2">
-                                        <button 
-                                            onClick={() => handleDelete(item.name, item.item_name)}
-                                            className="text-gray-500 hover:text-gray-700"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                        <button className="text-gray-500 hover:text-gray-700">
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            {/* Table */}
+            <InventoryTable
+                currentItems={currentItems}
+                selectedItems={selectedItems}
+                handleCheckboxChange={handleCheckboxChange}
+                handleSelectAll={handleSelectAll}
+                handleDelete={handleDelete}
+            />
 
             {/* Pagination */}
             <div className="flex justify-between items-center mt-4">

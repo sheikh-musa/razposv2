@@ -20,22 +20,29 @@ type ItemDetailed = {
 };
 
 interface ApiContextType {
-    fetchItems: () => Promise<ItemBasic[]>;
+    fetchItems: (includeDeleted?: boolean) => Promise<ItemBasic[]>;
     fetchItemDetails: (itemName: string) => Promise<ItemDetailed>;
     disableItem: (itemName: string) => Promise<Response>;
-    fetchDisabledItems: () => Promise<ItemBasic[]>;
+    undoDisableItem: (itemName: string) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
 
 export function ApiProvider({ children }: { children: ReactNode }) {
-    const fetchItems = async () => {
+    const fetchItems = async (includeDeleted: boolean = false) => {
         try {
-            const response = await fetch('http://localhost:8080/api/resource/Item?filters=[["has_variants","=",0],["disabled","=",0]]', {
-                headers: {
-                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+            const filters = includeDeleted 
+                ? '[["has_variants","=",0],["is_purchase_item","=",1],["disabled","=",1]]'
+                : '[["has_variants","=",0],["is_purchase_item","=",1],["disabled","=",0]]';
+
+            const response = await fetch(
+                `http://localhost:8080/api/resource/Item?filters=${filters}`,
+                {
+                    headers: {
+                        'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+                    }
                 }
-            });
+            );
             
             if (!response.ok) {
                 throw new Error('Failed to fetch items');
@@ -71,7 +78,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
 
             const itemData = await itemResponse.json();
-
             // Fetch stock information
             const stockResponse = await fetch(
                 `http://localhost:8080/api/resource/Bin?filters=[["item_code","=","${itemName}"]]&fields=["item_code","actual_qty","warehouse","valuation_rate"]`, 
@@ -131,31 +137,36 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     };
-    const fetchDisabledItems = async () => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/resource/Item?filters=[["disabled","=",1]]`, {
-                headers: {
-                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
-            },
-            method: 'GET'
-        });
-        const data = await response.json();
-        return data.data.map((item: any) => ({
-            name: item.name,
-                item_name: item.item_name || item.name,
-            }));
-        } catch (error) {
-            console.error('Error fetching disabled items:', error);
-            throw error;
-        }
-    };
-
+    const undoDisableItem = async (itemName: string) => {
+            try {
+                const response = await fetch(`http://localhost:8080/api/resource/Item/${itemName}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        disabled: 0
+                    })
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Failed to disable item');
+                }
+    
+                return response;
+            } catch (error) {
+                console.error('Error disabling item:', error);
+                throw error;
+            }
+        };
+   
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
             fetchItemDetails,
             disableItem,
-            fetchDisabledItems
+            undoDisableItem
         }}>
             {children}
         </ApiContext.Provider>
