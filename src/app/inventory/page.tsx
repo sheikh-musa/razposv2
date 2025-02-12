@@ -21,7 +21,7 @@ type ItemBasic = {
 
 export default function Inventory() {
     const router = useRouter();
-    const { fetchItems, fetchItemDetails, disableItem } = useApi();
+    const { fetchItems, fetchItemDetails, disableItem, undoDisableItem } = useApi();
     const [items, setItems] = useState<ItemBasic[]>([]);
     const [showOptions, setShowOptions] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -41,18 +41,6 @@ export default function Inventory() {
     const [filterOptions, setFilterOptions] = useState(false);
     const [showDeletedItems, setShowDeletedItems] = useState(false);
 
-    const fetchItemWithDetails = async () => {
-        const basicItems = await fetchItems(showDeletedItems);
-        console.log("delete", showDeletedItems)
-        const itemsWithDetails = await Promise.all(
-            basicItems.map(async (item) => {
-                console.log(item)
-                const details = await fetchItemDetails(item.name);
-                return details;
-            })
-        );
-        return itemsWithDetails;
-    }
     // Load items with their details
     useEffect(() => {
         const loadItems = async () => {
@@ -70,6 +58,17 @@ export default function Inventory() {
 
         loadItems();
     }, [showDeletedItems]);
+
+    const fetchItemWithDetails = async () => {
+        const basicItems = await fetchItems(showDeletedItems);
+        const itemsWithDetails = await Promise.all(
+            basicItems.map(async (item) => {
+                const details = await fetchItemDetails(item.name);
+                return details;
+            })
+        );
+        return itemsWithDetails;
+    };
 
     const handleDelete = (name: string, itemName: string) => {
         setItemToDelete({ name, item_name: itemName });
@@ -184,6 +183,24 @@ export default function Inventory() {
         } catch (error) {
             setError('Failed to delete items');
             console.error('Error deleting items:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Add restore handler
+    const handleRestore = async (name: string) => {
+        try {
+            setLoading(true);
+            const response = await undoDisableItem(name);
+
+            if (response.ok) {
+                const itemsWithDetails = await fetchItemWithDetails();
+                setItems(itemsWithDetails);
+            }
+        } catch (error) {
+            setError('Failed to restore item');
+            console.error('Error restoring item:', error);
         } finally {
             setLoading(false);
         }
@@ -333,6 +350,8 @@ export default function Inventory() {
                 handleCheckboxChange={handleCheckboxChange}
                 handleSelectAll={handleSelectAll}
                 handleDelete={handleDelete}
+                handleRestore={handleRestore}
+                showDeletedItems={showDeletedItems}
             />
 
             {/* Pagination */}
