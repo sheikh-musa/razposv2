@@ -173,17 +173,7 @@ export default function Inventory() {
                 )
             );
             
-            // Fetch basic items first
-            const basicItems = await fetchItems();
-            
-            // Then fetch details for each item
-            const itemsWithDetails = await Promise.all(
-                basicItems.map(async (item) => {
-                    const details = await fetchItemDetails(item.name);
-                    return details;
-                })
-            );
-            
+            const itemsWithDetails = await fetchItemWithDetails();
             setItems(itemsWithDetails);
             setSelectedItems([]);
             setShowMultiDeleteModal(false);
