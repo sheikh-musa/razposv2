@@ -23,6 +23,7 @@ interface ApiContextType {
     fetchItems: () => Promise<ItemBasic[]>;
     fetchItemDetails: (itemName: string) => Promise<ItemDetailed>;
     disableItem: (itemName: string) => Promise<Response>;
+    fetchDisabledItems: () => Promise<ItemBasic[]>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -130,12 +131,31 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     };
+    const fetchDisabledItems = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/resource/Item?filters=[["disabled","=",1]]`, {
+                headers: {
+                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+            },
+            method: 'GET'
+        });
+        const data = await response.json();
+        return data.data.map((item: any) => ({
+            name: item.name,
+                item_name: item.item_name || item.name,
+            }));
+        } catch (error) {
+            console.error('Error fetching disabled items:', error);
+            throw error;
+        }
+    };
 
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
             fetchItemDetails,
-            disableItem
+            disableItem,
+            fetchDisabledItems
         }}>
             {children}
         </ApiContext.Provider>
