@@ -1,8 +1,10 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
-import DeleteItemModal from '@/app/components/modals/DeleteItemModal';
-import DeleteMultipleItemsModal from '@/app/components/modals/DeleteMultipleItemsModal';
+import DeleteItemModal from '@/app/components/modals/inventory/DeleteItemModal';
+import DeleteMultipleItemsModal from '@/app/components/modals/inventory/DeleteMultipleItemsModal';
+import RestoreItemModal from '@/app/components/modals/inventory/RestoreItemModal';
+import RestoreMultipleItemsModal from '@/app/components/modals/inventory/RestoreMultipleItemsModal';
 import { useApi } from '../context/ApiContext';
 import InventoryTable from '@/app/components/inventory/InventoryTable';
 
@@ -40,6 +42,11 @@ export default function Inventory() {
     const [error, setError] = useState<string | null>(null);
     const [filterOptions, setFilterOptions] = useState(false);
     const [showDeletedItems, setShowDeletedItems] = useState(false);
+    const [itemToRestore, setItemToRestore] = useState<{
+        name: string;
+        item_name: string;
+    } | null>(null);
+    const [showMultiRestoreModal, setShowMultiRestoreModal] = useState(false);
 
     // Load items with their details
     useEffect(() => {
@@ -188,11 +195,18 @@ export default function Inventory() {
         }
     };
 
-    // Add restore handler
-    const handleRestore = async (name: string) => {
+    // Update handleRestore to show modal
+    const handleRestore = (name: string, itemName: string) => {
+        setItemToRestore({ name, item_name: itemName });
+    };
+
+    // Add confirmRestore function
+    const confirmRestore = async () => {
+        if (!itemToRestore) return;
+
         try {
             setLoading(true);
-            const response = await undoDisableItem(name);
+            const response = await undoDisableItem(itemToRestore.name);
 
             if (response.ok) {
                 const itemsWithDetails = await fetchItemWithDetails();
@@ -201,6 +215,29 @@ export default function Inventory() {
         } catch (error) {
             setError('Failed to restore item');
             console.error('Error restoring item:', error);
+        } finally {
+            setLoading(false);
+            setItemToRestore(null);
+        }
+    };
+
+    // Add bulk restore handler
+    const handleBulkRestore = async () => {
+        try {
+            setLoading(true);
+            await Promise.all(
+                selectedItems.map(item =>
+                    undoDisableItem(item.name)
+                )
+            );
+            
+            const itemsWithDetails = await fetchItemWithDetails();
+            setItems(itemsWithDetails);
+            setSelectedItems([]);
+            setShowMultiRestoreModal(false);
+        } catch (error) {
+            setError('Failed to restore items');
+            console.error('Error restoring items:', error);
         } finally {
             setLoading(false);
         }
@@ -404,6 +441,21 @@ export default function Inventory() {
                 isOpen={showMultiDeleteModal}
                 onClose={() => setShowMultiDeleteModal(false)}
                 onConfirm={handleBulkDelete}
+                itemCount={selectedItems.length}
+            />
+
+            {/* Add Restore Modals */}
+            <RestoreItemModal 
+                isOpen={!!itemToRestore}
+                onClose={() => setItemToRestore(null)}
+                onConfirm={confirmRestore}
+                itemName={itemToRestore?.item_name}
+            />
+
+            <RestoreMultipleItemsModal
+                isOpen={showMultiRestoreModal}
+                onClose={() => setShowMultiRestoreModal(false)}
+                onConfirm={handleBulkRestore}
                 itemCount={selectedItems.length}
             />
         </div>

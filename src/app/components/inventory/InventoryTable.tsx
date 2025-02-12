@@ -4,7 +4,7 @@ type InventoryTableProps = {
     handleCheckboxChange: (name: string, itemName: string, checked: boolean) => void;
     handleSelectAll: (checked: boolean) => void;
     handleDelete: (name: string, itemName: string) => void;
-    handleRestore?: (name: string) => void;
+    handleRestore?: (name: string, itemName: string) => void;
     showDeletedItems: boolean;
 };
 
@@ -60,7 +60,7 @@ export default function InventoryTable({
                                 <div className="flex gap-2">
                                     {showDeletedItems ? (
                                         <button 
-                                            onClick={() => handleRestore?.(item.name)}
+                                            onClick={() => handleRestore?.(item.name, item.item_name)}
                                             className="text-gray-500 hover:text-gray-700"
                                             title="Restore Item"
                                         >
