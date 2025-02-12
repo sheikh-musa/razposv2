@@ -38,20 +38,23 @@ export default function Inventory() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+
+    const fetchItemWithDetails = async () => {
+        const basicItems = await fetchItems();
+        const itemsWithDetails = await Promise.all(
+            basicItems.map(async (item) => {
+                const details = await fetchItemDetails(item.name);
+                return details;
+            })
+        );
+        return itemsWithDetails;
+    }
     // Load items with their details
     useEffect(() => {
         const loadItems = async () => {
             try {
                 setLoading(true);
-                const basicItems = await fetchItems();
-                
-                // Fetch details for each item
-                const itemsWithDetails = await Promise.all(
-                    basicItems.map(async (item) => {
-                        const details = await fetchItemDetails(item.name);
-                        return details;
-                    })
-                );
+                const itemsWithDetails = await fetchItemWithDetails();
                 
                 setItems(itemsWithDetails);
             } catch (err) {
@@ -76,17 +79,7 @@ export default function Inventory() {
             const response = await disableItem(itemToDelete.name);
 
             if (response.ok) {
-                // Fetch basic items first
-                const basicItems = await fetchItems();
-                
-                // Then fetch details for each item
-                const itemsWithDetails = await Promise.all(
-                    basicItems.map(async (item) => {
-                        const details = await fetchItemDetails(item.name);
-                        return details;
-                    })
-                );
-                
+                const itemsWithDetails = await fetchItemWithDetails();
                 setItems(itemsWithDetails);
             }
         } catch (error) {
