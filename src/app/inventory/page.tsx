@@ -54,7 +54,6 @@ export default function Inventory() {
             try {
                 setLoading(true);
                 const itemsWithDetails = await fetchItemWithDetails();
-                
                 setItems(itemsWithDetails);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred');
@@ -74,6 +73,9 @@ export default function Inventory() {
                 return details;
             })
         );
+        setFilterOptions(false);
+        setShowOptions(false);
+        setSelectedItems([]);
         return itemsWithDetails;
     };
 
