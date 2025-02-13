@@ -24,6 +24,9 @@ interface ApiContextType {
     fetchItemDetails: (itemName: string) => Promise<ItemDetailed>;
     disableItem: (itemName: string) => Promise<Response>;
     undoDisableItem: (itemName: string) => Promise<Response>;
+    createItemAttribute: (payload: any) => Promise<Response>;
+    createItemTemplate: (payload: any) => Promise<Response>;
+    createItemVariant: (payload: any) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -160,13 +163,82 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     };
-   
+
+    const createItemAttribute = async (payload: any) => {
+        try {
+            const response = await fetch('http://localhost:8080/api/resource/Item Attribute', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create item attribute');
+            }
+
+            return response;
+        } catch (error) {
+            console.error('Error creating item attribute:', error);
+            throw error;
+        }
+    };
+
+    const createItemTemplate = async (payload: any) => {
+        try {
+            const response = await fetch('http://localhost:8080/api/resource/Item', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create item template');
+            }
+
+            return response;
+        } catch (error) {
+            console.error('Error creating item template:', error);
+            throw error;
+        }
+    };
+
+    const createItemVariant = async (payload: any) => {
+        try {
+            const response = await fetch('http://localhost:8080/api/resource/Item', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create item variant');
+            }
+
+            return response;
+        } catch (error) {
+            console.error('Error creating item variant:', error);
+            throw error;
+        }
+    };
+
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
             fetchItemDetails,
             disableItem,
-            undoDisableItem
+            undoDisableItem,
+            createItemAttribute,
+            createItemTemplate,
+            createItemVariant
         }}>
             {children}
         </ApiContext.Provider>

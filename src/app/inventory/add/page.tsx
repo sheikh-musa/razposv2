@@ -3,11 +3,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
+import { useApi } from '@/app/context/ApiContext';
 
 export default function AddInventory() {
     const router = useRouter();
+    const { createItemAttribute, createItemTemplate, createItemVariant } = useApi();
     const [itemName, setItemName] = useState('');
     const [variants, setVariants] = useState([{ name: '', inventory: 0, price: 0 }]);
+    const [loading, setLoading] = useState(false);
 
     const handleAddVariant = () => {
         const lastVariant = variants[variants.length - 1];
@@ -34,39 +37,93 @@ export default function AddInventory() {
     };
 
     const handleSubmit = async () => {
-        // Check if item name is empty
+        // Validation checks
         if (!itemName.trim()) {
-            toast.error('Please enter an item name', {
-                duration: 3000,
-                position: 'top-center',
-                style: {
-                    background: '#F44336',
-                    color: '#fff',
-                }
-            });
+            toast.error('Please enter an item name');
             return;
         }
 
-        // Check if at least one variant has a name
         const hasVariantName = variants.some(variant => variant.name.trim() !== '');
         if (!hasVariantName) {
-            toast.error('Please add at least one variant name', {
-                duration: 3000,
-                position: 'top-center',
-                style: {
-                    background: '#F44336',
-                    color: '#fff',
-                }
-            });
+            toast.error('Please add at least one variant name');
             return;
         }
 
-        // Filter out variants with empty names before submission
-        const validVariants = variants.filter(variant => variant.name.trim() !== '');
+        try {
+            setLoading(true);
 
-        // Add your submit logic here with validVariants
-        // After successful submission:
-        router.push('/inventory');
+            // 1. Create Item Attribute
+            const attributePayload = {
+                attribute_name: `${itemName} - variant`,
+                numeric_values: 0,
+                item_attribute_values: variants
+                    .filter(variant => variant.name.trim() !== '')
+                    .map(variant => ({
+                        attribute_value: variant.name,
+                        abbr: variant.name
+                    }))
+            };
+            
+            const attributeResponse = await createItemAttribute(attributePayload);
+            if (!attributeResponse.ok) {
+                throw new Error('Failed to create item attribute');
+            }
+
+            // 2. Create Item Template
+            const templatePayload = {
+                item_code: itemName,
+                item_name: itemName,
+                item_group: "Consumable",
+                has_variants: 1,
+                variant_based_on: "Item Attribute",
+                attributes: [
+                    {
+                        attribute: `${itemName} - variant`
+                    }
+                ]
+            };
+
+            const templateResponse = await createItemTemplate(templatePayload);
+            if (!templateResponse.ok) {
+                throw new Error('Failed to create item template');
+            }
+
+            // 3. Create Variants
+            const validVariants = variants.filter(variant => variant.name.trim() !== '');
+            await Promise.all(
+                validVariants.map(async variant => {
+                    const variantPayload = {
+                        variant_of: itemName,
+                        item_code: `${itemName} - ${variant.name}`,
+                        item_name: `${itemName} - ${variant.name}`,
+                        item_group: "Consumable",
+                        stock_uom: "Nos",
+                        opening_stock: variant.inventory,
+                        valuation_rate: variant.price,
+                        attributes: [
+                            {
+                                attribute: `${itemName} - variant`,
+                                attribute_value: variant.name
+                            }
+                        ]
+                    };
+
+                    const variantResponse = await createItemVariant(variantPayload);
+                    if (!variantResponse.ok) {
+                        throw new Error(`Failed to create variant: ${variant.name}`);
+                    }
+                })
+            );
+
+            toast.success('Item and variants created successfully');
+            router.push('/inventory');
+
+        } catch (error) {
+            console.error('Error creating item:', error);
+            toast.error('Failed to create item and variants');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
