@@ -268,7 +268,7 @@ export default function Inventory() {
     return (
         <div className="p-6 bg-white min-h-screen">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-black">Inventory</h1>
+                <h1 className="text-2xl font-bold text-black">Inventory {showDeletedItems ? <span className="text-red-500">(Deleted)</span> : ''}</h1>
                 <div className="flex items-center gap-2 text-black text-sm">
                     {/* Search Bar */}
                     <div className="relative">
