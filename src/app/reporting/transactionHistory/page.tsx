@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
-import OrderDetails from './orderDetails/page';
+import OrderDetails from '../../components/transactionHistory/OrderDetails';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
