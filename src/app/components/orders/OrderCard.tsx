@@ -26,7 +26,7 @@ type OrderCardProps = {
 export default function OrderCard({ product, onQuantityChange, onAddToOrder }: OrderCardProps) {
   return (
     <div className="bg-white p-3 rounded-lg shadow-md text-black border-solid border mb-2">
-      <h2 className="text-md text-gray-500 font-semibold mb-4">{product.name}</h2>
+      <h2 className="text-md text-gray-500 font-semibold mb-4">{product.item_name}</h2>
       <div className="space-y-4">
         {product.variants.map((variant) => (
           <div key={variant.name} className="flex items-center gap-4">

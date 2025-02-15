@@ -35,7 +35,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     const fetchItems = async (includeDeleted: boolean = false, templatesOnly: boolean = false) => {
         try {
             const filters = templatesOnly 
-                ? '[["has_variants","=",1]]'
+                ? '[["has_variants","=",1]]&fields=["name","item_name"]'
                 : includeDeleted 
                     ? '[["has_variants","=",0],["is_purchase_item","=",1],["disabled","=",1]]'
                 : '[["has_variants","=",0],["is_purchase_item","=",1],["disabled","=",0]]';

@@ -53,7 +53,7 @@ export default function Orders() {
                         const variants = await fetchItemDetails(template.name, true);
                         return {
                             name: template.name,
-                            item_name: template.name,
+                            item_name: template.item_name,
                             variants: variants.map(variant => ({
                                 ...variant,
                                 quantity: 1 // Default quantity for ordering
