@@ -46,7 +46,6 @@ export default function Orders() {
                 setLoading(true);
                 // Fetch item templates (items with variants)
                 const templates = await fetchItems(false, true);
-              console.log('template :', templates)
                 // For each template, fetch its variants
                 const productsWithVariants = await Promise.all(
                     templates.map(async (template) => {
@@ -61,7 +60,6 @@ export default function Orders() {
                         };
                     })
                 );
-                console.log('productsWithVariants :', productsWithVariants)
                 setProducts(productsWithVariants);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load products');
