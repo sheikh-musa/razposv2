@@ -44,7 +44,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 `http://localhost:8080/api/resource/Item?filters=${filters}`,
                 {
                     headers: {
-                        'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+                        'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18'
                     }
                 }
             );
@@ -69,7 +69,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                     `http://localhost:8080/api/resource/Item?filters=[["variant_of","=","${itemName}"],["is_purchase_item","=",1]]`,
                     {
                         headers: {
-                            'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+                            'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18'
                         }
                     }
                 );
@@ -86,7 +86,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                             `http://localhost:8080/api/resource/Item/${variant.name}`,
                             {
                                 headers: {
-                                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+                                    'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18'
                                 }
                             }
                         );
@@ -102,7 +102,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                             `http://localhost:8080/api/resource/Bin?filters=[["item_code","=","${variant.name}"]]&fields=["item_code","actual_qty","warehouse","valuation_rate"]`,
                             {
                                 headers: {
-                                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+                                    'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18'
                                 }
                             }
                         );
@@ -134,7 +134,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             // For single item details (non-variant case)
             const itemResponse = await fetch(`http://localhost:8080/api/resource/Item/${itemName}`, {
                 headers: {
-                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+                    'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18'
                 }
             });
             
@@ -149,7 +149,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 `http://localhost:8080/api/resource/Bin?filters=[["item_code","=","${itemName}"]]&fields=["item_code","actual_qty","warehouse","valuation_rate"]`, 
                 {
                     headers: {
-                        'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'
+                        'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18'
                     }
                 }
             );
@@ -184,7 +184,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             const response = await fetch(`http://localhost:8080/api/resource/Item/${itemName}`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090',
+                    'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -207,7 +207,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             const response = await fetch(`http://localhost:8080/api/resource/Item/${itemName}`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090',
+                    'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -231,7 +231,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             const response = await fetch('http://localhost:8080/api/resource/Item Attribute', {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090',
+                    'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(payload)
@@ -253,7 +253,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             const response = await fetch('http://localhost:8080/api/resource/Item', {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090',
+                    'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(payload)
@@ -275,7 +275,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             const response = await fetch('http://localhost:8080/api/resource/Item', {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090',
+                    'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(payload)
