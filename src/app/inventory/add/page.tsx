@@ -94,8 +94,8 @@ export default function AddInventory() {
                 validVariants.map(async variant => {
                     const variantPayload = {
                         variant_of: itemName,
-                        item_code: `${variant.name}`,
-                        item_name: `${variant.name}`,
+                        item_code: variant.name,
+                        item_name: variant.name,
                         item_group: "Consumable",
                         stock_uom: "Nos",
                         opening_stock: variant.inventory,
@@ -107,7 +107,7 @@ export default function AddInventory() {
                             }
                         ]
                     };
-
+                    // console.log('variantPayload :', variantPayload)
                     const variantResponse = await createItemVariant(variantPayload);
                     if (!variantResponse.ok) {
                         throw new Error(`Failed to create variant: ${variant.name}`);
