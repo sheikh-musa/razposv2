@@ -7,7 +7,7 @@ import { useApi } from '@/app/context/ApiContext';
 
 export default function AddInventory() {
     const router = useRouter();
-    const { createItemAttribute, createItemTemplate, createItemVariant } = useApi();
+    const { createItemAttribute, createItemTemplate, createItemVariant, createItemPrice } = useApi();
     const [itemName, setItemName] = useState('');
     const [variants, setVariants] = useState([{ name: '', inventory: 0, price: 0 }]);
     const [loading, setLoading] = useState(false);
@@ -99,7 +99,6 @@ export default function AddInventory() {
                         item_group: "Consumable",
                         stock_uom: "Nos",
                         opening_stock: variant.inventory,
-                        valuation_rate: variant.price,
                         attributes: [
                             {
                                 attribute: `${itemName} - variant`,
@@ -107,10 +106,24 @@ export default function AddInventory() {
                             }
                         ]
                     };
+                    const itemPricePayload = {
+                        item_code: variant.name,
+                        item_name: variant.name,
+                        stock_uom: "Nos",
+                        price_list: "Standard Selling",
+                        selling: 1,
+                        currency: "SGD",
+                        price_list_rate: variant.price
+                    }
                     // console.log('variantPayload :', variantPayload)
                     const variantResponse = await createItemVariant(variantPayload);
                     if (!variantResponse.ok) {
                         throw new Error(`Failed to create variant: ${variant.name}`);
+                    }
+                    console.log('itemPricePayload :', itemPricePayload)
+                    const itemPriceResponse = await createItemPrice(itemPricePayload);
+                    if (!itemPriceResponse.ok) {
+                        throw new Error(`Failed to create item price: ${variant.name}`);
                     }
                 })
             );

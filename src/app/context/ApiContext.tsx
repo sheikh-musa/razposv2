@@ -27,6 +27,7 @@ interface ApiContextType {
     createItemAttribute: (payload: any) => Promise<Response>;
     createItemTemplate: (payload: any) => Promise<Response>;
     createItemVariant: (payload: any) => Promise<Response>;
+    createItemPrice: (payload: any) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -46,7 +47,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                     headers: {
                         'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18'
                     }
-                }
+                } 
             );
             
             if (!response.ok) {
@@ -292,6 +293,28 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const createItemPrice = async (payload: any) => {
+        try {
+            const response = await fetch('http://localhost:8080/api/resource/Item Price', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'token 54a35c2b0bf6af0:2a339eca08bbb18',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create item price');
+            }
+
+            return response;
+        } catch (error) {
+            console.error('Error creating item price:', error);
+            throw error;
+        }
+    } 
+
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
@@ -300,7 +323,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             undoDisableItem,
             createItemAttribute,
             createItemTemplate,
-            createItemVariant
+            createItemVariant,
+            createItemPrice
         }}>
             {children}
         </ApiContext.Provider>
