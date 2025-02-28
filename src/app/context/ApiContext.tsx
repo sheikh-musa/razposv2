@@ -4,7 +4,7 @@ import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, 
 
 interface ApiContextType {
     fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
-    fetchItemDetails: (itemName: string, fetchVariants?: boolean) => Promise<ItemDetailed>;
+    fetchItemDetails: (itemName: string, fetchVariants?: boolean) => Promise<ItemDetailed[]>;
     disableItem: (itemName: string) => Promise<Response>;
     undoDisableItem: (itemName: string) => Promise<Response>;
     createItemAttribute: (payload: ItemAttributePayload) => Promise<Response>;
@@ -45,7 +45,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const fetchItemDetails = async (itemName: string, fetchVariants: boolean = false) => {
+    const fetchItemDetails = async (itemName: string, fetchVariants: boolean = false): Promise<ItemDetailed[]> => {
         try {
             if (fetchVariants) {
                 // 1. First fetch basic variant information
@@ -57,14 +57,15 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                         }
                     }
                 );
+
                 if (!variantsResponse.ok) {
                     throw new Error('Failed to fetch variants');
                 }
                 const variantsData = await variantsResponse.json();
-                console.log('variantsData :', variantsData)
+                // console.log('variantsData :', variantsData)
                 // 2. For each variant, fetch its complete details and stock information
                 const variantsWithDetails = await Promise.all(
-                    variantsData.data.map(async (variant: ItemBasic) => {
+                    variantsData.data.map(async (variant: ItemTemplate) => {
                         // Fetch detailed item information
                         const itemResponse = await fetch(
                             `http://localhost:8080/api/resource/Item/${variant.name}`,
@@ -150,12 +151,14 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 warehouse: 'N/A'
             };
 
-            return {
-                ...itemData.data,
-                actual_qty: stockInfo.actual_qty,
-                valuation_rate: stockInfo.valuation_rate,
-                warehouse: stockInfo.warehouse
-            };
+            return [
+                {
+                    ...itemData.data,
+                    actual_qty: stockInfo.actual_qty,
+                    valuation_rate: stockInfo.valuation_rate,
+                    warehouse: stockInfo.warehouse
+                }
+            ];
 
         } catch (error) {
             console.error('Error fetching item details:', error);
