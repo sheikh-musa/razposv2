@@ -1,26 +1,10 @@
 import Image from 'next/image';
-
-type ItemBasic = {
-  name: string;
-  item_name: string;
-  item_code: string;
-  description: string;
-  stock_uom: string;
-  valuation_rate: number;
-  item_group: string;
-  actual_qty: number;
-  warehouse: string;
-  quantity?: number;
-};
+import { ItemDetailed, ItemTemplate } from '@/app/context/types/ERPNext';
 
 type OrderCardProps = {
-  product: {
-    name: string;
-    item_name: string;
-    variants: ItemBasic[];
-  };
+  product: ItemTemplate;
   onQuantityChange: (productName: string, variantName: string, change: number) => void;
-  onAddToOrder: (product: { name: string; item_name: string; }, variant: ItemBasic) => void;
+  onAddToOrder: (product: ItemTemplate, variant: ItemDetailed) => void;
 };
 
 export default function OrderCard({ product, onQuantityChange, onAddToOrder }: OrderCardProps) {

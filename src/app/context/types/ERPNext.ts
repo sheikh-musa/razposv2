@@ -46,7 +46,7 @@ export type ItemPricePayload = {
     item_name: string;
     stock_uom: string;
     price_list: string;
-    selling: 1 | 0;
+    selling: number;
     currency: string;
     price_list_rate: number;
     // valid_from?: string;
@@ -54,7 +54,7 @@ export type ItemPricePayload = {
 }
 
 // Common Types
-export type ItemBasic = {
+export type ItemDetailed = {
     name: string;
     item_name: string;
     item_code: string;
@@ -62,6 +62,7 @@ export type ItemBasic = {
     stock_uom: string;
     valuation_rate: number;
     item_group: string;
+    opening_stock: number;
     actual_qty: number;
     warehouse: string;
     quantity?: number;
@@ -70,5 +71,10 @@ export type ItemBasic = {
 export type ItemTemplate = {
     name: string;
     item_name: string;
-    variants: ItemBasic[];
+    variants: ItemDetailed[];
 } 
+
+export type ItemBasic = {
+    name: string;
+    item_name: string;
+}

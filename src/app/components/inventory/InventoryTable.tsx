@@ -1,5 +1,5 @@
 type InventoryTableProps = {
-    currentItems: ItemBasic[];
+    currentItems: ItemDetailed[];
     selectedItems: { name: string; item_name: string; }[];
     handleCheckboxChange: (name: string, itemName: string, checked: boolean) => void;
     handleSelectAll: (checked: boolean) => void;

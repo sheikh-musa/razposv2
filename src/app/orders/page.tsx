@@ -5,37 +5,19 @@ import { useCart } from '../context/CartContext';
 import OrderConfirmationModal from '../components/modals/OrderConfirmationModal';
 import OrderCard from '../components/orders/OrderCard';
 import { useApi } from '../context/ApiContext';
-
-type ItemBasic = {
-    name: string;
-    item_name: string;
-    item_code: string;
-    description: string;
-    stock_uom: string;
-    valuation_rate: number;
-    item_group: string;
-    actual_qty: number;
-    warehouse: string;
-    quantity?: number;
-};
-
-type ItemTemplate = {
-    name: string;
-    item_name: string;
-    variants: ItemBasic[];
-};
+import { ItemDetailed, ItemTemplate } from '../context/types/ERPNext';
 
 export default function Orders() {
     const { fetchItems, fetchItemDetails } = useApi();
     const [products, setProducts] = useState<ItemTemplate[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [showFilters, setShowFilters] = useState(false);
+    // const [showFilters, setShowFilters] = useState(false);
     const [showOrderSummary, setShowOrderSummary] = useState(false);
     const { addItem, items } = useCart();
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [pendingOrder, setPendingOrder] = useState<{
         product: ItemTemplate;
-        variant: ItemBasic;
+        variant: ItemDetailed;
     } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -94,7 +76,7 @@ export default function Orders() {
         );
     };
 
-    const handleAddToOrder = (product: ItemTemplate, variant: ItemBasic) => {
+    const handleAddToOrder = (product: ItemTemplate, variant: ItemDetailed) => {
         const existingItem = items.find(
             item => item.productId === product.name && item.variantId === variant.name
         );

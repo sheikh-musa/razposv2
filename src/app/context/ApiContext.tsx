@@ -1,33 +1,16 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-
-type ItemBasic = {
-    name: string;
-    item_name: string;
-};
-
-type ItemDetailed = {
-    name: string;
-    item_name: string;
-    item_code: string;
-    description: string;
-    stock_uom: string;
-    valuation_rate: number;
-    item_group: string;
-    opening_stock: number;
-    actual_qty: number;
-    warehouse: string;
-};
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic } from './types/ERPNext';
 
 interface ApiContextType {
-    fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemBasic[]>;
+    fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
     fetchItemDetails: (itemName: string, fetchVariants?: boolean) => Promise<ItemDetailed>;
     disableItem: (itemName: string) => Promise<Response>;
     undoDisableItem: (itemName: string) => Promise<Response>;
-    createItemAttribute: (payload: any) => Promise<Response>;
-    createItemTemplate: (payload: any) => Promise<Response>;
-    createItemVariant: (payload: any) => Promise<Response>;
-    createItemPrice: (payload: any) => Promise<Response>;
+    createItemAttribute: (payload: ItemAttributePayload) => Promise<Response>;
+    createItemTemplate: (payload: ItemTemplatePayload) => Promise<Response>;
+    createItemVariant: (payload: ItemVariantPayload) => Promise<Response>;
+    createItemPrice: (payload: ItemPricePayload) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -81,7 +64,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 console.log('variantsData :', variantsData)
                 // 2. For each variant, fetch its complete details and stock information
                 const variantsWithDetails = await Promise.all(
-                    variantsData.data.map(async (variant: any) => {
+                    variantsData.data.map(async (variant: ItemBasic) => {
                         // Fetch detailed item information
                         const itemResponse = await fetch(
                             `http://localhost:8080/api/resource/Item/${variant.name}`,
@@ -227,7 +210,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const createItemAttribute = async (payload: any) => {
+    const createItemAttribute = async (payload: ItemAttributePayload) => {
         try {
             const response = await fetch('http://localhost:8080/api/resource/Item Attribute', {
                 method: 'POST',
@@ -249,7 +232,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const createItemTemplate = async (payload: any) => {
+    const createItemTemplate = async (payload: ItemTemplatePayload) => {
         try {
             const response = await fetch('http://localhost:8080/api/resource/Item', {
                 method: 'POST',
@@ -271,7 +254,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const createItemVariant = async (payload: any) => {
+    const createItemVariant = async (payload: ItemVariantPayload) => {
         try {
             const response = await fetch('http://localhost:8080/api/resource/Item', {
                 method: 'POST',
@@ -293,7 +276,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const createItemPrice = async (payload: any) => {
+    const createItemPrice = async (payload: ItemPricePayload) => {
         try {
             const response = await fetch('http://localhost:8080/api/resource/Item Price', {
                 method: 'POST',

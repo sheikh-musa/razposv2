@@ -7,24 +7,12 @@ import RestoreItemModal from '@/app/components/modals/inventory/RestoreItemModal
 import RestoreMultipleItemsModal from '@/app/components/modals/inventory/RestoreMultipleItemsModal';
 import { useApi } from '../context/ApiContext';
 import InventoryTable from '@/app/components/inventory/InventoryTable';
-
-// Updated types to match ERPNext structure
-type ItemBasic = {
-    name: string;
-    item_name: string;
-    item_code: string;
-    description: string;
-    stock_uom: string;
-    valuation_rate: number;
-    item_group: string;
-    actual_qty: number;
-    warehouse: string;
-};
+import { ItemDetailed } from '../context/types/ERPNext';
 
 export default function Inventory() {
     const router = useRouter();
     const { fetchItems, fetchItemDetails, disableItem, undoDisableItem } = useApi();
-    const [items, setItems] = useState<ItemBasic[]>([]);
+    const [items, setItems] = useState<ItemDetailed[]>([]);
     const [showOptions, setShowOptions] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);

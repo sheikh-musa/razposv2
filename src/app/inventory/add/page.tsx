@@ -98,7 +98,7 @@ export default function AddInventory() {
                         item_name: variant.name,
                         item_group: "Consumable",
                         stock_uom: "Nos",
-                        opening_stock: variant.inventory,
+                        opening_qty: variant.inventory,
                         attributes: [
                             {
                                 attribute: `${itemName} - variant`,
