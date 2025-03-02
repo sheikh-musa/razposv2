@@ -42,7 +42,8 @@ export default function Inventory() {
             try {
                 setLoading(true);
                 const itemsWithDetails = await fetchItemWithDetails();
-                setItems(itemsWithDetails);
+                setItems(itemsWithDetails)
+                console.log(itemsWithDetails)
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred');
             } finally {
@@ -58,7 +59,7 @@ export default function Inventory() {
         const itemsWithDetails = await Promise.all(
             basicItems.map(async (item) => {
                 const details = await fetchItemDetails(item.name);
-                return details;
+                return details[0];
             })
         );
         setFilterOptions(false);
@@ -94,7 +95,7 @@ export default function Inventory() {
     // Filter items based on search query
     const filteredItems = items.filter(item => 
         item.item_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.item_code.toLowerCase().includes(searchQuery.toLowerCase())
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // Pagination

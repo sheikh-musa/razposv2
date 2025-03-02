@@ -1,3 +1,5 @@
+import { ItemDetailed } from '@/app/context/types/ERPNext';
+
 type InventoryTableProps = {
     currentItems: ItemDetailed[];
     selectedItems: { name: string; item_name: string; }[];
@@ -7,6 +9,7 @@ type InventoryTableProps = {
     handleRestore?: (name: string, itemName: string) => void;
     showDeletedItems: boolean;
 };
+
 
 export default function InventoryTable({ 
     currentItems, 
