@@ -8,6 +8,7 @@ import RestoreMultipleItemsModal from '@/app/components/modals/inventory/Restore
 import { useApi } from '../context/ApiContext';
 import InventoryTable from '@/app/components/inventory/InventoryTable';
 import { ItemWithPrice } from '../context/types/ERPNext';
+import InventoryDetails from '@/app/components/inventory/InventoryDetails';
 
 export default function Inventory() {
     const router = useRouter();
@@ -35,6 +36,7 @@ export default function Inventory() {
         item_name: string;
     } | null>(null);
     const [showMultiRestoreModal, setShowMultiRestoreModal] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<ItemWithPrice | null>(null);
     // const [itemPrice, setItemPrice] = useState<ItemPrice[]>([]);
     // Load items with their details
     useEffect(() => {
@@ -238,6 +240,10 @@ export default function Inventory() {
         }
     };
 
+    const handleEditItem = (item: ItemWithPrice) => {
+        setSelectedItem(item);
+    };
+
     if (loading) {
         return (
             <div className="p-6">
@@ -400,6 +406,7 @@ export default function Inventory() {
                 handleDelete={handleDelete}
                 handleRestore={handleRestore}
                 showDeletedItems={showDeletedItems}
+                onEditItem={handleEditItem}
             />
 
             {/* Pagination */}
@@ -469,6 +476,13 @@ export default function Inventory() {
                 onConfirm={handleBulkRestore}
                 itemCount={selectedItems.length}
             />
+
+            {selectedItem && (
+                <InventoryDetails
+                    item={selectedItem}
+                    onClose={() => setSelectedItem(null)}
+                />
+            )}
         </div>
     )
 }
