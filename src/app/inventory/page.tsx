@@ -7,12 +7,12 @@ import RestoreItemModal from '@/app/components/modals/inventory/RestoreItemModal
 import RestoreMultipleItemsModal from '@/app/components/modals/inventory/RestoreMultipleItemsModal';
 import { useApi } from '../context/ApiContext';
 import InventoryTable from '@/app/components/inventory/InventoryTable';
-import { ItemDetailed } from '../context/types/ERPNext';
+import { ItemWithPrice } from '../context/types/ERPNext';
 
 export default function Inventory() {
     const router = useRouter();
-    const { fetchItems, fetchItemDetails, disableItem, undoDisableItem } = useApi();
-    const [items, setItems] = useState<ItemDetailed[]>([]);
+    const { fetchItems, fetchItemDetails, disableItem, undoDisableItem, fetchItemPrice } = useApi();
+    const [items, setItems] = useState<ItemWithPrice[]>([]);
     const [showOptions, setShowOptions] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -35,7 +35,7 @@ export default function Inventory() {
         item_name: string;
     } | null>(null);
     const [showMultiRestoreModal, setShowMultiRestoreModal] = useState(false);
-
+    // const [itemPrice, setItemPrice] = useState<ItemPrice[]>([]);
     // Load items with their details
     useEffect(() => {
         const loadItems = async () => {
@@ -43,7 +43,6 @@ export default function Inventory() {
                 setLoading(true);
                 const itemsWithDetails = await fetchItemWithDetails();
                 setItems(itemsWithDetails)
-                console.log(itemsWithDetails)
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred');
             } finally {
@@ -59,9 +58,14 @@ export default function Inventory() {
         const itemsWithDetails = await Promise.all(
             basicItems.map(async (item) => {
                 const details = await fetchItemDetails(item.name);
-                return details[0];
+                const price = await fetchItemPrice(item.name);
+                return {
+                    ...details[0],
+                    price: price[0]
+                };
             })
         );
+
         setFilterOptions(false);
         setShowOptions(false);
         setSelectedItems([]);

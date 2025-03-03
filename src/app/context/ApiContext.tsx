@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice } from './types/ERPNext';
 
 interface ApiContextType {
     fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
@@ -11,6 +11,7 @@ interface ApiContextType {
     createItemTemplate: (payload: ItemTemplatePayload) => Promise<Response>;
     createItemVariant: (payload: ItemVariantPayload) => Promise<Response>;
     createItemPrice: (payload: ItemPricePayload) => Promise<Response>;
+    fetchItemPrice: (itemName: string) => Promise<ItemPrice[]>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -300,6 +301,18 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     } 
+    const fetchItemPrice = async (itemName: string) => {
+        const response = await fetch(`http://localhost:8080/api/resource/Item Price?filters=[["item_code","=","${itemName}"]]&fields=["item_name","price_list_rate","selling"]`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch item price');
+        }
+        const data = await response.json();
+        return data.data;
+    }
 
     return (
         <ApiContext.Provider value={{ 
@@ -310,7 +323,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             createItemAttribute,
             createItemTemplate,
             createItemVariant,
-            createItemPrice
+            createItemPrice,
+            fetchItemPrice
         }}>
             {children}
         </ApiContext.Provider>

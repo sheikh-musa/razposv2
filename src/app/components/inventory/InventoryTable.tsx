@@ -1,7 +1,7 @@
-import { ItemDetailed } from '@/app/context/types/ERPNext';
+import { ItemWithPrice } from '@/app/context/types/ERPNext';
 
 type InventoryTableProps = {
-    currentItems: ItemDetailed[];
+    currentItems: ItemWithPrice[];
     selectedItems: { name: string; item_name: string; }[];
     handleCheckboxChange: (name: string, itemName: string, checked: boolean) => void;
     handleSelectAll: (checked: boolean) => void;
@@ -9,7 +9,6 @@ type InventoryTableProps = {
     handleRestore?: (name: string, itemName: string) => void;
     showDeletedItems: boolean;
 };
-
 
 export default function InventoryTable({ 
     currentItems, 
@@ -58,7 +57,7 @@ export default function InventoryTable({
                             </td>
                             <td className="px-6 py-4">{item.item_name}</td>
                             <td className="px-6 py-4">{item.actual_qty}</td>
-                            <td className="px-6 py-4">${item.valuation_rate.toFixed(2)}</td>
+                            <td className="px-6 py-4">${item.price?.price_list_rate.toFixed(2) || 0}</td>
                             <td className="px-6 py-4">
                                 <div className="flex gap-2">
                                     {showDeletedItems ? (

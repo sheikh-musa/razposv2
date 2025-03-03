@@ -53,6 +53,12 @@ export type ItemPricePayload = {
     // valid_upto?: string;
 }
 
+export type ItemPrice = {
+    item_name: string;
+    price_list_rate: number;
+    selling: number;
+}
+
 // Common Types
 export type ItemDetailed = {
     name: string;
@@ -78,3 +84,7 @@ export type ItemBasic = {
     name: string;
     item_name: string;
 }
+
+export type ItemWithPrice = ItemDetailed & {
+    price?: ItemPrice;  // Making it optional in case price isn't always available
+};
