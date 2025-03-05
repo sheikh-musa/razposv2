@@ -1,17 +1,51 @@
 'use client'
 import { useState } from 'react';
-import { ItemWithPrice } from '@/app/context/types/ERPNext';
+import { ItemWithPrice, StockReconciliationPayload } from '@/app/context/types/ERPNext';
+import { useApi } from '@/app/context/ApiContext';
+import toast from 'react-hot-toast';
 
 type InventoryDetailsProps = {
   item?: ItemWithPrice;
   onClose: () => void;
+  onUpdate?: () => Promise<void>;
 };
 
-export default function InventoryDetails({ item, onClose }: InventoryDetailsProps) {
+export default function InventoryDetails({ item, onClose, onUpdate }: InventoryDetailsProps) {
+  const { stockReconciliation } = useApi();
   const [quantity, setQuantity] = useState(item?.actual_qty || 0);
   const [price, setPrice] = useState(item?.price?.price_list_rate || 0);
+  const [loading, setLoading] = useState(false);
 
   if (!item) return null;
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      const payload: StockReconciliationPayload = {
+        purpose: "Stock Reconciliation",
+        items: [{
+          item_code: item.name,
+          warehouse: "Stores - R",
+          qty: quantity
+        }],
+        docstatus: 1
+      };
+
+      await stockReconciliation(payload);
+      toast.success('Inventory updated successfully');
+      
+      if (onUpdate) {
+        await onUpdate();
+      }
+      
+      onClose();
+    } catch (error) {
+      toast.error('Failed to update inventory');
+      console.error('Error updating inventory:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-y-0 right-0 w-[315px] bg-white shadow-xl transform transition-transform duration-300 ease-in-out flex flex-col">
@@ -110,10 +144,19 @@ export default function InventoryDetails({ item, onClose }: InventoryDetailsProp
       {/* Action Buttons */}
       <div className="border-t bg-white p-3">
         <div className="space-y-3">
-          <button className="w-full py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
-            Save Changes
+          <button 
+            className={`w-full py-2 bg-purple-600 text-white text-sm rounded-lg 
+              ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-700'}`}
+            onClick={handleSave}
+            disabled={loading}
+          >
+            {loading ? 'Saving...' : 'Save Changes'}
           </button>
-          <button className="w-full py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50">
+          <button 
+            className="w-full py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50"
+            onClick={onClose}
+            disabled={loading}
+          >
             Cancel
           </button>
         </div>

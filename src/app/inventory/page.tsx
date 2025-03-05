@@ -8,7 +8,7 @@ import RestoreMultipleItemsModal from '@/app/components/modals/inventory/Restore
 import { useApi } from '../context/ApiContext';
 import InventoryTable from '@/app/components/inventory/InventoryTable';
 import { ItemWithPrice } from '../context/types/ERPNext';
-import InventoryDetails from '@/app/components/inventory/InventoryDetails';
+import InventoryEdit from '@/app/components/inventory/InventoryEdit';
 
 export default function Inventory() {
     const router = useRouter();
@@ -242,6 +242,11 @@ export default function Inventory() {
 
     const handleEditItem = (item: ItemWithPrice) => {
         setSelectedItem(item);
+    };
+
+    const handleInventoryUpdate = async () => {
+        const updatedItems = await fetchItemWithDetails();
+        setItems(updatedItems);
     };
 
     if (loading) {
@@ -478,9 +483,10 @@ export default function Inventory() {
             />
 
             {selectedItem && (
-                <InventoryDetails
+                <InventoryEdit
                     item={selectedItem}
                     onClose={() => setSelectedItem(null)}
+                    onUpdate={handleInventoryUpdate}
                 />
             )}
         </div>

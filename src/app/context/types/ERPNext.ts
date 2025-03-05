@@ -88,3 +88,13 @@ export type ItemBasic = {
 export type ItemWithPrice = ItemDetailed & {
     price?: ItemPrice;  // Making it optional in case price isn't always available
 };
+
+export type StockReconciliationPayload = {
+    purpose: string;
+    items: {
+        item_code: string;
+        warehouse: string;
+        qty: number;
+    }[];
+    docstatus: number;
+}

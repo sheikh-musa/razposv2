@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice, StockReconciliationPayload } from './types/ERPNext';
 
 interface ApiContextType {
     fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
@@ -12,6 +12,7 @@ interface ApiContextType {
     createItemVariant: (payload: ItemVariantPayload) => Promise<Response>;
     createItemPrice: (payload: ItemPricePayload) => Promise<Response>;
     fetchItemPrice: (itemName: string) => Promise<ItemPrice[]>;
+    stockReconciliation: (payload: StockReconciliationPayload) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -314,6 +315,20 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return data.data;
     }
 
+    const stockReconciliation = async (payload: StockReconciliationPayload) => {
+        const response = await fetch('http://localhost:8080/api/resource/Stock Reconciliation', {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            throw new Error('Failed to reconcile stock');
+        }
+        return response;
+    }
+
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
@@ -324,7 +339,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             createItemTemplate,
             createItemVariant,
             createItemPrice,
-            fetchItemPrice
+            fetchItemPrice,
+            stockReconciliation
         }}>
             {children}
         </ApiContext.Provider>

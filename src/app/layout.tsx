@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "./components/navbar";
 import { CartProvider } from './context/CartContext';
 import { ApiProvider } from './context/ApiContext';
+import { Toaster } from 'react-hot-toast';
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -29,6 +30,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Toaster 
+          position="top-center"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: '#333',
+              color: '#fff',
+            },
+          }}
+        />
         <ApiProvider>
           <CartProvider>
             <div className="flex h-screen bg-white">
