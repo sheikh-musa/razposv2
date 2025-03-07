@@ -57,7 +57,7 @@ export default function InventoryTable({
                                     )}
                                 />
                             </td>
-                            <td className="px-6 py-4">{item.item_name}</td>
+                            <td className="px-6 py-4">{item.item_code}</td>
                             <td className="px-6 py-4">{item.actual_qty}</td>
                             <td className="px-6 py-4">${item.price?.price_list_rate.toFixed(2) || 0}</td>
                             <td className="px-6 py-4">

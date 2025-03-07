@@ -67,7 +67,7 @@ export default function Inventory() {
                 };
             })
         );
-
+        console.log(itemsWithDetails);
         setFilterOptions(false);
         setShowOptions(false);
         setSelectedItems([]);

@@ -94,7 +94,7 @@ export default function AddInventory() {
                 validVariants.map(async variant => {
                     const variantPayload = {
                         variant_of: itemName,
-                        item_code: variant.name,
+                        item_code: itemName + " - " + variant.name,
                         item_name: variant.name,
                         item_group: "Consumable",
                         stock_uom: "Nos",
@@ -107,7 +107,7 @@ export default function AddInventory() {
                         ]
                     };
                     const itemPricePayload = {
-                        item_code: variant.name,
+                        item_code: itemName + " - " + variant.name,
                         item_name: variant.name,
                         stock_uom: "Nos",
                         price_list: "Standard Selling",
