@@ -120,7 +120,7 @@ export default function AddInventory() {
                     if (!variantResponse.ok) {
                         throw new Error(`Failed to create variant: ${variant.name}`);
                     }
-                    console.log('itemPricePayload :', itemPricePayload)
+                    
                     const itemPriceResponse = await createItemPrice(itemPricePayload);
                     if (!itemPriceResponse.ok) {
                         throw new Error(`Failed to create item price: ${variant.name}`);

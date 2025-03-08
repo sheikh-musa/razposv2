@@ -18,6 +18,11 @@ interface ApiContextType {
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
 
 export function ApiProvider({ children }: { children: ReactNode }) {
+
+    //* -------------------------------------------------------------------------- */
+    //*                          API calls for fetching Items                      */
+    //* -------------------------------------------------------------------------- */
+
     const fetchItems = async (includeDeleted: boolean = false, templatesOnly: boolean = false) => {
         try {
             const filters = templatesOnly 
@@ -215,6 +220,10 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    //* -------------------------------------------------------------------------- */
+    //*                          API calls for creating Items                      */
+    //* -------------------------------------------------------------------------- */
+
     const createItemAttribute = async (payload: ItemAttributePayload) => {
         try {
             const response = await fetch('http://localhost:8080/api/resource/Item Attribute', {
@@ -281,6 +290,10 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    //* -------------------------------------------------------------------------- */
+    //*                             API calls for Item Price                       */
+    //* -------------------------------------------------------------------------- */
+
     const createItemPrice = async (payload: ItemPricePayload) => {
         try {
             const response = await fetch('http://localhost:8080/api/resource/Item Price', {
@@ -314,6 +327,10 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         const data = await response.json();
         return data.data;
     }
+
+    //* -------------------------------------------------------------------------- */
+    //*                        API calls for Stock Reconciliation                  */
+    //* -------------------------------------------------------------------------- */
 
     const stockReconciliation = async (payload: StockReconciliationPayload) => {
         const response = await fetch('http://localhost:8080/api/resource/Stock Reconciliation', {
