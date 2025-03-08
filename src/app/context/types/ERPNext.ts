@@ -19,7 +19,7 @@ export type ItemTemplatePayload = {
     item_code: string;
     item_name: string;
     item_group: string;
-    has_variants: 1 | 0;
+    has_variants: number;
     variant_based_on: string;
     attributes: ItemAttribute[];
 }
