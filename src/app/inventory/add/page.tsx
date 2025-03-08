@@ -52,7 +52,7 @@ export default function AddInventory() {
         try {
             setLoading(true);
 
-            // 1. Create Item Attribute
+            // * -----------------------  1. Create Item Attribute ---------------------- */
             const attributePayload = {
                 attribute_name: `${itemName} - variant`,
                 numeric_values: 0,
@@ -69,7 +69,7 @@ export default function AddInventory() {
                 throw new Error('Failed to create item attribute');
             }
 
-            // 2. Create Item Template
+            // * -----------------------  2. Create Item Template ---------------------- */
             const templatePayload = {
                 item_code: itemName,
                 item_name: itemName,
@@ -88,7 +88,7 @@ export default function AddInventory() {
                 throw new Error('Failed to create item template');
             }
 
-            // 3. Create Variants
+            // * -----------------------  3. Create Variants ---------------------- */  
             const validVariants = variants.filter(variant => variant.name.trim() !== '');
             await Promise.all(
                 validVariants.map(async variant => {

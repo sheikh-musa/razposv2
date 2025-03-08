@@ -1,4 +1,4 @@
-// Item Attribute Types
+// * -------------------------  Item Attribute Types ------------------------ */
 export type ItemAttributeValue = {
     attribute_value: string;
     abbr: string;
@@ -10,7 +10,7 @@ export type ItemAttributePayload = {
     item_attribute_values: ItemAttributeValue[];
 }
 
-// Item Template Types
+//* --------------------------- Item Template Types -------------------------- */
 export type ItemAttribute = {
     attribute: string;
 }
@@ -24,7 +24,7 @@ export type ItemTemplatePayload = {
     attributes: ItemAttribute[];
 }
 
-// Item Variant Types
+//* --------------------------- Item Variant Types --------------------------- */
 export type VariantAttribute = {
     attribute: string;
     attribute_value: string;
@@ -40,7 +40,7 @@ export type ItemVariantPayload = {
     attributes: VariantAttribute[];
 }
 
-// Item Price Types
+//* --------------------------- Item Price Types ---------------------------- */
 export type ItemPricePayload = {
     item_code: string;
     item_name: string;
@@ -58,8 +58,42 @@ export type ItemPrice = {
     price_list_rate: number;
     selling: number;
 }
+//* --------------------------- Stock Types ---------------------------- */ 
 
-// Common Types
+export type StockEntryPayload = {
+    purpose: string;
+    items: {
+        item_code: string;
+        warehouse: string;
+        qty: number;
+    }[];
+    docstatus: number;
+}
+
+export type StockReconciliationPayload = {
+    purpose: string;
+    items: {
+        item_code: string;
+        warehouse: string;
+        qty: number;
+    }[];
+    docstatus: number;
+}
+
+export type StockEntry = {
+    name: string;
+    item_name: string;
+    item_code: string;
+    description: string;
+    stock_uom: string;
+    valuation_rate: number;
+    item_group: string;
+    opening_stock: number;
+    actual_qty: number;
+    warehouse: string;
+}
+
+//* --------------------------- Common Types ---------------------------- */
 export type ItemDetailed = {
     name: string;
     item_name: string;
@@ -89,12 +123,3 @@ export type ItemWithPrice = ItemDetailed & {
     price?: ItemPrice;  // Making it optional in case price isn't always available
 };
 
-export type StockReconciliationPayload = {
-    purpose: string;
-    items: {
-        item_code: string;
-        warehouse: string;
-        qty: number;
-    }[];
-    docstatus: number;
-}

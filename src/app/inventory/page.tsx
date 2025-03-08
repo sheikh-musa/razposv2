@@ -12,7 +12,7 @@ import InventoryEdit from '@/app/components/inventory/InventoryEdit';
 
 export default function Inventory() {
     const router = useRouter();
-    const { fetchItems, fetchItemDetails, disableItem, undoDisableItem, fetchItemPrice } = useApi();
+    const { fetchItems, fetchItemDetails, disableItem, undoDisableItem, fetchItemPrice, fetchStockEntry } = useApi();
     const [items, setItems] = useState<ItemWithPrice[]>([]);
     const [showOptions, setShowOptions] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -63,7 +63,7 @@ export default function Inventory() {
                 const price = await fetchItemPrice(item.name);
                 return {
                     ...details[0],
-                    price: price[0]
+                    price: price[0],
                 };
             })
         );

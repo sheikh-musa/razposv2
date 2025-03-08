@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice, StockReconciliationPayload } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice, StockReconciliationPayload, StockEntryPayload } from './types/ERPNext';
 
 interface ApiContextType {
     fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
@@ -12,6 +12,8 @@ interface ApiContextType {
     createItemVariant: (payload: ItemVariantPayload) => Promise<Response>;
     createItemPrice: (payload: ItemPricePayload) => Promise<Response>;
     fetchItemPrice: (itemName: string) => Promise<ItemPrice[]>;
+    createStockEntry: (payload: StockEntryPayload) => Promise<Response>;
+    fetchStockEntry: (itemName: string) => Promise<Response>;
     stockReconciliation: (payload: StockReconciliationPayload) => Promise<Response>;
 }
 
@@ -329,9 +331,35 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     //* -------------------------------------------------------------------------- */
-    //*                        API calls for Stock Reconciliation                  */
+    //*                             API calls for Stock                            */
     //* -------------------------------------------------------------------------- */
+    const createStockEntry = async (payload: StockEntryPayload) => {
+        const response = await fetch('http://localhost:8080/api/resource/Stock Entry', {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            throw new Error('Failed to create stock entry');
+        }
+        return response;
+    }
 
+    const fetchStockEntry = async (itemName: string) => {
+        const response = await fetch(`http://localhost:8080/api/resource/Bin?filters=[["item_code","=","${itemName}"]]&fields=["*"]`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch stock entry');
+        }
+        const data = await response.json();
+        return data.data;
+    }
+   
     const stockReconciliation = async (payload: StockReconciliationPayload) => {
         const response = await fetch('http://localhost:8080/api/resource/Stock Reconciliation', {
             method: 'POST',
@@ -357,6 +385,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             createItemVariant,
             createItemPrice,
             fetchItemPrice,
+            createStockEntry,
+            fetchStockEntry,
             stockReconciliation
         }}>
             {children}
