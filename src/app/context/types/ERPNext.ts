@@ -60,15 +60,18 @@ export type ItemPrice = {
 }
 //* --------------------------- Stock Types ---------------------------- */ 
 
+export type StockEntryItem = {
+    item_code: string;
+    qty: number;
+    t_warehouse: string;
+    uom: string;
+};
+
 export type StockEntryPayload = {
-    purpose: string;
-    items: {
-        item_code: string;
-        warehouse: string;
-        qty: number;
-    }[];
+    stock_entry_type: string;
+    items: StockEntryItem[];
     docstatus: number;
-}
+};
 
 export type StockReconciliationPayload = {
     purpose: string;

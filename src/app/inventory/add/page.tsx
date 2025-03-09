@@ -4,13 +4,15 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
 import { useApi } from '@/app/context/ApiContext';
+import { StockEntryItem, StockEntryPayload } from '@/app/context/types/ERPNext';
 
 export default function AddInventory() {
     const router = useRouter();
-    const { createItemAttribute, createItemTemplate, createItemVariant, createItemPrice } = useApi();
+    const { createItemAttribute, createItemTemplate, createItemVariant, createItemPrice, createStockEntry } = useApi();
     const [itemName, setItemName] = useState('');
     const [variants, setVariants] = useState([{ name: '', inventory: 0, price: 0 }]);
     const [loading, setLoading] = useState(false);
+    let stockItems: StockEntryItem[] = [];
 
     const handleAddVariant = () => {
         const lastVariant = variants[variants.length - 1];
@@ -125,8 +127,29 @@ export default function AddInventory() {
                     if (!itemPriceResponse.ok) {
                         throw new Error(`Failed to create item price: ${variant.name}`);
                     }
+
+                    
+                    // Collect all variant items first
+                    stockItems.push({
+                        item_code: itemName + " - " + variant.name,
+                        qty: variant.inventory,
+                        t_warehouse: "Stores - R",
+                        uom: "Nos"
+                    })
+                    
                 })
             );
+            // * -----------------------  4. Create Stock Entry ---------------------- */
+            const stockEntryPayload: StockEntryPayload = {
+                stock_entry_type: "Material Receipt",
+                items: stockItems,
+                docstatus: 1
+            }
+
+            const stockEntryResponse = await createStockEntry(stockEntryPayload);
+            if (!stockEntryResponse.ok) {
+                throw new Error(`Failed to create stock entry for variants`);
+            }
 
             toast.success('Item and variants created successfully');
             router.push('/inventory');
