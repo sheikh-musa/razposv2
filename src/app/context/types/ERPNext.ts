@@ -79,6 +79,7 @@ export type StockReconciliationPayload = {
         item_code: string;
         warehouse: string;
         qty: number;
+        valuation_rate: number;
     }[];
     docstatus: number;
 }

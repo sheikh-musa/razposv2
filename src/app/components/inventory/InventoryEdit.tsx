@@ -26,7 +26,8 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
         items: [{
           item_code: item.name,
           warehouse: "Stores - R",
-          qty: quantity
+          qty: quantity,
+          valuation_rate: item.price?.price_list_rate || 0
         }],
         docstatus: 1
       };
