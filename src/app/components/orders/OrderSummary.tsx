@@ -1,6 +1,9 @@
 'use client'
 import React, { useState } from 'react';
 import { useCart } from '../../context/CartContext';
+import { useApi } from '../../context/ApiContext';
+import { SalesOrderPayload } from '../../context/types/ERPNext';
+import toast from 'react-hot-toast';
 
 interface OrderSummaryProps {
   onClose: () => void;
@@ -8,11 +11,37 @@ interface OrderSummaryProps {
 
 export default function OrderSummary({ onClose }: OrderSummaryProps) {
   const { items, removeItem, updateQuantity, total } = useCart();
+  const { createKitchenOrder } = useApi();
   const [dineIn, setDineIn] = useState(true);
   const [buzzerNumber, setBuzzerNumber] = useState('');
   const [remark, setRemark] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
 //   const shippingFee = 3.99;
+
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+  };
+
+  const handleConfirm = async () => {
+    const payload: SalesOrderPayload = {
+      customer: 'Guest',
+      delivery_date: getCurrentDate(),
+      items: items.map((item) => ({ item_code: item.name, qty: item.quantity })),
+      status: 'To Deliver and Bill',
+      custom_kitchen_status: 'prepared',
+      custom_remarks: remark,
+      custom_payment_mode: paymentMethod,
+      docstatus: 1,
+    };
+
+    const response = await createKitchenOrder(payload);
+    if (response.ok) {
+      toast.success('Order created successfully');
+    } else {
+      toast.error('Failed to create order');
+    }
+  };
 
   return (
     <div className="bg-white border-solid border p-4 rounded-lg shadow-md h-[calc(100vh-7rem)] sticky top-4 relative">
@@ -176,7 +205,10 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
             <span className="font-medium">${(total).toFixed(2)}</span>
           </div>
         </div>
-        <button className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700">
+        <button 
+          onClick={handleConfirm}
+          className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700"
+        >
           Confirm
         </button>
       </div>

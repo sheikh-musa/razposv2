@@ -1,5 +1,6 @@
 'use client'
 import React, { createContext, useContext, useState } from 'react';
+import { SalesOrderItem } from './types/ERPNext';
 
 type CartItem = {
   productId: string;
@@ -9,6 +10,10 @@ type CartItem = {
   quantity: number;
   type: string;
 };
+
+//  -------------------------------------------------------------------------- */
+//                 TODO: REDO THE CART CONTEXT USING THE NEW TYPES             */
+//  -------------------------------------------------------------------------- */
 
 type CartContextType = {
   items: CartItem[];

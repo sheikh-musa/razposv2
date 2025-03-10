@@ -131,6 +131,7 @@ export type SalesOrderPayload = {
     custom_kitchen_status: string;
     custom_remarks: string;
     custom_payment_mode: string;
+    docstatus: number;
   }
 
 //* --------------------------- Common Types ---------------------------- */
