@@ -22,20 +22,23 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
     const today = new Date();
     return today.toISOString().split('T')[0]; // Returns YYYY-MM-DD
   };
+// TODO: Add logic to check if the items are in stock
+// TODO: Add logic to change outstanding amount to 0 if paid
 
+ // ! Current item naming convention is item_code
+ // ! Not all items are based on Item Price
   const handleConfirm = async () => {
     const payload: SalesOrderPayload = {
       customer: 'Guest',
       delivery_date: getCurrentDate(),
-      items: items.map((item) => ({ item_code: item.name, qty: item.quantity })), // ! Current item naming convention is item_code
+      items: items.map((item) => ({ item_code: item.name, qty: item.quantity })),
       status: 'To Deliver and Bill',
       custom_kitchen_status: 'preparing',
       custom_remarks: remark,
       custom_payment_mode: paymentMethod,
       docstatus: 1,
     };
-    console.log('items', items);
-    console.log('payload', payload);
+
     const response = await createKitchenOrder(payload);
     if (response.ok) {
       toast.success('Order created successfully');
