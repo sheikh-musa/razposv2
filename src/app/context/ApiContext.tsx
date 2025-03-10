@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice, StockReconciliationPayload, StockEntryPayload } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders } from './types/ERPNext';
 
 interface ApiContextType {
     fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
@@ -15,6 +15,8 @@ interface ApiContextType {
     createStockEntry: (payload: StockEntryPayload) => Promise<Response>;
     fetchStockEntry: (itemName: string) => Promise<Response>;
     stockReconciliation: (payload: StockReconciliationPayload) => Promise<Response>;
+    createKitchenOrder: (payload: SalesOrderPayload) => Promise<Response>;
+    fetchKitchenOrders: () => Promise<SalesOrders[]>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -374,6 +376,37 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return response;
     }
 
+    //* -------------------------------------------------------------------------- */
+    //*                             API calls for Kitchen                          */
+    //* -------------------------------------------------------------------------- */
+
+    const fetchKitchenOrders = async () => {
+        const response = await fetch('http://localhost:8080/api/resource/Sales Order', {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch kitchen orders');
+        }
+        const data = await response.json();
+        return data.data;
+    }
+
+    const createKitchenOrder = async (payload: SalesOrderPayload) => {
+        const response = await fetch('http://localhost:8080/api/resource/Sales Order', {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            throw new Error('Failed to create kitchen order');
+        }
+        return response;
+    }
+
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
@@ -387,7 +420,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             fetchItemPrice,
             createStockEntry,
             fetchStockEntry,
-            stockReconciliation
+            stockReconciliation,
+            createKitchenOrder,
+            fetchKitchenOrders
         }}>
             {children}
         </ApiContext.Provider>

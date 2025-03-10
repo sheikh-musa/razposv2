@@ -97,6 +97,42 @@ export type StockEntry = {
     warehouse: string;
 }
 
+//* --------------------------- Sales Order (Kitchen) Types ---------------------------- */
+
+export type SalesOrders = {
+    name: string;
+    customer: string;
+    transaction_date: string;
+    total_qty: number;
+    total: number
+    custom_kitchen_status: string;
+    custom_remarks: string;
+    custom_payment_mode: string;
+    payment_schedule: PaymentSchedule[];
+    items: SalesOrderItem[];
+}
+
+export type PaymentSchedule = {
+    payment_amount: number;
+    discount: number;
+    outstanding: number;
+}
+
+export type SalesOrderItem = {
+    item_code: string;
+    qty: number;
+}
+    
+export type SalesOrderPayload = {
+    customer: string;
+    delivery_date: string;
+    items: SalesOrderItem[];
+    status: string;
+    custom_kitchen_status: string;
+    custom_remarks: string;
+    custom_payment_mode: string;
+  }
+
 //* --------------------------- Common Types ---------------------------- */
 export type ItemDetailed = {
     name: string;
