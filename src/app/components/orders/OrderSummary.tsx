@@ -10,7 +10,7 @@ interface OrderSummaryProps {
 }
 
 export default function OrderSummary({ onClose }: OrderSummaryProps) {
-  const { items, removeItem, updateQuantity, total } = useCart();
+  const { items, removeItem, updateQuantity, total, clearCart } = useCart();
   const { createKitchenOrder } = useApi();
   const [dineIn, setDineIn] = useState(true);
   const [buzzerNumber, setBuzzerNumber] = useState('');
@@ -27,17 +27,20 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
     const payload: SalesOrderPayload = {
       customer: 'Guest',
       delivery_date: getCurrentDate(),
-      items: items.map((item) => ({ item_code: item.name, qty: item.quantity })),
+      items: items.map((item) => ({ item_code: item.name, qty: item.quantity })), // ! Current item naming convention is item_code
       status: 'To Deliver and Bill',
-      custom_kitchen_status: 'prepared',
+      custom_kitchen_status: 'preparing',
       custom_remarks: remark,
       custom_payment_mode: paymentMethod,
       docstatus: 1,
     };
-
+    console.log('items', items);
+    console.log('payload', payload);
     const response = await createKitchenOrder(payload);
     if (response.ok) {
       toast.success('Order created successfully');
+      clearCart();
+      onClose();
     } else {
       toast.error('Failed to create order');
     }
