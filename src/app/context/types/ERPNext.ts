@@ -108,6 +108,7 @@ export type SalesOrders = {
     custom_kitchen_status: string;
     custom_remarks: string;
     custom_payment_mode: string;
+    custom_status: string;
     payment_schedule: PaymentSchedule[];
     items: SalesOrderItem[];
 }

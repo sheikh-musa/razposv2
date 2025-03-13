@@ -27,6 +27,8 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
 
  // ! Current item naming convention is item_code
  // ! Not all items are based on Item Price
+ // ! Status is always To Deliver and Bill will change to Overdue after 1 day
+
   const handleConfirm = async () => {
     const payload: SalesOrderPayload = {
       customer: 'Guest',

@@ -16,7 +16,8 @@ interface ApiContextType {
     fetchStockEntry: (itemName: string) => Promise<Response>;
     stockReconciliation: (payload: StockReconciliationPayload) => Promise<Response>;
     createKitchenOrder: (payload: SalesOrderPayload) => Promise<Response>;
-    fetchKitchenOrders: () => Promise<SalesOrders[]>;
+    fetchKitchenOrderNames: () => Promise<SalesOrders[]>;
+    fetchKitchenOrderDetails: (orderId: string) => Promise<SalesOrders[]>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -380,7 +381,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //*                             API calls for Kitchen                          */
     //* -------------------------------------------------------------------------- */
 
-    const fetchKitchenOrders = async () => {
+    const fetchKitchenOrderNames = async () => {
         const response = await fetch('http://localhost:8080/api/resource/Sales Order', {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -388,6 +389,19 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         });
         if (!response.ok) {
             throw new Error('Failed to fetch kitchen orders');
+        }
+        const data = await response.json();
+        return data.data;
+    }
+
+    const fetchKitchenOrderDetails = async (orderId: string) => {
+        const response = await fetch(`http://localhost:8080/api/resource/Sales Order/${orderId}`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch kitchen order details');
         }
         const data = await response.json();
         return data.data;
@@ -422,7 +436,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             fetchStockEntry,
             stockReconciliation,
             createKitchenOrder,
-            fetchKitchenOrders
+            fetchKitchenOrderNames,
+            fetchKitchenOrderDetails
         }}>
             {children}
         </ApiContext.Provider>
