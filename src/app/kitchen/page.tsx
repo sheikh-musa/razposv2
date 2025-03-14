@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useApi } from '../context/ApiContext';
 import { SalesOrders } from '../context/types/ERPNext';
+import KitchenOrderCard from '@/app/components/kitchen/KitchenOrderCard';
 
 export default function Kitchen() {
     const { fetchKitchenOrderNames, fetchKitchenOrderDetails } = useApi();
@@ -36,7 +37,6 @@ export default function Kitchen() {
                 // Filter out completed orders
                 const incompleteOrders = flattenedOrders.filter(order => !order.custom_status);
                 setOrders(incompleteOrders);
-                console.log('incompleteOrders', incompleteOrders);
                 // Calculate item summary
                 const summary: Record<string, number> = {};
                 incompleteOrders.forEach((order) => {
@@ -76,6 +76,35 @@ export default function Kitchen() {
         }
     };
 
+    const handlePaymentMethodChange = async (orderName: string, method: string) => {
+        // Add API call to update payment method
+        setOrders(prevOrders =>
+            prevOrders.map(order =>
+                order.name === orderName
+                    ? { ...order, payment_method: method }
+                    : order
+            )
+        );
+    };
+
+    const handleItemComplete = async (orderName: string, itemCode: string, completed: boolean) => {
+        // Add API call to update item completion status
+        setOrders(prevOrders =>
+            prevOrders.map(order =>
+                order.name === orderName
+                    ? {
+                        ...order,
+                        items: order.items.map(item =>
+                            item.item_code === itemCode
+                                ? { ...item, completed }
+                                : item
+                        )
+                    }
+                    : order
+            )
+        );
+    };
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
@@ -98,14 +127,16 @@ export default function Kitchen() {
                 </div>
             </div>
             
-            // TODO add logic to display orders
             {/* Orders Section */}
             <div className='flex overflow-x-auto mt-2 h-2/3'>
                 {orders.map((order) => (
-                    <div key={order.name} className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[320px] overflow-y-auto'>
-                        {/* Order header and content */}
-                        {/* Update this section based on your KitchenOrder type structure */}
-                    </div>
+                    <KitchenOrderCard
+                        key={order.name}
+                        order={order}
+                        onPaymentToggle={handlePaymentToggle}
+                        onPaymentMethodChange={handlePaymentMethodChange}
+                        onItemComplete={handleItemComplete}
+                    />   
                 ))}
             </div>
         </div>
