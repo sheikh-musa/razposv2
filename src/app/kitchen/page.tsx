@@ -29,6 +29,7 @@ export default function Kitchen() {
                         return details;
                     })
                 );
+                console.log('ordersWithDetails', ordersWithDetails);
 
                 // Flatten the array if fetchKitchenOrderDetails returns an array
                 const flattenedOrders = ordersWithDetails.flat();

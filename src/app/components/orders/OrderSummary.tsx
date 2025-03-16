@@ -40,7 +40,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       custom_payment_mode: paymentMethod,
       docstatus: 1,
     };
-
+    console.log('payload', payload);
     const response = await createKitchenOrder(payload);
     if (response.ok) {
       toast.success('Order created successfully');
