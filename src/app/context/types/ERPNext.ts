@@ -127,13 +127,14 @@ export type SalesOrderItem = {
 export type SalesOrderPayload = {
     customer: string;
     delivery_date: string;
-    custom_time: string;
+    custom_order_time: string;
     items: SalesOrderItem[];
     status: string;
     custom_kitchen_status: string;
     custom_remarks: string;
     custom_payment_mode: string;
-    custom_order_completed: boolean;
+    custom_order_complete: number;
+    custom_payment_complete: number;
     docstatus: number;
   }
 

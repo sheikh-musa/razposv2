@@ -16,6 +16,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
   const [buzzerNumber, setBuzzerNumber] = useState('');
   const [remark, setRemark] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const [paymentComplete, setPaymentComplete] = useState<number>(0);
 //   const shippingFee = 3.99;
 
   const getCurrentDate = () => {
@@ -28,18 +29,24 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
  // ! Current item naming convention is item_code
  // ! Not all items are based on Item Price
  // ! Status is always To Deliver and Bill will change to Overdue after 1 day
+ // ! stock will be deducted when Sales Order converted to Sales Invoice
 
   const handleConfirm = async () => {
     const payload: SalesOrderPayload = {
       customer: 'Guest',
-      delivery_date: getCurrentDate(),
+      delivery_date: getCurrentDate(), // TODO: Change to actual delivery date past 12am
+      custom_order_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: '2-digit' }).replace(' ', ''),
       items: items.map((item) => ({ item_code: item.name, qty: item.quantity })),
       status: 'To Deliver and Bill',
       custom_kitchen_status: 'preparing',
       custom_remarks: remark,
       custom_payment_mode: paymentMethod,
+      custom_order_complete: 0,
+      custom_payment_complete: paymentComplete,
       docstatus: 1,
     };
+    console.log('paymentComplete', payload.custom_payment_complete);
+    console.log('orderComplete', payload.custom_order_complete);
     console.log('payload', payload);
     const response = await createKitchenOrder(payload);
     if (response.ok) {
@@ -192,10 +199,12 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
           <div>
             <label className="block text-sm mb-1">Payment status</label>
             <select
+              value={paymentComplete}
+              onChange={(e) => setPaymentComplete(Number(e.target.value))}
               className="w-full p-2 border rounded-md text-sm"
             >
-              <option value="pending">Pending</option>
-              <option value="paid">Paid</option>
+              <option value="0">Pending</option>
+              <option value="1">Paid</option>
             </select>
           </div>
         </div>
