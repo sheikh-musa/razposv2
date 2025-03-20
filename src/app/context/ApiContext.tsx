@@ -382,7 +382,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //* -------------------------------------------------------------------------- */
 
     const fetchKitchenOrderNames = async () => {
-        const response = await fetch('http://localhost:8080/api/resource/Sales Order', {
+        const response = await fetch('http://localhost:8080/api/resource/Sales Order?limit_page_length=1000', {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
             }
