@@ -33,25 +33,25 @@ export default function KitchenOrderCard({
             <div className='border-b pb-3'>
                 <p className='font-bold text-xl'>Order No: #{order.name}</p>
                 <p className='text-sm my-2'>Order placed <span className='text-slate-500'>
-                    {new Date(order.delivery_date).toLocaleTimeString()}
+                    {new Date(order.transaction_date).toLocaleTimeString()}
                 </span></p>
                 <div className='flex gap-2 mt-4'>
                     <button 
-                        onClick={() => onPaymentToggle(order.name, !order.payment_received)}
+                        onClick={() => onPaymentToggle(order.name, !order.custom_payment_complete)}
                         className={`text-xs px-4 py-2 ${
-                            order.payment_received 
+                            order.custom_payment_complete 
                                 ? 'bg-green-500 hover:bg-green-600' 
                                 : 'bg-red-500 hover:bg-red-600'
                         } text-white rounded-md`}
                     >
-                        {order.payment_received ? 'Payment Received' : 'Payment Pending'}
+                        {order.custom_payment_complete ? 'Payment Received' : 'Payment Pending'}
                     </button>
                     <div className="relative">
                         <button 
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                             className='text-xs px-4 py-2 bg-slate-200 rounded-md hover:bg-slate-300 flex items-center gap-2'
                         >
-                            {order.payment_method}
+                            {order.custom_payment_mode}
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -91,17 +91,17 @@ export default function KitchenOrderCard({
                                 onChange={(e) => handleCheckboxChange(item.item_code, e.target.checked)}
                             />
                             <div className={completedItems[item.item_code] ? 'line-through text-gray-400' : ''}>
-                                <p className='font-medium'>{item.item_name}</p>
+                                <p className='font-medium'>{item.item_code}</p>
                                 <p className='text-slate-600'>Qty: {item.qty}</p>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
-            {order.remarks && (
+            {order.custom_remarks && (
                 <div className='pt-3 border-t'>
                     <p className='text-red-500 font-medium'>Remarks:</p>
-                    <p className='text-slate-600'>{order.remarks}</p>
+                    <p className='text-slate-600'>{order.custom_remarks}</p>
                 </div>
             )}
         </div>

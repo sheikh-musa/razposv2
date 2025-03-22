@@ -34,9 +34,8 @@ export default function Kitchen() {
                 // Flatten the array if fetchKitchenOrderDetails returns an array
                 const flattenedOrders = ordersWithDetails.flat();
 
-                // ! Custom status is not a valid field in the API for now
                 // Filter out completed orders
-                const incompleteOrders = flattenedOrders.filter(order => !order.custom_status);
+                const incompleteOrders = flattenedOrders.filter(order => !order.custom_order_complete);
                 setOrders(incompleteOrders);
                 // Calculate item summary
                 const summary: Record<string, number> = {};
