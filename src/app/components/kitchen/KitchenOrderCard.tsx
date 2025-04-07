@@ -1,6 +1,8 @@
 'use client'
-import { useState } from 'react';
-import { SalesOrders } from '@/app/context/types/ERPNext';
+import { useState, useEffect } from 'react';
+import { SalesOrders, SalesInvoicePayload } from '@/app/context/types/ERPNext';
+import { useApi } from '@/app/context/ApiContext';
+import toast from 'react-hot-toast';
 
 type KitchenOrderCardProps = {
     order: SalesOrders;
@@ -15,10 +17,19 @@ export default function KitchenOrderCard({
     onPaymentMethodChange,
     onItemComplete 
 }: KitchenOrderCardProps) {
+    const { createSalesInvoice } = useApi();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
+    const [isCompleting, setIsCompleting] = useState(false);
+    const [canComplete, setCanComplete] = useState(false);
     
     const paymentOptions = ["Cash", "Paynow", "Credit Card"];
+
+    // Check if all items are completed and payment is received
+    useEffect(() => {
+        const allItemsCompleted = order.items.every(item => completedItems[item.item_code]);
+        setCanComplete(order.custom_payment_complete === 1 && allItemsCompleted);
+    }, [completedItems, order.custom_payment_complete, order.items]);
 
     const handleCheckboxChange = (itemCode: string, checked: boolean) => {
         setCompletedItems(prev => ({
@@ -28,8 +39,41 @@ export default function KitchenOrderCard({
         onItemComplete(order.name, itemCode, checked);
     };
 
+    const handleCompleteOrder = async () => {
+        try {
+            setIsCompleting(true);
+            const today = new Date().toISOString().split('T')[0];
+            
+            const invoicePayload: SalesInvoicePayload = {
+                customer: order.customer,
+                posting_date: today,
+                due_date: today,
+                items: order.items.map(item => ({
+                    item_code: item.item_code,
+                    qty: item.qty,
+                    rate: item.rate
+                })),
+                sales_order: order.name,
+                docstatus: 1
+            };
+
+            const response = await createSalesInvoice(invoicePayload);
+            
+            if (!response.ok) {
+                throw new Error('Failed to create invoice');
+            }
+
+            toast.success('Order completed and invoice created');
+        } catch (error) {
+            console.error('Error completing order:', error);
+            toast.error('Failed to complete order');
+        } finally {
+            setIsCompleting(false);
+        }
+    };
+
     return (
-        <div className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[320px] overflow-y-auto'>
+        <div className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[320px] overflow-y-auto relative'>
             <div className='border-b pb-3'>
                 <p className='font-bold text-xl'>Order No: #{order.name}</p>
                 <p className='text-sm my-2'>Order placed <span className='text-slate-500'>
@@ -102,6 +146,34 @@ export default function KitchenOrderCard({
                 <div className='pt-3 border-t'>
                     <p className='text-red-500 font-medium'>Remarks:</p>
                     <p className='text-slate-600'>{order.custom_remarks}</p>
+                </div>
+            )}
+            <div className='absolute bottom-4 right-4'>
+                <button 
+                    onClick={handleCompleteOrder}
+                    disabled={!canComplete || isCompleting}
+                    className={`px-4 py-2 rounded-md text-white text-sm font-medium transition-colors
+                        ${!canComplete 
+                            ? 'bg-gray-300 cursor-not-allowed' 
+                            : isCompleting
+                                ? 'bg-blue-400 cursor-wait'
+                                : 'bg-blue-500 hover:bg-blue-600'
+                        }`}
+                >
+                    {isCompleting 
+                        ? 'Completing...' 
+                        : !order.custom_payment_complete
+                            ? 'Payment Required'
+                            : !order.items.every(item => completedItems[item.item_code])
+                                ? 'Items Pending'
+                                : 'Complete Order'
+                    }
+                </button>
+            </div>
+            {!canComplete && (
+                <div className='absolute bottom-14 right-4 text-xs text-gray-500'>
+                    {!order.custom_payment_complete && '• Payment required'}
+                    {!order.items.every(item => completedItems[item.item_code]) && '• Complete all items'}
                 </div>
             )}
         </div>

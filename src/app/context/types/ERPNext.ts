@@ -139,6 +139,21 @@ export type SalesOrderPayload = {
     docstatus: number;
   }
 
+//* --------------------------- Sales Invoice Types ---------------------------- */
+
+export type SalesInvoicePayload = {
+    customer: string;
+    items: {
+        item_code: string;
+        qty: number;
+        warehouse: string;
+        income_account: string;
+        sales_order: string;
+    }[];
+    update_stock: number;
+    docstatus: number;
+}
+
 //* --------------------------- Common Types ---------------------------- */
 export type ItemDetailed = {
     name: string;
