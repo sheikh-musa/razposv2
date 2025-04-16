@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload } from './types/ERPNext';
 
 interface ApiContextType {
     fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
@@ -19,6 +19,7 @@ interface ApiContextType {
     fetchKitchenOrderNames: () => Promise<SalesOrders[]>;
     fetchKitchenOrderDetails: (orderId: string) => Promise<SalesOrders[]>;
     createSalesInvoice: (payload: SalesInvoicePayload) => Promise<Response>;
+    createPaymentEntry: (payload: PaymentEntryPayload) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -437,6 +438,17 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return response;
     }
 
+    const createPaymentEntry = async (payload: PaymentEntryPayload) => {
+        const response = await fetch('http://localhost:8080/api/resource/Payment Entry', {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            },
+            body: JSON.stringify(payload)
+        });
+        return response;
+    }
+
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
@@ -454,7 +466,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             createKitchenOrder,
             fetchKitchenOrderNames,
             fetchKitchenOrderDetails,
-            createSalesInvoice
+            createSalesInvoice,
+            createPaymentEntry
         }}>
             {children}
         </ApiContext.Provider>

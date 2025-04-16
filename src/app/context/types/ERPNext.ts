@@ -154,6 +154,22 @@ export type SalesInvoicePayload = {
     docstatus: number;
 }
 
+export type PaymentEntryPayload = {
+    doctype: string;
+    payment_type: string;
+    party_type: string;
+    party: string;
+    paid_to: string;
+    received_amount: number;
+    paid_amount: number;
+    references: {
+        reference_doctype: string;
+        reference_name: string;
+    }[];
+    mode_of_payment: string;
+    docstatus: number;
+}
+
 //* --------------------------- Common Types ---------------------------- */
 export type ItemDetailed = {
     name: string;

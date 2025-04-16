@@ -48,7 +48,7 @@ export default function KitchenOrderCard({
                 customer: order.customer,
                 posting_date: today,
                 due_date: today,
-                items: order.items.map(item => ({
+                items: order.items.map(item => ({ // TODO: CORRECT THIS
                     item_code: item.item_code,
                     qty: item.qty,
                     rate: item.rate
