@@ -97,7 +97,7 @@ export type StockEntry = {
     warehouse: string;
 }
 
-//* --------------------------- Sales Order (Kitchen) Types ---------------------------- */
+ Order (Kitchen) Types ---------------------------- */
 
 export type SalesOrders = {
     name: string;
@@ -148,7 +148,6 @@ export type SalesInvoicePayload = {
         qty: number;
         warehouse: string;
         income_account: string;
-        sales_order: string;
     }[];
     update_stock: number;
     docstatus: number;

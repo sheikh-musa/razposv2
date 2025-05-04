@@ -46,23 +46,22 @@ export default function KitchenOrderCard({
             
             const invoicePayload: SalesInvoicePayload = {
                 customer: order.customer,
-                posting_date: today,
-                due_date: today,
-                items: order.items.map(item => ({ // TODO: CORRECT THIS
+                items: order.items.map(item => ({
                     item_code: item.item_code,
                     qty: item.qty,
-                    rate: item.rate
+                    warehouse: "Stores - R",
+                    income_account: "Sales Income - R",
                 })),
-                sales_order: order.name,
+                update_stock: 1,
                 docstatus: 1
             };
-
+            console.log('invoicePayload', invoicePayload);
             const response = await createSalesInvoice(invoicePayload);
             
             if (!response.ok) {
                 throw new Error('Failed to create invoice');
             }
-
+            // order.custom_order_complete = 1;
             toast.success('Order completed and invoice created');
         } catch (error) {
             console.error('Error completing order:', error);
@@ -73,7 +72,7 @@ export default function KitchenOrderCard({
     };
 
     return (
-        <div className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[320px] overflow-y-auto relative'>
+        <div className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[320px] min-h-[300px] overflow-y-auto relative'>
             <div className='border-b pb-3'>
                 <p className='font-bold text-xl'>Order No: #{order.name}</p>
                 <p className='text-sm my-2'>Order placed <span className='text-slate-500'>

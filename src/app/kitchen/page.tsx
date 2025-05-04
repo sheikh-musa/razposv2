@@ -7,6 +7,7 @@ import KitchenOrderCard from '@/app/components/kitchen/KitchenOrderCard';
 export default function Kitchen() {
     const { fetchKitchenOrderNames, fetchKitchenOrderDetails } = useApi();
     const [orders, setOrders] = useState<SalesOrders[]>([]);
+    const [showOrders, setShowOrders] = useState(true);
     const [completedOrders, setCompletedOrders] = useState<SalesOrders[]>([]);
     const [showCompleted, setShowCompleted] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -130,7 +131,24 @@ export default function Kitchen() {
             </div>
             
             {/* Orders Section */}
-            <div className='flex overflow-x-auto mt-2 h-2/3'>
+            <div className='mt-2 bg-slate-100 pl-4 py-2 rounded-md shadow-lg'>
+            <button 
+                    onClick={() => setShowOrders(!showOrders)}
+                    className="flex items-center gap-2 font-semibold"
+                >
+                    <h3>Pending Orders ({orders.length})</h3>
+                    <svg 
+                        className={`w-4 h-4 transition-transform ${showOrders ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+            {showOrders && (
+                <div className='flex overflow-x-auto mt-2 mb-2h-full'>
                 {orders.map((order) => (
                     <KitchenOrderCard
                         key={order.name}
@@ -139,11 +157,13 @@ export default function Kitchen() {
                         onPaymentMethodChange={handlePaymentMethodChange}
                         onItemComplete={handleItemComplete}
                     />   
-                ))}
+                    ))}
+                    </div>
+                )}
             </div>
 
             {/* Completed Orders Section */}
-            <div className='mt-2 bg-slate-100 pl-4 py-2 rounded-md shadow-lg'>
+            <div className='mt-2 bg-slate-100 pl-4 py-2 rounded-md shadow-lg overflow-y-auto'>
                 <button 
                     onClick={() => setShowCompleted(!showCompleted)}
                     className="flex items-center gap-2 font-semibold"
