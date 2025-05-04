@@ -148,7 +148,7 @@ export default function Kitchen() {
                 </button>
 
             {showOrders && (
-                <div className='flex overflow-x-auto mt-2 mb-2h-full'>
+                <div className='flex overflow-x-auto mt-2 mb-2 h-[550px]'>
                 {orders.map((order) => (
                     <KitchenOrderCard
                         key={order.name}
@@ -163,7 +163,7 @@ export default function Kitchen() {
             </div>
 
             {/* Completed Orders Section */}
-            <div className='mt-2 bg-slate-100 pl-4 py-2 rounded-md shadow-lg overflow-y-auto'>
+            <div className='mt-2 bg-slate-100 pl-4 py-2 rounded-md shadow-lg'>
                 <button 
                     onClick={() => setShowCompleted(!showCompleted)}
                     className="flex items-center gap-2 font-semibold"

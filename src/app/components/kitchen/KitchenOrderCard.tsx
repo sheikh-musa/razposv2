@@ -72,7 +72,7 @@ export default function KitchenOrderCard({
     };
 
     return (
-        <div className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[320px] min-h-[300px] overflow-y-auto relative'>
+        <div className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[320px] max-h-[500px]'>
             <div className='border-b pb-3'>
                 <p className='font-bold text-xl'>Order No: #{order.name}</p>
                 <p className='text-sm my-2'>Order placed <span className='text-slate-500'>
@@ -118,40 +118,42 @@ export default function KitchenOrderCard({
                     </div>
                 </div>
             </div>
-            <div className='py-3 border-b text-sm'>
-                <p className='font-medium'>Total: <span className='font-light'>${order.total.toFixed(2)}</span></p>
-                <p className='font-medium'>Items: <span className='font-light'>{order.items.length}</span></p>
-            </div>
-            <div className='py-3'>
-                <p className='font-bold mb-3'>Remaining order:</p>
-                {order.items.map((item, idx) => (
-                    <div key={idx} className='flex items-center justify-between mb-2'>
-                        <div className='flex items-center gap-3'>
-                            <input 
-                                type="checkbox" 
-                                className='w-4 h-4'
-                                checked={completedItems[item.item_code] || false}
-                                onChange={(e) => handleCheckboxChange(item.item_code, e.target.checked)}
-                            />
-                            <div className={completedItems[item.item_code] ? 'line-through text-gray-400' : ''}>
-                                <p className='font-medium'>{item.item_code}</p>
-                                <p className='text-slate-600'>Qty: {item.qty}</p>
+            <div className='flex-1 overflow-y-auto'>
+                <div className='py-3 border-b text-sm'>
+                    <p className='font-medium'>Total: <span className='font-light'>${order.total.toFixed(2)}</span></p>
+                    <p className='font-medium'>Items: <span className='font-light'>{order.items.length}</span></p>
+                </div>
+                <div className='py-3'>
+                    <p className='font-bold mb-3'>Remaining order:</p>
+                    {order.items.map((item, idx) => (
+                        <div key={idx} className='flex items-center justify-between mb-2'>
+                            <div className='flex items-center gap-3'>
+                                <input 
+                                    type="checkbox" 
+                                    className='w-4 h-4'
+                                    checked={completedItems[item.item_code] || false}
+                                    onChange={(e) => handleCheckboxChange(item.item_code, e.target.checked)}
+                                />
+                                <div className={completedItems[item.item_code] ? 'line-through text-gray-400' : ''}>
+                                    <p className='font-medium'>{item.item_code}</p>
+                                    <p className='text-slate-600'>Qty: {item.qty}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
-            {order.custom_remarks && (
-                <div className='pt-3 border-t'>
-                    <p className='text-red-500 font-medium'>Remarks:</p>
-                    <p className='text-slate-600'>{order.custom_remarks}</p>
+                    ))}
                 </div>
-            )}
-            <div className='absolute bottom-4 right-4'>
+                {order.custom_remarks && (
+                    <div className='pt-3 border-t'>
+                        <p className='text-red-500 font-medium'>Remarks:</p>
+                        <p className='text-slate-600'>{order.custom_remarks}</p>
+                    </div>
+                )}
+            </div>
+            <div className='mt-4 pt-3 border-t'>
                 <button 
                     onClick={handleCompleteOrder}
                     disabled={!canComplete || isCompleting}
-                    className={`px-4 py-2 rounded-md text-white text-sm font-medium transition-colors
+                    className={`w-full px-4 py-2 rounded-md text-white text-sm font-medium transition-colors
                         ${!canComplete 
                             ? 'bg-gray-300 cursor-not-allowed' 
                             : isCompleting
@@ -168,13 +170,13 @@ export default function KitchenOrderCard({
                                 : 'Complete Order'
                     }
                 </button>
+                {!canComplete && (
+                    <div className='mt-2 text-xs text-gray-500'>
+                        {!order.custom_payment_complete && '• Payment required'}
+                        {!order.items.every(item => completedItems[item.item_code]) && '• Complete all items'}
+                    </div>
+                )}
             </div>
-            {!canComplete && (
-                <div className='absolute bottom-14 right-4 text-xs text-gray-500'>
-                    {!order.custom_payment_complete && '• Payment required'}
-                    {!order.items.every(item => completedItems[item.item_code]) && '• Complete all items'}
-                </div>
-            )}
         </div>
     );
 }
