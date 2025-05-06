@@ -51,17 +51,16 @@ export default function KitchenOrderCard({
                     qty: item.qty,
                     warehouse: "Stores - R",
                     income_account: "Sales Income - R",
+                    sales_order: order.name,
                 })),
                 update_stock: 1,
                 docstatus: 1
             };
-            console.log('invoicePayload', invoicePayload);
+
             const response = await createSalesInvoice(invoicePayload);
+            const data = await response.json();
+            console.log('Invoice created:', data);
             
-            if (!response.ok) {
-                throw new Error('Failed to create invoice');
-            }
-            // order.custom_order_complete = 1;
             toast.success('Order completed and invoice created');
         } catch (error) {
             console.error('Error completing order:', error);

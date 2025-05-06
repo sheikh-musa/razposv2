@@ -148,6 +148,7 @@ export type SalesInvoicePayload = {
         qty: number;
         warehouse: string;
         income_account: string;
+        sales_order: string;
     }[];
     update_stock: number;
     docstatus: number;
@@ -198,4 +199,3 @@ export type ItemBasic = {
 export type ItemWithPrice = ItemDetailed & {
     price?: ItemPrice;  // Making it optional in case price isn't always available
 };
-

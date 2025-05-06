@@ -435,6 +435,11 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             },
             body: JSON.stringify(payload)
         });
+        
+        if (!response.ok) {
+            throw new Error('Failed to create sales invoice');
+        }
+
         return response;
     }
 
@@ -446,6 +451,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             },
             body: JSON.stringify(payload)
         });
+        if (!response.ok) {
+            throw new Error('Failed to create payment entry');
+        }
         return response;
     }
 
