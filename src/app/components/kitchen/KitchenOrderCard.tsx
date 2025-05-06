@@ -72,7 +72,7 @@ export default function KitchenOrderCard({
     };
 
     return (
-        <div className='shadow-lg bg-slate-100 mr-3.5 my-5 flex flex-col border-2 p-4 rounded-md min-w-[320px] max-h-[500px]'>
+        <div className='shadow-lg bg-slate-100 mr-3.5 my-3 flex flex-col border-2 p-4 rounded-md min-w-[320px] h-full max-h-[520px]'>
             <div className='border-b pb-3'>
                 <p className='font-bold text-xl'>Order No: #{order.name}</p>
                 <p className='text-sm my-2'>Order placed <span className='text-slate-500'>
