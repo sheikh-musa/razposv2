@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { SalesOrders, SalesInvoicePayload } from '@/app/context/types/ERPNext';
+import { SalesOrders, SalesInvoicePayload, PaymentEntryPayload } from '@/app/context/types/ERPNext';
 import { useApi } from '@/app/context/ApiContext';
 import toast from 'react-hot-toast';
 
@@ -17,7 +17,7 @@ export default function KitchenOrderCard({
     onPaymentMethodChange,
     onItemComplete 
 }: KitchenOrderCardProps) {
-    const { createSalesInvoice } = useApi();
+    const { createSalesInvoice, createPaymentEntry } = useApi();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
     const [isCompleting, setIsCompleting] = useState(false);
@@ -57,10 +57,28 @@ export default function KitchenOrderCard({
                 docstatus: 1
             };
 
-            const response = await createSalesInvoice(invoicePayload);
-            const data = await response.json();
-            console.log('Invoice created:', data);
-            
+            const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
+            const salesInvoiceData = await salesInvoiceResponse.json();
+
+            const paymentPayload: PaymentEntryPayload = {
+                payment_type: "Receive",
+                party_type: "Customer",
+                party: order.customer,
+                paid_to: "Petty Cash - R",
+                received_amount: order.total,
+                paid_amount: order.total,
+                references: [{
+                    reference_doctype: "Sales Invoice",
+                    reference_name: salesInvoiceData.data.name
+                }],
+                mode_of_payment: "Cash",
+                docstatus: 1
+            };
+
+            const paymentEntryResponse = await createPaymentEntry(paymentPayload);
+            const paymentEntryData = await paymentEntryResponse.json();
+            console.log('paymentEntryData', paymentEntryData);
+
             toast.success('Order completed and invoice created');
         } catch (error) {
             console.error('Error completing order:', error);

@@ -155,7 +155,6 @@ export type SalesInvoicePayload = {
 }
 
 export type PaymentEntryPayload = {
-    doctype: string;
     payment_type: string;
     party_type: string;
     party: string;
