@@ -18,45 +18,46 @@ export default function Kitchen() {
 
     const paymentOptions = ["Cash", "Paynow", "Credit Card"];
 
-    useEffect(() => {
-        const loadOrders = async () => {
-            try {
-                setLoading(true);
-                const orderNames = await fetchKitchenOrderNames();
-                
-                const ordersWithDetails = await Promise.all(
-                    orderNames.map(async (orders) => {
-                        const details = await fetchKitchenOrderDetails(orders.name);
-                        return details;
-                    })
-                );
+    const loadOrders = async () => {
+        try {
+            setLoading(true);
+            const orderNames = await fetchKitchenOrderNames();
+            
+            const ordersWithDetails = await Promise.all(
+                orderNames.map(async (orders) => {
+                    const details = await fetchKitchenOrderDetails(orders.name);
+                    return details;
+                })
+            );
 
-                const flattenedOrders = ordersWithDetails.flat();
+            const flattenedOrders = ordersWithDetails.flat();
 
-                // Separate completed and incomplete orders
-                const incompleteOrders = flattenedOrders.filter(order => !order.custom_order_complete);
-                const completedOrders = flattenedOrders.filter(order => order.custom_order_complete === 1);
-                
-                setOrders(incompleteOrders);
-                setCompletedOrders(completedOrders);
-                
-                // Calculate item summary from incomplete orders only
-                const summary: Record<string, number> = {};
-                incompleteOrders.forEach((order) => {
-                    order.items.forEach((item) => {
-                        const key = `${item.item_code}`;
-                        summary[key] = (summary[key] || 0) + item.qty;
-                    });
+            // Separate completed and incomplete orders
+            const incompleteOrders = flattenedOrders.filter(order => !order.custom_order_complete);
+            const completedOrders = flattenedOrders.filter(order => order.custom_order_complete === 1);
+            console.log('completedOrders', completedOrders);
+            console.log('incompleteOrders', incompleteOrders);
+            setOrders(incompleteOrders);
+            setCompletedOrders(completedOrders);
+            
+            // Calculate item summary
+            const summary: Record<string, number> = {};
+            incompleteOrders.forEach((order) => {
+                order.items.forEach((item) => {
+                    const key = `${item.item_code}`;
+                    summary[key] = (summary[key] || 0) + item.qty;
                 });
-                setItemSummary(summary);
-                
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred');
-            } finally {
-                setLoading(false);
-            }
-        };
+            });
+            setItemSummary(summary);
+            
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         loadOrders();
     }, []);
 
@@ -156,6 +157,7 @@ export default function Kitchen() {
                         onPaymentToggle={handlePaymentToggle}
                         onPaymentMethodChange={handlePaymentMethodChange}
                         onItemComplete={handleItemComplete}
+                        onOrderComplete={loadOrders}
                     />   
                     ))}
                     </div>
@@ -188,6 +190,7 @@ export default function Kitchen() {
                                 onPaymentToggle={handlePaymentToggle}
                                 onPaymentMethodChange={handlePaymentMethodChange}
                                 onItemComplete={handleItemComplete}
+                                onOrderComplete={loadOrders}
                             />
                         ))}
                     </div>

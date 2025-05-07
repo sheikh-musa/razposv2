@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemBasic, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload } from './types/ERPNext';
 
 interface ApiContextType {
     fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
@@ -18,6 +18,7 @@ interface ApiContextType {
     createKitchenOrder: (payload: SalesOrderPayload) => Promise<Response>;
     fetchKitchenOrderNames: () => Promise<SalesOrders[]>;
     fetchKitchenOrderDetails: (orderId: string) => Promise<SalesOrders[]>;
+    updateKitchenOrder: (orderName: string, payload: SalesOrderUpdatePayload) => Promise<Response>;
     createSalesInvoice: (payload: SalesInvoicePayload) => Promise<Response>;
     createPaymentEntry: (payload: PaymentEntryPayload) => Promise<Response>;
 }
@@ -423,6 +424,18 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return response;
     }
 
+    const updateKitchenOrder = async (orderName: string, payload: SalesOrderUpdatePayload) => {
+        const response = await fetch(`http://localhost:8080/api/resource/Sales Order/${orderName}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        return response;
+    }
+
     //* -------------------------------------------------------------------------- */
     //*                             API calls for Payment                          */
     //* -------------------------------------------------------------------------- */
@@ -474,6 +487,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             createKitchenOrder,
             fetchKitchenOrderNames,
             fetchKitchenOrderDetails,
+            updateKitchenOrder,
             createSalesInvoice,
             createPaymentEntry
         }}>

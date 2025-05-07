@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { SalesOrders, SalesInvoicePayload, PaymentEntryPayload } from '@/app/context/types/ERPNext';
+import { SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload } from '@/app/context/types/ERPNext';
 import { useApi } from '@/app/context/ApiContext';
 import toast from 'react-hot-toast';
 
@@ -9,15 +9,17 @@ type KitchenOrderCardProps = {
     onPaymentToggle: (orderName: string, paymentReceived: boolean) => void;
     onPaymentMethodChange: (orderName: string, method: string) => void;
     onItemComplete: (orderName: string, itemCode: string, completed: boolean) => void;
+    onOrderComplete: () => void;
 };
 
 export default function KitchenOrderCard({ 
     order, 
     onPaymentToggle, 
     onPaymentMethodChange,
-    onItemComplete 
+    onItemComplete,
+    onOrderComplete
 }: KitchenOrderCardProps) {
-    const { createSalesInvoice, createPaymentEntry } = useApi();
+    const { createSalesInvoice, createPaymentEntry, updateKitchenOrder } = useApi();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
     const [isCompleting, setIsCompleting] = useState(false);
@@ -44,41 +46,49 @@ export default function KitchenOrderCard({
             setIsCompleting(true);
             const today = new Date().toISOString().split('T')[0];
             
-            const invoicePayload: SalesInvoicePayload = {
-                customer: order.customer,
-                items: order.items.map(item => ({
-                    item_code: item.item_code,
-                    qty: item.qty,
-                    warehouse: "Stores - R",
-                    income_account: "Sales Income - R",
-                    sales_order: order.name,
-                })),
-                update_stock: 1,
-                docstatus: 1
+            // const invoicePayload: SalesInvoicePayload = {
+            //     customer: order.customer,
+            //     items: order.items.map(item => ({
+            //         item_code: item.item_code,
+            //         qty: item.qty,
+            //         warehouse: "Stores - R",
+            //         income_account: "Sales Income - R",
+            //         sales_order: order.name,
+            //     })),
+            //     update_stock: 1,
+            //     docstatus: 1
+            // };
+
+            // const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
+            // const salesInvoiceData = await salesInvoiceResponse.json();
+
+            // const paymentPayload: PaymentEntryPayload = {
+            //     payment_type: "Receive",
+            //     party_type: "Customer",
+            //     party: order.customer,
+            //     paid_to: "Petty Cash - R",
+            //     received_amount: order.total,
+            //     paid_amount: order.total,
+            //     references: [{
+            //         reference_doctype: "Sales Invoice",
+            //         reference_name: salesInvoiceData.data.name
+            //     }],
+            //     mode_of_payment: "Cash",
+            //     docstatus: 1
+            // };
+
+            // const paymentEntryResponse = await createPaymentEntry(paymentPayload);
+            // const paymentEntryData = await paymentEntryResponse.json();
+
+            const updatePayload: SalesOrderUpdatePayload = {
+                custom_order_complete: 1,
+                custom_payment_complete: 1,
             };
+            const updateResponse = await updateKitchenOrder(order.name, updatePayload);
+            const updateData = await updateResponse.json();
+            console.log('updateData', updateData);
 
-            const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
-            const salesInvoiceData = await salesInvoiceResponse.json();
-
-            const paymentPayload: PaymentEntryPayload = {
-                payment_type: "Receive",
-                party_type: "Customer",
-                party: order.customer,
-                paid_to: "Petty Cash - R",
-                received_amount: order.total,
-                paid_amount: order.total,
-                references: [{
-                    reference_doctype: "Sales Invoice",
-                    reference_name: salesInvoiceData.data.name
-                }],
-                mode_of_payment: "Cash",
-                docstatus: 1
-            };
-
-            const paymentEntryResponse = await createPaymentEntry(paymentPayload);
-            const paymentEntryData = await paymentEntryResponse.json();
-            console.log('paymentEntryData', paymentEntryData);
-
+            onOrderComplete();
             toast.success('Order completed and invoice created');
         } catch (error) {
             console.error('Error completing order:', error);

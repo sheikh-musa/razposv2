@@ -124,7 +124,7 @@ export type SalesOrderItem = {
     item_code: string;
     qty: number;
 }
-    
+
 export type SalesOrderPayload = {
     customer: string;
     delivery_date: string;
@@ -139,6 +139,10 @@ export type SalesOrderPayload = {
     docstatus: number;
   }
 
+export type SalesOrderUpdatePayload = {
+    custom_order_complete: number;
+    custom_payment_complete: number;
+}
 //* --------------------------- Sales Invoice Types ---------------------------- */
 
 export type SalesInvoicePayload = {
@@ -198,3 +202,4 @@ export type ItemBasic = {
 export type ItemWithPrice = ItemDetailed & {
     price?: ItemPrice;  // Making it optional in case price isn't always available
 };
+
