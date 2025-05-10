@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 
 type KitchenOrderCardProps = {
     order: SalesOrders;
-    onPaymentToggle: (orderName: string, paymentReceived: boolean) => void;
     onPaymentMethodChange: (orderName: string, method: string) => void;
     onItemComplete: (orderName: string, itemCode: string, completed: boolean) => void;
     onOrderComplete: () => void;
@@ -14,7 +13,6 @@ type KitchenOrderCardProps = {
 
 export default function KitchenOrderCard({ 
     order, 
-    onPaymentToggle, 
     onPaymentMethodChange,
     onItemComplete,
     onOrderComplete
@@ -24,7 +22,8 @@ export default function KitchenOrderCard({
     const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
     const [isCompleting, setIsCompleting] = useState(false);
     const [canComplete, setCanComplete] = useState(false);
-    
+    const [paymentStatus, setPaymentStatus] = useState(order.custom_payment_complete);
+
     const paymentOptions = ["Cash", "Paynow", "Credit Card"];
 
     // Check if all items are completed and payment is received
@@ -39,6 +38,10 @@ export default function KitchenOrderCard({
             [itemCode]: checked
         }));
         onItemComplete(order.name, itemCode, checked);
+    };
+
+    const handlePaymentToggle = () => {
+        setPaymentStatus(prev => prev === 1 ? 0 : 1);
     };
 
     const handleCompleteOrder = async () => {
@@ -71,7 +74,10 @@ export default function KitchenOrderCard({
                 paid_amount: order.total,
                 references: [{
                     reference_doctype: "Sales Invoice",
-                    reference_name: salesInvoiceData.data.name
+                    reference_name: salesInvoiceData.data.name,
+                    total_amount: order.total,
+                    outstanding_amount: order.total,
+                    allocated_amount: order.total,
                 }],
                 mode_of_payment: "Cash",
                 docstatus: 1
@@ -107,14 +113,14 @@ export default function KitchenOrderCard({
                 </span></p>
                 <div className='flex gap-2 mt-4'>
                     <button 
-                        onClick={() => onPaymentToggle(order.name, !order.custom_payment_complete)}
+                        onClick={handlePaymentToggle}
                         className={`text-xs px-4 py-2 ${
-                            order.custom_payment_complete 
+                            paymentStatus === 1
                                 ? 'bg-green-500 hover:bg-green-600' 
                                 : 'bg-red-500 hover:bg-red-600'
                         } text-white rounded-md`}
                     >
-                        {order.custom_payment_complete ? 'Payment Received' : 'Payment Pending'}
+                        {paymentStatus === 1 ? 'Payment Received' : 'Payment Pending'}
                     </button>
                     <div className="relative">
                         <button 

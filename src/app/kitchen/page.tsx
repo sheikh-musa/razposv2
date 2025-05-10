@@ -61,24 +61,6 @@ export default function Kitchen() {
         loadOrders();
     }, []);
 
-    const handlePaymentToggle = async (orderName: string, paymentReceived: boolean) => {
-        try {
-            // Update local state
-            setOrders(prevOrders => 
-                prevOrders.map(order => 
-                    order.name === orderName 
-                        ? { ...order, payment_received: paymentReceived }
-                        : order
-                )
-            );
-
-            // Update backend
-            // Add your API call here to update payment status
-        } catch (error) {
-            console.error('Error updating payment status:', error);
-            // Revert local state if API call fails
-        }
-    };
 
     const handlePaymentMethodChange = async (orderName: string, method: string) => {
         // Add API call to update payment method
@@ -154,7 +136,6 @@ export default function Kitchen() {
                     <KitchenOrderCard
                         key={order.name}
                         order={order}
-                        onPaymentToggle={handlePaymentToggle}
                         onPaymentMethodChange={handlePaymentMethodChange}
                         onItemComplete={handleItemComplete}
                         onOrderComplete={loadOrders}
@@ -187,7 +168,6 @@ export default function Kitchen() {
                             <KitchenOrderCard
                                 key={order.name}
                                 order={order}
-                                onPaymentToggle={handlePaymentToggle}
                                 onPaymentMethodChange={handlePaymentMethodChange}
                                 onItemComplete={handleItemComplete}
                                 onOrderComplete={loadOrders}

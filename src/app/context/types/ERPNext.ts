@@ -168,6 +168,9 @@ export type PaymentEntryPayload = {
     references: {
         reference_doctype: string;
         reference_name: string;
+        total_amount: number;
+        outstanding_amount: number;
+        allocated_amount: number;
     }[];
     mode_of_payment: string;
     docstatus: number;
