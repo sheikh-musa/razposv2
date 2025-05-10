@@ -46,39 +46,39 @@ export default function KitchenOrderCard({
             setIsCompleting(true);
             const today = new Date().toISOString().split('T')[0];
             
-            // const invoicePayload: SalesInvoicePayload = {
-            //     customer: order.customer,
-            //     items: order.items.map(item => ({
-            //         item_code: item.item_code,
-            //         qty: item.qty,
-            //         warehouse: "Stores - R",
-            //         income_account: "Sales Income - R",
-            //         sales_order: order.name,
-            //     })),
-            //     update_stock: 1,
-            //     docstatus: 1
-            // };
+            const invoicePayload: SalesInvoicePayload = {
+                customer: order.customer,
+                items: order.items.map(item => ({
+                    item_code: item.item_code,
+                    qty: item.qty,
+                    warehouse: "Stores - R",
+                    income_account: "Sales Income - R",
+                    sales_order: order.name,
+                })),
+                update_stock: 1,
+                docstatus: 1
+            };
 
-            // const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
-            // const salesInvoiceData = await salesInvoiceResponse.json();
+            const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
+            const salesInvoiceData = await salesInvoiceResponse.json();
 
-            // const paymentPayload: PaymentEntryPayload = {
-            //     payment_type: "Receive",
-            //     party_type: "Customer",
-            //     party: order.customer,
-            //     paid_to: "Petty Cash - R",
-            //     received_amount: order.total,
-            //     paid_amount: order.total,
-            //     references: [{
-            //         reference_doctype: "Sales Invoice",
-            //         reference_name: salesInvoiceData.data.name
-            //     }],
-            //     mode_of_payment: "Cash",
-            //     docstatus: 1
-            // };
+            const paymentPayload: PaymentEntryPayload = {
+                payment_type: "Receive",
+                party_type: "Customer",
+                party: order.customer,
+                paid_to: "Petty Cash - R",
+                received_amount: order.total,
+                paid_amount: order.total,
+                references: [{
+                    reference_doctype: "Sales Invoice",
+                    reference_name: salesInvoiceData.data.name
+                }],
+                mode_of_payment: "Cash",
+                docstatus: 1
+            };
 
-            // const paymentEntryResponse = await createPaymentEntry(paymentPayload);
-            // const paymentEntryData = await paymentEntryResponse.json();
+            const paymentEntryResponse = await createPaymentEntry(paymentPayload);
+            const paymentEntryData = await paymentEntryResponse.json();
 
             const updatePayload: SalesOrderUpdatePayload = {
                 custom_order_complete: 1,
