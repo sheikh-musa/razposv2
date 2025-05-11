@@ -29,8 +29,8 @@ export default function KitchenOrderCard({
     // Check if all items are completed and payment is received
     useEffect(() => {
         const allItemsCompleted = order.items.every(item => completedItems[item.item_code]);
-        setCanComplete(order.custom_payment_complete === 1 && allItemsCompleted);
-    }, [completedItems, order.custom_payment_complete, order.items]);
+        setCanComplete(paymentStatus === 1 && allItemsCompleted);
+    }, [completedItems, paymentStatus, order.items]);
 
     const handleCheckboxChange = (itemCode: string, checked: boolean) => {
         setCompletedItems(prev => ({
@@ -61,9 +61,11 @@ export default function KitchenOrderCard({
                 update_stock: 1,
                 docstatus: 1
             };
-
+            console.log('invoicePayload', invoicePayload);
             const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
             const salesInvoiceData = await salesInvoiceResponse.json();
+
+            console.log('salesInvoiceData', salesInvoiceData);
 
             const paymentPayload: PaymentEntryPayload = {
                 payment_type: "Receive",
@@ -86,6 +88,7 @@ export default function KitchenOrderCard({
             const paymentEntryResponse = await createPaymentEntry(paymentPayload);
             const paymentEntryData = await paymentEntryResponse.json();
 
+            console.log('paymentEntryData', paymentEntryData);
             const updatePayload: SalesOrderUpdatePayload = {
                 custom_order_complete: 1,
                 custom_payment_complete: 1,
@@ -196,7 +199,7 @@ export default function KitchenOrderCard({
                 >
                     {isCompleting 
                         ? 'Completing...' 
-                        : !order.custom_payment_complete
+                        : !paymentStatus
                             ? 'Payment Required'
                             : !order.items.every(item => completedItems[item.item_code])
                                 ? 'Items Pending'
@@ -205,7 +208,7 @@ export default function KitchenOrderCard({
                 </button>
                 {!canComplete && (
                     <div className='mt-2 text-xs text-gray-500'>
-                        {!order.custom_payment_complete && '• Payment required'}
+                        {!paymentStatus && '• Payment required'}
                         {!order.items.every(item => completedItems[item.item_code]) && '• Complete all items'}
                     </div>
                 )}
