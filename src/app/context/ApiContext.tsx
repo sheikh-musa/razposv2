@@ -21,6 +21,7 @@ interface ApiContextType {
     updateKitchenOrder: (orderName: string, payload: SalesOrderUpdatePayload) => Promise<Response>;
     createSalesInvoice: (payload: SalesInvoicePayload) => Promise<Response>;
     createPaymentEntry: (payload: PaymentEntryPayload) => Promise<Response>;
+    getRevenue: () => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -469,6 +470,28 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
         return response;
     }
+    //* -------------------------------------------------------------------------- */
+    //*                             Get revenue from Payment Entry                 */
+    //* -------------------------------------------------------------------------- */
+
+    const getRevenue = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount"]`, {
+                headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch revenue');
+        }
+        const data = await response.json();
+        return data.data;
+        } catch (error) {
+            console.error('Error fetching revenue:', error);
+            throw error;
+        }
+    }      
+    
 
     return (
         <ApiContext.Provider value={{ 
@@ -489,7 +512,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             fetchKitchenOrderDetails,
             updateKitchenOrder,
             createSalesInvoice,
-            createPaymentEntry
+            createPaymentEntry,
+            getRevenue
         }}>
             {children}
         </ApiContext.Provider>

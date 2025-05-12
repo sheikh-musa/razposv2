@@ -1,13 +1,15 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Area } from 'recharts';
+import { useApi } from '../../context/ApiContext';
 
 export default function Analytics() {
+  const { getRevenue } = useApi();
   const [salesData, setSalesData] = useState<any[]>([]);
   const [currentRevenue, setCurrentRevenue] = useState(0);
   const [lastRevenue, setLastRevenue] = useState(0);
   const [percentageIncrease, setPercentageIncrease] = useState(0);
-
+  const [revenue, setRevenue] = useState(0);
   // Payment methods data
   const paymentMethodData = [
     { name: 'Cash', value: 35, color: '#7C3AED' },
@@ -35,6 +37,8 @@ export default function Analytics() {
         const data = await response.json();
         setSalesData(data);
         
+        const revenue = await getRevenue(); //! testing revenue from payment entry
+        console.log('revenue', revenue);
         // Calculate revenues and percentage
         const currentMonth = data[data.length - 1];
         const lastMonth = data[data.length - 2];
@@ -44,6 +48,10 @@ export default function Analytics() {
         
         const increase = ((currentMonth.totalSales - lastMonth.totalSales) / lastMonth.totalSales) * 100;
         setPercentageIncrease(increase);
+
+        const totalRevenue = revenue.reduce((sum, item) => sum + item.paid_amount, 0); //! testing revenue from payment entry
+        console.log('totalRevenue', totalRevenue);
+        setRevenue(totalRevenue);
       } catch (error) {
         console.error('Error fetching sales data:', error);
       }
@@ -98,7 +106,7 @@ export default function Analytics() {
           <h2 className="text-sm text-gray-500 font-semibold mb-1">Sales over time</h2>
           <p className="text-gray-500 text-xs mb-2">Track how your sales over time.</p>
           <div className="mb-2">
-            <span className="text-2xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
+            <span className="text-2xl font-bold text-black">${revenue.toLocaleString()}</span>
             <span className="text-green-500 text-sm ml-2">↑ 7.4%</span>
           </div>
 
@@ -163,7 +171,7 @@ export default function Analytics() {
               <div>
                 <h3 className="text-gray-500 text-xs font-semibold mb-1">Current Revenue</h3>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-black">${currentRevenue.toLocaleString()}</span>
+                  <span className="text-lg font-bold text-black">${revenue.toLocaleString()}</span>
                   <span className="text-green-500 text-sm">↑ 9.2%</span>
                 </div>
               </div>

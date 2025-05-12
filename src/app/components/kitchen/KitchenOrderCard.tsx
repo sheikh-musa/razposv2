@@ -65,7 +65,7 @@ export default function KitchenOrderCard({
             const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
             const salesInvoiceData = await salesInvoiceResponse.json();
 
-            console.log('salesInvoiceData', salesInvoiceData);
+            console.log('salesInvoiceData', salesInvoiceData); // ! CONSOLE LOG
 
             const paymentPayload: PaymentEntryPayload = {
                 payment_type: "Receive",
@@ -88,14 +88,14 @@ export default function KitchenOrderCard({
             const paymentEntryResponse = await createPaymentEntry(paymentPayload);
             const paymentEntryData = await paymentEntryResponse.json();
 
-            console.log('paymentEntryData', paymentEntryData);
+            console.log('paymentEntryData', paymentEntryData); // ! CONSOLE LOG
             const updatePayload: SalesOrderUpdatePayload = {
                 custom_order_complete: 1,
                 custom_payment_complete: 1,
             };
             const updateResponse = await updateKitchenOrder(order.name, updatePayload);
             const updateData = await updateResponse.json();
-            console.log('updateData', updateData);
+            console.log('updateData', updateData); // ! CONSOLE LOG
 
             onOrderComplete();
             toast.success('Order completed and invoice created');
