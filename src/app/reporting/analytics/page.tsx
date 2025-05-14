@@ -42,15 +42,27 @@ export default function Analytics() {
         const monthlyRevenue = groupRevenueByMonth(revenue);
         console.log('Monthly Revenue:', monthlyRevenue);
         
-        // Calculate revenues and percentage
-        const currentMonth = data[data.length - 1];
-        const lastMonth = data[data.length - 2];
+        // Get current and last month in YYYY-MM format
+        const today = new Date();
+        const currentMonth = today.toISOString().substring(0, 7);
         
-        setCurrentRevenue(currentMonth.totalSales);
-        setLastRevenue(lastMonth.totalSales);
+        // Get last month
+        const lastMonthDate = new Date(today.getFullYear(), today.getMonth() - 1);
+        const lastMonth = lastMonthDate.toISOString().substring(0, 7);
         
-        const increase = ((currentMonth.totalSales - lastMonth.totalSales) / lastMonth.totalSales) * 100;
-        setPercentageIncrease(increase);
+        // Find revenue for current and last month
+        const currentMonthData = monthlyRevenue.find(m => m.month === currentMonth);
+        const lastMonthData = monthlyRevenue.find(m => m.month === lastMonth);
+        
+        // Set the revenues
+        setCurrentRevenue(currentMonthData?.total || 0);
+        setLastRevenue(lastMonthData?.total || 0);
+        
+        // Calculate percentage increase
+        if (lastMonthData?.total && currentMonthData?.total) {
+          const increase = ((currentMonthData.total - lastMonthData.total) / lastMonthData.total) * 100;
+          setPercentageIncrease(increase);
+        }
 
         const totalRevenue = revenue.reduce((sum, item) => sum + item.paid_amount, 0);
         console.log('totalRevenue', totalRevenue);
@@ -209,12 +221,14 @@ export default function Analytics() {
                 <h3 className="text-gray-500 text-xs font-semibold mb-1">Last Month Revenue</h3>
                 <div className="flex items-baseline gap-2">
                   <span className="text-lg font-bold text-black">${lastRevenue.toLocaleString()}</span>
-                  <span className="text-green-500 text-sm">↑ 6.6%</span>
+                  <span className={`text-sm ${percentageIncrease >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}%
+                  </span>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-gray-500 text-xs font-semibold mb-1">Percentage difference</h3>
+                <h3 className="text-gray-500 text-xs font-semibold mb-1">Difference (%)</h3>
                 <div className="flex items-baseline gap-2">
                   <span className="text-lg font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
                   <span className="text-green-500 text-sm">↑ 8.1%</span>
