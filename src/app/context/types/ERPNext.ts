@@ -206,3 +206,15 @@ export type ItemWithPrice = ItemDetailed & {
     price?: ItemPrice;  // Making it optional in case price isn't always available
 };
 
+//* --------------------------- Revenue Types ---------------------------- */
+export type RevenueEntry = {
+    paid_amount: number;
+    posting_date: string;
+}
+
+export type MonthlyRevenue = {
+    month: string;  // e.g., "2025-03"
+    total: number;
+    entries: RevenueEntry[];
+}
+

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Area } from 'recharts';
 import { useApi } from '../../context/ApiContext';
+import { RevenueEntry, MonthlyRevenue } from '../../context/types/ERPNext';
 
 export default function Analytics() {
   const { getRevenue } = useApi();
@@ -37,8 +38,10 @@ export default function Analytics() {
         const data = await response.json();
         setSalesData(data);
         
-        const revenue = await getRevenue(); //! testing revenue from payment entry
-        console.log('revenue', revenue);
+        const revenue = await getRevenue();
+        const monthlyRevenue = groupRevenueByMonth(revenue);
+        console.log('Monthly Revenue:', monthlyRevenue);
+        
         // Calculate revenues and percentage
         const currentMonth = data[data.length - 1];
         const lastMonth = data[data.length - 2];
@@ -49,7 +52,7 @@ export default function Analytics() {
         const increase = ((currentMonth.totalSales - lastMonth.totalSales) / lastMonth.totalSales) * 100;
         setPercentageIncrease(increase);
 
-        const totalRevenue = revenue.reduce((sum, item) => sum + item.paid_amount, 0); //! testing revenue from payment entry
+        const totalRevenue = revenue.reduce((sum, item) => sum + item.paid_amount, 0);
         console.log('totalRevenue', totalRevenue);
         setRevenue(totalRevenue);
       } catch (error) {
@@ -66,6 +69,32 @@ export default function Analytics() {
       name: new Date(2024, month.month - 1).toLocaleString('default', { month: 'short' }),
       value: month.totalSales
     }));
+  };
+
+  const groupRevenueByMonth = (revenue: RevenueEntry[]): MonthlyRevenue[] => {
+    // Create a map to group entries by month
+    const monthlyGroups = revenue.reduce((groups, entry) => {
+        // Get YYYY-MM from the posting_date
+        const month = entry.posting_date.substring(0, 7);
+
+        if (!groups.has(month)) {
+            groups.set(month, {
+                month,
+                total: 0,
+                entries: []
+            });
+        }
+        
+        const group = groups.get(month)!;
+        group.entries.push(entry);
+        group.total += entry.paid_amount;
+        
+        return groups;
+    }, new Map<string, MonthlyRevenue>());
+
+    // Convert map to array and sort by month
+    return Array.from(monthlyGroups.values())
+        .sort((a, b) => a.month.localeCompare(b.month));
   };
 
   return (
@@ -185,7 +214,7 @@ export default function Analytics() {
               </div>
 
               <div>
-                <h3 className="text-gray-500 text-xs font-semibold mb-1">Percentage increase</h3>
+                <h3 className="text-gray-500 text-xs font-semibold mb-1">Percentage difference</h3>
                 <div className="flex items-baseline gap-2">
                   <span className="text-lg font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
                   <span className="text-green-500 text-sm">↑ 8.1%</span>
