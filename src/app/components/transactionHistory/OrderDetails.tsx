@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 type Order = {
-  id: string;
+  id: number;
   paymentBy?: string;
   paymentReceived?: boolean;
   totalPrice: number;
@@ -17,7 +17,7 @@ type Order = {
 };
 
 type OrderDetailsProps = {
-  order?: Order;
+  order: Order;
   onClose: () => void;
 };
 

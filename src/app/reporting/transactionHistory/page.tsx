@@ -330,6 +330,7 @@ export default function TransactionHistory() {
           </svg>
         </button>
       </div>
+
       {showOrderDetails && selectedOrder && (
         <OrderDetails 
           order={selectedOrder} // Now selectedOrder is guaranteed to be Order type
