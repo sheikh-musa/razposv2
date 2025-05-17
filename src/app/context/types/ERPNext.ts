@@ -97,7 +97,7 @@ export type StockEntry = {
     warehouse: string;
 }
 
- Order (Kitchen) Types ---------------------------- */
+//* --------------------------- Order (Kitchen) Types ---------------------------- */
 
 export type SalesOrders = {
     name: string;
@@ -206,7 +206,6 @@ export type ItemWithPrice = ItemDetailed & {
     price?: ItemPrice;  // Making it optional in case price isn't always available
 };
 
-//* --------------------------- Revenue Types ---------------------------- */
 export type RevenueEntry = {
     paid_amount: number;
     posting_date: string;

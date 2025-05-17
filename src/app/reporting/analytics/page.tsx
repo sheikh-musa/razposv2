@@ -38,7 +38,8 @@ export default function Analytics() {
         const data = await response.json();
         setSalesData(data);
         
-        const revenue = await getRevenue();
+        const revenue: RevenueEntry[] = await getRevenue();
+        console.log('Revenue:', revenue);
         const monthlyRevenue = groupRevenueByMonth(revenue);
         console.log('Monthly Revenue:', monthlyRevenue);
         

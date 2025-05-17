@@ -1,6 +1,21 @@
 'use client'
 import { useState } from 'react';
 
+type Order = {
+  id: string;
+  paymentBy?: string;
+  paymentReceived?: boolean;
+  totalPrice: number;
+  product: {
+    type: string;
+    variants: {
+      name: string;
+      price: number;
+      orderQuantity: number;
+    }[];
+  }[];
+};
+
 type OrderDetailsProps = {
   order?: Order;
   onClose: () => void;

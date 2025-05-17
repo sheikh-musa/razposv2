@@ -330,9 +330,9 @@ export default function TransactionHistory() {
           </svg>
         </button>
       </div>
-      {showOrderDetails && (
+      {showOrderDetails && selectedOrder && (
         <OrderDetails 
-          order={selectedOrder} 
+          order={selectedOrder} // Now selectedOrder is guaranteed to be Order type
           onClose={() => {
             setShowOrderDetails(false);
             setSelectedOrder(null);

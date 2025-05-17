@@ -47,14 +47,14 @@ export default function Home() {
       case '30 days':
         // Get last 30 days from the most recent month
         const last30Days = data[data.length - 1].dailySales.slice(-30);
-        return last30Days.map(day => ({
+        return last30Days.map((day: any) => ({
           name: new Date(day.date).getDate().toString(),
           value: day.totalSales
         }));
       case '7 days':
         // Get last 7 days from the most recent month
         const last7Days = data[data.length - 1].dailySales.slice(-7);
-        return last7Days.map(day => ({
+        return last7Days.map((day: any) => ({
           name: new Date(day.date).getDate().toString(),
           value: day.totalSales
         }));
