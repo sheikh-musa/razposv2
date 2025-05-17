@@ -115,10 +115,11 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
                   </button>
                 </div>
               </div>
-              <div className="text-xs">
-                <p className="text-gray-500">Reorder Level</p>
-                <p className="text-black">{item.reorder_level || 0}</p>
-              </div>
+              {/* <div className="text-xs"> */}
+                {/* <p className="text-gray-500">Reorder Level</p>
+                <p className="text-black">{item.reorder_level || 0}</p> */}
+              {/* </div> */} 
+              {/* //! mock field */}
             </div>
           </div>
 
