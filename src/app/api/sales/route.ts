@@ -1,5 +1,18 @@
 import { NextResponse } from "next/server";
 
+type VariantSale = {
+    quantity: number;
+    revenue: number;
+};
+
+type ProductSale = {
+    quantity: number;
+    revenue: number;
+    variants: {
+        [key: string]: VariantSale;
+    };
+};
+
 type DailySale = {
     date: string;  // YYYY-MM-DD
     totalSales: number;
@@ -11,16 +24,7 @@ type DailySale = {
         payNow: number;
     };
     productSales: {
-        [key: string]: {  // product type (e.g., "Bagels", "Pastries")
-            quantity: number;
-            revenue: number;
-            variants: {
-                [key: string]: {  // variant name (e.g., "Blueberry", "Sesame")
-                    quantity: number;
-                    revenue: number;
-                }
-            }
-        }
+        [key: string]: ProductSale;
     };
     dineInCount: number;
     takeawayCount: number;
@@ -38,16 +42,7 @@ type MonthlySales = {
         payNow: number;
     };
     productSales: {
-        [key: string]: {
-            quantity: number;
-            revenue: number;
-            variants: {
-                [key: string]: {
-                    quantity: number;
-                    revenue: number;
-                }
-            }
-        }
+        [key: string]: ProductSale;
     };
     dineInCount: number;
     takeawayCount: number;
@@ -74,13 +69,13 @@ const mockSalesData: MonthlySales[] = Array.from({ length: 12 }, (_, monthIndex)
             "Croissants": ["Classic", "Almond", "Chocolate"]
         };
 
-        const productSales: any = {};
+        const productSales: { [key: string]: ProductSale } = {};
         let totalSales = 0;
         let itemsSold = 0;
 
         productTypes.forEach(type => {
             const typeQuantity = Math.floor(Math.random() * 50) + 20;
-            const variantSales: any = {};
+            const variantSales: { [key: string]: VariantSale } = {};
             
             variants[type as keyof typeof variants].forEach(variant => {
                 const quantity = Math.floor(Math.random() * (typeQuantity / 2)) + 5;
@@ -98,7 +93,7 @@ const mockSalesData: MonthlySales[] = Array.from({ length: 12 }, (_, monthIndex)
 
             productSales[type] = {
                 quantity: typeQuantity,
-                revenue: Object.values(variantSales).reduce((acc: number, curr: any) => acc + curr.revenue, 0),
+                revenue: Object.values(variantSales).reduce((acc: number, curr: VariantSale) => acc + curr.revenue, 0),
                 variants: variantSales
             };
         });

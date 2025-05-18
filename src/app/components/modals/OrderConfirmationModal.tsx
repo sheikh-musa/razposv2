@@ -38,10 +38,10 @@ export default function OrderConfirmationModal({
         {/* Content */}
         <div className="text-center mt-8">
           <h3 className="text-lg font-semibold mb-2">
-            You've already added onto the cart
+            This item is already in the cart
           </h3>
           <p className="text-gray-600 mb-6">
-            There's already one set of {itemName} in the cart, do you wish to add another set?
+            There is already one set of {itemName} in the cart, do you wish to add another set?
           </p>
           
           {/* Buttons */}

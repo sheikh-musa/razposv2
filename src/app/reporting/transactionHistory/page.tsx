@@ -75,7 +75,7 @@ export default function TransactionHistory() {
     }
     return pages;
   };
-
+/* eslint-disable */
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -91,7 +91,7 @@ export default function TransactionHistory() {
 
     fetchOrders();
   }, []);
-
+/* eslint-enable */
   const filterOrdersByTimeRange = (range: string, ordersList = orders) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

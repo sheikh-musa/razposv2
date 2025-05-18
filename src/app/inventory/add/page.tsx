@@ -12,7 +12,7 @@ export default function AddInventory() {
     const [itemName, setItemName] = useState('');
     const [variants, setVariants] = useState([{ name: '', inventory: 0, price: 0 }]);
     const [loading, setLoading] = useState(false);
-    let stockItems: StockEntryItem[] = [];
+    const stockItems: StockEntryItem[] = [];
 
     const handleAddVariant = () => {
         const lastVariant = variants[variants.length - 1];
@@ -292,9 +292,10 @@ export default function AddInventory() {
                         </button>
                         <button 
                             onClick={handleSubmit}
-                            className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 text-sm"
+                            disabled={loading}
+                            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
                         >
-                            Add item
+                            {loading ? 'Adding...' : 'Add item'}
                         </button>
                     </div>
                 </div>

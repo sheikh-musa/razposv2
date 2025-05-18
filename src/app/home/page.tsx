@@ -16,13 +16,24 @@ type Transaction = {
   type: string;
 };
 
+type DailySale = {
+  date: string;
+  totalSales: number;
+};
+
+type MonthlySale = {
+  month: number;
+  totalSales: number;
+  dailySales: DailySale[];
+};
+
 export default function Home() {
   const [selectedRange, setSelectedRange] = useState<TimeRange>('12 months');
-  const [salesData, setSalesData] = useState<any[]>([]);
+  const [salesData, setSalesData] = useState<{ name: string; value: number }[]>([]);
   const [currentRevenue, setCurrentRevenue] = useState(0);
   const [lastRevenue, setLastRevenue] = useState(0);
   const [percentageIncrease, setPercentageIncrease] = useState(0);
-  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  // const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
     fetch('/api/sales')
@@ -30,14 +41,14 @@ export default function Home() {
       .then(data => {
         // Process data based on selected range
         const processedData = processDataForRange(data, selectedRange);
-        setSalesData(processedData);
+        setSalesData(processedData as { name: string; value: number }[]);
         
         // Calculate current and previous period revenues
         calculateRevenues(data, selectedRange);
       });
   }, [selectedRange]);
 
-  const processDataForRange = (data: any[], range: TimeRange) => {
+  const processDataForRange = (data: MonthlySale[], range: TimeRange) => {
     switch (range) {
       case '12 months':
         return data.map(month => ({
@@ -45,21 +56,18 @@ export default function Home() {
           value: month.totalSales
         }));
       case '30 days':
-        // Get last 30 days from the most recent month
         const last30Days = data[data.length - 1].dailySales.slice(-30);
-        return last30Days.map((day: any) => ({
+        return last30Days.map((day: DailySale) => ({
           name: new Date(day.date).getDate().toString(),
           value: day.totalSales
         }));
       case '7 days':
-        // Get last 7 days from the most recent month
         const last7Days = data[data.length - 1].dailySales.slice(-7);
-        return last7Days.map((day: any) => ({
+        return last7Days.map((day: DailySale) => ({
           name: new Date(day.date).getDate().toString(),
           value: day.totalSales
         }));
       case '24 hours':
-        // For demo, generate 24 hour data points
         return Array.from({ length: 24 }, (_, i) => ({
           name: `${i}:00`,
           value: Math.floor(Math.random() * 1000) + 500
@@ -69,9 +77,7 @@ export default function Home() {
     }
   };
 
-  const calculateRevenues = (data: any[], range: TimeRange) => {
-    // Calculate revenues based on time range
-    // This is a simplified example
+  const calculateRevenues = (data: MonthlySale[], range: TimeRange) => {
     if (range === '12 months') {
       const currentMonth = data[data.length - 1].totalSales;
       const lastMonth = data[data.length - 2].totalSales;

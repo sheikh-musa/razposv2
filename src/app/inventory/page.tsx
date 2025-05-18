@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client"
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
@@ -12,7 +13,7 @@ import InventoryEdit from '@/app/components/inventory/InventoryEdit';
 
 export default function Inventory() {
     const router = useRouter();
-    const { fetchItems, fetchItemDetails, disableItem, undoDisableItem, fetchItemPrice, fetchStockEntry } = useApi();
+    const { fetchItems, fetchItemDetails, disableItem, undoDisableItem, fetchItemPrice } = useApi();
     const [items, setItems] = useState<ItemWithPrice[]>([]);
     const [showOptions, setShowOptions] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -38,7 +39,7 @@ export default function Inventory() {
     const [showMultiRestoreModal, setShowMultiRestoreModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState<ItemWithPrice | null>(null);
     // const [itemPrice, setItemPrice] = useState<ItemPrice[]>([]);
-    // Load items with their details
+
     useEffect(() => {
         const loadItems = async () => {
             try {

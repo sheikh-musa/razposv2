@@ -47,7 +47,7 @@ export default function KitchenOrderCard({
     const handleCompleteOrder = async () => {
         try {
             setIsCompleting(true);
-            const today = new Date().toISOString().split('T')[0];
+            // const today = new Date().toISOString().split('T')[0];
             
             const invoicePayload: SalesInvoicePayload = {
                 customer: order.customer,

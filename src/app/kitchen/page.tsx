@@ -17,7 +17,7 @@ export default function Kitchen() {
     // const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
 
     // const paymentOptions = ["Cash", "Paynow", "Credit Card"];
-
+/* eslint-disable */
     const loadOrders = async () => {
         try {
             setLoading(true);
@@ -60,7 +60,7 @@ export default function Kitchen() {
     useEffect(() => {
         loadOrders();
     }, []);
-
+/* eslint-enable */
 
     const handlePaymentMethodChange = async (orderName: string, method: string) => {
         // Add API call to update payment method

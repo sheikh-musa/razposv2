@@ -37,6 +37,7 @@ export default function Analytics() {
   ];
 
   // Add useEffect for data fetching
+  /* eslint-disable */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -81,7 +82,7 @@ export default function Analytics() {
 
     fetchData();
   }, []);
-
+/* eslint-enable */
   // Update the process function with proper typing
   const processDataForChart = (data: SalesData[]) => {
     return data.map(month => ({
