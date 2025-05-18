@@ -13,10 +13,10 @@ export default function Kitchen() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [itemSummary, setItemSummary] = useState<Record<string, number>>({});
-    const [isDropdownOpen, setIsDropdownOpen] = useState<Record<string, boolean>>({});
-    const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
+    // const [isDropdownOpen, setIsDropdownOpen] = useState<Record<string, boolean>>({});
+    // const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
 
-    const paymentOptions = ["Cash", "Paynow", "Credit Card"];
+    // const paymentOptions = ["Cash", "Paynow", "Credit Card"];
 
     const loadOrders = async () => {
         try {

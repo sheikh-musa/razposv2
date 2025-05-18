@@ -4,10 +4,16 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, 
 import { useApi } from '../../context/ApiContext';
 import { RevenueEntry, MonthlyRevenue } from '../../context/types/ERPNext';
 
+// Add these type definitions at the top of the file
+type SalesData = {
+  month: number;
+  totalSales: number;
+};
+
 export default function Analytics() {
   const { getRevenue } = useApi();
-  const [salesData, setSalesData] = useState<any[]>([]);
-  const [currentRevenue, setCurrentRevenue] = useState(0);
+  const [salesData, setSalesData] = useState<SalesData[]>([]);
+  // const [currentRevenue, setCurrentRevenue] = useState(0); // ! mock api data
   const [lastRevenue, setLastRevenue] = useState(0);
   const [percentageIncrease, setPercentageIncrease] = useState(0);
   const [revenue, setRevenue] = useState(0);
@@ -56,7 +62,7 @@ export default function Analytics() {
         const lastMonthData = monthlyRevenue.find(m => m.month === lastMonth);
         
         // Set the revenues
-        setCurrentRevenue(currentMonthData?.total || 0);
+        // setCurrentRevenue(currentMonthData?.total || 0);
         setLastRevenue(lastMonthData?.total || 0);
         
         // Calculate percentage increase
@@ -76,8 +82,8 @@ export default function Analytics() {
     fetchData();
   }, []);
 
-  // Add data processing function
-  const processDataForChart = (data: any[]) => {
+  // Update the process function with proper typing
+  const processDataForChart = (data: SalesData[]) => {
     return data.map(month => ({
       name: new Date(2024, month.month - 1).toLocaleString('default', { month: 'short' }),
       value: month.totalSales
