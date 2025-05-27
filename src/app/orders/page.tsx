@@ -5,10 +5,10 @@ import { useCart } from '../context/CartContext';
 import OrderConfirmationModal from '../components/modals/OrderConfirmationModal';
 import OrderCard from '../components/orders/OrderCard';
 import { useApi } from '../context/ApiContext';
-import { ItemDetailed, ItemTemplate } from '../context/types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemWithPrice } from '../context/types/ERPNext';
 
 export default function Orders() {
-    const { fetchItems, fetchItemDetails } = useApi();
+    const { fetchItems, fetchItemDetails, fetchItemPrice } = useApi();
     const [products, setProducts] = useState<ItemTemplate[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     // const [showFilters, setShowFilters] = useState(false);
@@ -32,17 +32,28 @@ export default function Orders() {
                 const productsWithVariants = await Promise.all(
                     templates.map(async (template) => {
                         const variants = await fetchItemDetails(template.name, true);
+                        // Fetch prices for all variants
+                        const variantsWithPrices = await Promise.all(
+                            variants.map(async (variant) => {
+                                const price = await fetchItemPrice(variant.name);
+                                const itemPrice = price[0]; // Get first price from array
+                                return {
+                                    ...variant,
+                                    price: itemPrice, // Use single ItemPrice object instead of array
+                                    quantity: 1, // Default quantity for ordering
+                                } as ItemWithPrice;
+                            })
+                        );
+                        
                         return {
                             name: template.name,
                             item_name: template.item_name,
-                            variants: variants.map(variant => ({
-                                ...variant,
-                                quantity: 1 // Default quantity for ordering
-                            }))
+                            variants: variantsWithPrices
                         };
                     })
                 );
                 setProducts(productsWithVariants);
+                console.log('productsWithVariants', productsWithVariants); // ! console log
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load products');
                 console.error('Error loading products:', err);
