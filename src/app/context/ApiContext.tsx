@@ -41,7 +41,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 : '[["has_variants","=",0],["is_purchase_item","=",1],["disabled","=",0]]';
                 
             const response = await fetch(
-                `http://localhost:8080/api/resource/Item?filters=${filters}`,
+                `http://localhost:8080/api/resource/Item?limit_page_length=1000&filters=${filters}`,
                 {
                     headers: {
                         'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -66,7 +66,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             if (fetchVariants) {
                 // 1. First fetch basic variant information
                 const variantsResponse = await fetch(
-                    `http://localhost:8080/api/resource/Item?filters=[["variant_of","=","${itemName}"],["is_purchase_item","=",1]]`,
+                    `http://localhost:8080/api/resource/Item?limit_page_length=1000&filters=[["variant_of","=","${itemName}"],["is_purchase_item","=",1]]`,
                     {
                         headers: {
                             'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`

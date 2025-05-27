@@ -68,7 +68,7 @@ export default function Inventory() {
                 };
             })
         );
-        console.log(itemsWithDetails);
+        console.log('itemsWithDetails', itemsWithDetails); // ! console log
         setFilterOptions(false);
         setShowOptions(false);
         setSelectedItems([]);
