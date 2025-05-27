@@ -1,10 +1,14 @@
 import Image from 'next/image';
-import { ItemDetailed, ItemTemplate } from '@/app/context/types/ERPNext';
+import { ItemTemplate, ItemWithPrice } from '@/app/context/types/ERPNext';
 
 type OrderCardProps = {
-  product: ItemTemplate;
+  product: {
+    name: string;
+    item_name: string;
+    variants: ItemWithPrice[];
+  };
   onQuantityChange: (productName: string, variantName: string, change: number) => void;
-  onAddToOrder: (product: ItemTemplate, variant: ItemDetailed) => void;
+  onAddToOrder: (product: ItemTemplate, variant: ItemWithPrice) => void;
 };
 
 export default function OrderCard({ product, onQuantityChange, onAddToOrder }: OrderCardProps) {
@@ -25,7 +29,7 @@ export default function OrderCard({ product, onQuantityChange, onAddToOrder }: O
             </div>
             <div className="flex-1">
               <h3 className="font-semibold">{variant.item_name}</h3>
-              <p className="text-sm text-gray-600">${variant.valuation_rate.toFixed(2)}</p>
+              <p className="text-sm text-gray-600">${variant.price?.price_list_rate.toFixed(2)}</p>
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex items-center border rounded-md">
                   <button

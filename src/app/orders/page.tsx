@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import OrderConfirmationModal from '../components/modals/OrderConfirmationModal';
 import OrderCard from '../components/orders/OrderCard';
 import { useApi } from '../context/ApiContext';
-import { ItemDetailed, ItemTemplate, ItemWithPrice } from '../context/types/ERPNext';
+import { ItemTemplate, ItemWithPrice } from '../context/types/ERPNext';
 
 export default function Orders() {
     const { fetchItems, fetchItemDetails, fetchItemPrice } = useApi();
@@ -17,7 +17,7 @@ export default function Orders() {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [pendingOrder, setPendingOrder] = useState<{
         product: ItemTemplate;
-        variant: ItemDetailed;
+        variant: ItemWithPrice;
     } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -87,7 +87,7 @@ export default function Orders() {
         );
     };
 
-    const handleAddToOrder = (product: ItemTemplate, variant: ItemDetailed) => {
+    const handleAddToOrder = (product: ItemTemplate, variant: ItemWithPrice) => {
         const existingItem = items.find(
             item => item.productId === product.name && item.variantId === variant.name
         );
@@ -100,7 +100,7 @@ export default function Orders() {
                 productId: product.name,
                 variantId: variant.name,
                 name: variant.item_name,
-                price: variant.valuation_rate,
+                price: variant.price?.price_list_rate || 0, // ! some of the old data use valuation_rate
                 quantity: variant.quantity || 1,
                 type: product.item_name
             });
@@ -115,7 +115,7 @@ export default function Orders() {
                 productId: product.name,
                 variantId: variant.name,
                 name: variant.item_name,
-                price: variant.valuation_rate,
+                price: variant.price?.price_list_rate || 0, // ! some of the old data use valuation_rate
                 quantity: variant.quantity || 1,
                 type: product.item_name
             });
