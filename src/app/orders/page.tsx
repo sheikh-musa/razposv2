@@ -104,6 +104,7 @@ export default function Orders() {
                 quantity: variant.quantity || 1,
                 type: product.item_name
             });
+            console.log('variant', variant); // ! console log
             setShowOrderSummary(true);
         }
     };

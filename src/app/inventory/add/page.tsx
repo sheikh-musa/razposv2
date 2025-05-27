@@ -97,7 +97,7 @@ export default function AddInventory() {
                     const variantPayload = {
                         variant_of: itemName,
                         item_code: itemName + " - " + variant.name,
-                        item_name: variant.name,
+                        item_name: itemName + " - " + variant.name,
                         item_group: "Consumable",
                         stock_uom: "Nos",
                         opening_qty: variant.inventory,
@@ -110,7 +110,7 @@ export default function AddInventory() {
                     };
                     const itemPricePayload = {
                         item_code: itemName + " - " + variant.name,
-                        item_name: variant.name,
+                        item_name: itemName + " - " + variant.name,
                         stock_uom: "Nos",
                         price_list: "Standard Selling",
                         selling: 1,
