@@ -1,28 +1,27 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload } from '@/app/context/types/ERPNext';
+import { SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, PaymentUpdatePayload } from '@/app/context/types/ERPNext';
 import { useApi } from '@/app/context/ApiContext';
 import toast from 'react-hot-toast';
 
 type KitchenOrderCardProps = {
     order: SalesOrders;
-    onPaymentMethodChange: (orderName: string, method: string) => void;
     onItemComplete: (orderName: string, itemCode: string, completed: boolean) => void;
     onOrderComplete: () => void;
 };
 
 export default function KitchenOrderCard({ 
     order, 
-    onPaymentMethodChange,
     onItemComplete,
     onOrderComplete
 }: KitchenOrderCardProps) {
-    const { createSalesInvoice, createPaymentEntry, updateKitchenOrder } = useApi();
+    const { createSalesInvoice, createPaymentEntry, updateKitchenOrder, updateKitchenOrderPayment } = useApi();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
     const [isCompleting, setIsCompleting] = useState(false);
     const [canComplete, setCanComplete] = useState(false);
     const [paymentStatus, setPaymentStatus] = useState(order.custom_payment_complete);
+    const [paymentMethod, setPaymentMethod] = useState(order.custom_payment_mode);
 
     const paymentOptions = ["Cash", "Paynow", "Debit/Credit Card", "NETS"];
 
@@ -42,6 +41,16 @@ export default function KitchenOrderCard({
 
     const handlePaymentToggle = () => {
         setPaymentStatus(prev => prev === 1 ? 0 : 1);
+    };
+
+    const handlePaymentMethodChange = async (orderName: string, method: string) => {
+        const payload: PaymentUpdatePayload = {
+            custom_payment_mode: method
+        };
+        const response = await updateKitchenOrderPayment(orderName, payload);
+        const data = await response.json();
+        console.log('data', data.data); // ! console log
+        toast.success('Payment method updated');
     };
 
     const handleCompleteOrder = async () => {
@@ -130,7 +139,7 @@ export default function KitchenOrderCard({
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                             className='text-xs px-4 py-2 bg-slate-200 rounded-md hover:bg-slate-300 flex items-center gap-2'
                         >
-                            {order.custom_payment_mode}
+                            {paymentMethod}
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -141,7 +150,8 @@ export default function KitchenOrderCard({
                                     <button
                                         key={option}
                                         onClick={() => {
-                                            onPaymentMethodChange(order.name, option);
+                                            handlePaymentMethodChange(order.name, option);
+                                            setPaymentMethod(option);
                                             setIsDropdownOpen(false);
                                         }}
                                         className="block w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-slate-100 first:rounded-t-md last:rounded-b-md"

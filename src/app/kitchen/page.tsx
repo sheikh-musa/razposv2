@@ -62,17 +62,6 @@ export default function Kitchen() {
     }, []);
 /* eslint-enable */
 
-    const handlePaymentMethodChange = async (orderName: string, method: string) => {
-        // Add API call to update payment method
-        setOrders(prevOrders =>
-            prevOrders.map(order =>
-                order.name === orderName
-                    ? { ...order, payment_method: method }
-                    : order
-            )
-        );
-    };
-
     const handleItemComplete = async (orderName: string, itemCode: string, completed: boolean) => {
         // Add API call to update item completion status
         setOrders(prevOrders =>
@@ -136,7 +125,6 @@ export default function Kitchen() {
                     <KitchenOrderCard
                         key={order.name}
                         order={order}
-                        onPaymentMethodChange={handlePaymentMethodChange}
                         onItemComplete={handleItemComplete}
                         onOrderComplete={loadOrders}
                     />   
@@ -168,7 +156,6 @@ export default function Kitchen() {
                             <KitchenOrderCard
                                 key={order.name}
                                 order={order}
-                                onPaymentMethodChange={handlePaymentMethodChange}
                                 onItemComplete={handleItemComplete}
                                 onOrderComplete={loadOrders}
                             />
