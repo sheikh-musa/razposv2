@@ -217,3 +217,7 @@ export type MonthlyRevenue = {
     entries: RevenueEntry[];
 }
 
+export type PaymentUpdatePayload = {
+    custom_payment_mode: string;
+};
+
