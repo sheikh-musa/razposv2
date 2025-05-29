@@ -155,6 +155,7 @@ export type SalesInvoicePayload = {
         sales_order: string;
     }[];
     update_stock: number;
+    disable_rounded_total: number;
     docstatus: number;
 }
 

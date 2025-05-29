@@ -455,19 +455,24 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //* -------------------------------------------------------------------------- */
 
     const createSalesInvoice = async (payload: SalesInvoicePayload) => {
-        const response = await fetch('http://localhost:8080/api/resource/Sales Invoice', {
-            method: 'POST',
-            headers: {
-                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
-            },
-            body: JSON.stringify(payload)
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to create sales invoice');
+        try {
+            const response = await fetch('http://localhost:8080/api/resource/Sales Invoice', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to create sales invoice');
+            }
+    
+            return response;
+        } catch (error) {
+            console.error('Error creating sales invoice:', error);
+            throw error;
         }
-
-        return response;
     }
 
     const createPaymentEntry = async (payload: PaymentEntryPayload) => {

@@ -68,6 +68,7 @@ export default function KitchenOrderCard({
                     sales_order: order.name,
                 })),
                 update_stock: 1,
+                disable_rounded_total: 1,
                 docstatus: 1
             };
             console.log('invoicePayload', invoicePayload);
@@ -80,7 +81,7 @@ export default function KitchenOrderCard({
                 payment_type: "Receive",
                 party_type: "Customer",
                 party: order.customer,
-                paid_to: "Petty Cash - R",
+                paid_to: "Bank Account - R",
                 received_amount: order.total,
                 paid_amount: order.total,
                 references: [{
@@ -90,10 +91,10 @@ export default function KitchenOrderCard({
                     outstanding_amount: order.total,
                     allocated_amount: order.total,
                 }],
-                mode_of_payment: "Cash",
+                mode_of_payment: paymentMethod,
                 docstatus: 1
             };
-
+            console.log('paymentPayload', paymentPayload); // ! console log
             const paymentEntryResponse = await createPaymentEntry(paymentPayload);
             const paymentEntryData = await paymentEntryResponse.json();
 
