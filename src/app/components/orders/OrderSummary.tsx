@@ -190,8 +190,9 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
               className="w-full p-2 border rounded-md text-sm"
             >
               <option value="Cash">Cash</option>
-              <option value="Card">Card</option>
+              <option value="Debit/Credit Card">Debit/Credit Card</option>
               <option value="PayNow">PayNow</option>
+              <option value="NETS">NETS</option>
             </select>
           </div>
 

@@ -24,7 +24,7 @@ export default function KitchenOrderCard({
     const [canComplete, setCanComplete] = useState(false);
     const [paymentStatus, setPaymentStatus] = useState(order.custom_payment_complete);
 
-    const paymentOptions = ["Cash", "Paynow", "Credit Card"];
+    const paymentOptions = ["Cash", "Paynow", "Debit/Credit Card", "NETS"];
 
     // Check if all items are completed and payment is received
     useEffect(() => {
