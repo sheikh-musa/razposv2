@@ -193,6 +193,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
               <option value="Debit/Credit Card">Debit/Credit Card</option>
               <option value="PayNow">PayNow</option>
               <option value="NETS">NETS</option>
+              <option value="CDC">CDC</option>
             </select>
           </div>
 
