@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Area } from 'recharts';
 import { useApi } from '../../context/ApiContext';
-import { RevenueEntry, MonthlyRevenue } from '../../context/types/ERPNext';
+import { RevenueEntry, MonthlyRevenue, RevenueByPaymentMode } from '../../context/types/ERPNext';
 
 // Add these type definitions at the top of the file
 type SalesData = {
@@ -11,22 +11,32 @@ type SalesData = {
 };
 
 export default function Analytics() {
-  const { getRevenue } = useApi();
+  const { getRevenue, getRevenueByPaymentMode } = useApi();
   const [salesData, setSalesData] = useState<SalesData[]>([]);
   // const [currentRevenue, setCurrentRevenue] = useState(0); // ! mock api data
   const [lastRevenue, setLastRevenue] = useState(0);
   const [percentageIncrease, setPercentageIncrease] = useState(0);
   const [revenue, setRevenue] = useState(0);
-  // Payment methods data
+  const [revenueByPaymentMode, setRevenueByPaymentMode] = useState<RevenueByPaymentMode[]>([]);
+  const paymentModeData = [
+    { name: 'Cash', total: 0, color: '#7C3AED' },
+    { name: 'Debit/Credit Card', total: 0, color: '#9461FB' },
+    { name: 'PayNow', total: 0, color: '#B794FF' },
+    { name: 'NETS', total: 0, color: '#D4B5FF' },
+    { name: 'CDC', total: 0, color: '#EBD7FF' },
+  ];
+  
+  //! Payment methods data (mock api data)
   const paymentMethodData = [
     { name: 'Cash', value: 35, color: '#7C3AED' },
-    { name: 'Credit Card', value: 25, color: '#9461FB' },
+    { name: 'Debit/Credit Card', value: 25, color: '#9461FB' },
     { name: 'PayNow', value: 20, color: '#B794FF' },
-    { name: 'E-payment', value: 15, color: '#D4B5FF' },
+    { name: 'NETS', value: 15, color: '#D4B5FF' },
     { name: 'CDC', value: 5, color: '#EBD7FF' },
   ];
 
-  // Monthly revenue by item
+
+  //! Monthly revenue by item (mock api data)
   const itemRevenue = [
     { name: 'Croissant', value: 148.40, color: '#7C3AED' },
     { name: 'Baguette', value: 642.48, color: '#9461FB' },
@@ -73,8 +83,12 @@ export default function Analytics() {
         }
 
         const totalRevenue = revenue.reduce((sum, item) => sum + item.paid_amount, 0);
-        console.log('totalRevenue', totalRevenue);
+        console.log('totalRevenue', totalRevenue); // ! console log
         setRevenue(totalRevenue);
+
+        const revenueByPaymentMode: RevenueByPaymentMode[] = await getRevenueByPaymentMode(paymentModeData[3].name);
+        console.log('Revenue by payment mode:', revenueByPaymentMode);
+        setRevenueByPaymentMode(revenueByPaymentMode);
       } catch (error) {
         console.error('Error fetching sales data:', error);
       }

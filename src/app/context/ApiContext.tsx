@@ -512,7 +512,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
     
     const getRevenueByPaymentMode = async (paymentMode: string) => {
-        const response = await fetch(`http://localhost:8080/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date"]&filters=[["mode_of_payment","=","${paymentMode}"]]`, {
+        const response = await fetch(`http://localhost:8080/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date", "mode_of_payment"]&filters=[["mode_of_payment","=","${paymentMode}"]]`, {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
             }
