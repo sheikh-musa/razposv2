@@ -1,6 +1,7 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
 import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, RevenueByPaymentMode } from './types/ERPNext';
+import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
     fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
@@ -29,6 +30,7 @@ interface ApiContextType {
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
 
 export function ApiProvider({ children }: { children: ReactNode }) {
+    const isStaging = process.env.NEXT_PUBLIC_ENV === 'staging';
 
     //* -------------------------------------------------------------------------- */
     //*                          API calls for fetching Items                      */
@@ -495,6 +497,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
     const getRevenue = async () => {
         try {
+            if (isStaging) {
+                return mockRevenueData;
+            }
             const response = await fetch(`http://localhost:8080/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date"]`, {
                 headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
