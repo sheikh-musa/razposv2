@@ -218,6 +218,12 @@ export type MonthlyRevenue = {
     entries: RevenueEntry[];
 }
 
+export type RevenueByPaymentMode = {
+    paid_amount: number;
+    posting_date: string;
+    mode_of_payment: string;
+}
+
 export type PaymentUpdatePayload = {
     custom_payment_mode: string;
 };

@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, RevenueByPaymentMode } from './types/ERPNext';
 
 interface ApiContextType {
     fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
@@ -23,6 +23,7 @@ interface ApiContextType {
     createPaymentEntry: (payload: PaymentEntryPayload) => Promise<Response>;
     getRevenue: () => Promise<RevenueEntry[]>;
     updateKitchenOrderPayment: (orderName: string, payload: PaymentUpdatePayload) => Promise<Response>;
+    getRevenueByPaymentMode: (paymentMode: string) => Promise<RevenueByPaymentMode[]>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -508,7 +509,20 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             console.error('Error fetching revenue:', error);
             throw error;
         }
-    }      
+    }
+    
+    const getRevenueByPaymentMode = async (paymentMode: string) => {
+        const response = await fetch(`http://localhost:8080/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date"]&filters=[["mode_of_payment","=","${paymentMode}"]]`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch revenue by payment mode');
+        }
+        const data = await response.json();
+        return data.data;
+    }
     
 
     return (
@@ -532,7 +546,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             createSalesInvoice,
             createPaymentEntry,
             getRevenue,
-            updateKitchenOrderPayment
+            updateKitchenOrderPayment,
+            getRevenueByPaymentMode
         }}>
             {children}
         </ApiContext.Provider>
