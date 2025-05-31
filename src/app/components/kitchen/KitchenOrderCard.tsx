@@ -81,7 +81,7 @@ export default function KitchenOrderCard({
                 payment_type: "Receive",
                 party_type: "Customer",
                 party: order.customer,
-                paid_to: "Bank Account - R",
+                paid_to: "Petty Cash - R", // ! if Bank Account - R, then reference no. needed regardless of mode of payment
                 received_amount: order.total,
                 paid_amount: order.total,
                 references: [{
