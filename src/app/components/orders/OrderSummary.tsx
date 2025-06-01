@@ -45,8 +45,6 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       custom_payment_complete: paymentComplete,
       docstatus: 1,
     };
-    console.log('paymentComplete', payload.custom_payment_complete);
-    console.log('orderComplete', payload.custom_order_complete);
     console.log('payload', payload);
     const response = await createKitchenOrder(payload);
     if (response.ok) {

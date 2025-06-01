@@ -17,13 +17,13 @@ export default function Analytics() {
   const [lastRevenue, setLastRevenue] = useState(0);
   const [percentageIncrease, setPercentageIncrease] = useState(0);
   const [revenue, setRevenue] = useState(0);
-  const [revenueByPaymentMode, setRevenueByPaymentMode] = useState<RevenueByPaymentMode[]>([]);
+  const [revenueByPaymentMode, setRevenueByPaymentMode] = useState([]);
   const paymentModeData = [
-    { name: 'Cash', total: 0, color: '#7C3AED' },
-    { name: 'Debit/Credit Card', total: 0, color: '#9461FB' },
-    { name: 'PayNow', total: 0, color: '#B794FF' },
-    { name: 'NETS', total: 0, color: '#D4B5FF' },
-    { name: 'CDC', total: 0, color: '#EBD7FF' },
+    { name: 'Cash', color: '#7C3AED' },
+    { name: 'Debit/Credit Card', color: '#9461FB' },
+    { name: 'PayNow', color: '#B794FF' },
+    { name: 'NETS', color: '#D4B5FF' },
+    { name: 'CDC', color: '#EBD7FF' },
   ];
   
   //! Payment methods data (mock api data)
@@ -89,6 +89,7 @@ export default function Analytics() {
         // Get revenue by payment mode
         const paymentModes = paymentModeData.map(mode => mode.name);
         let revenueByModes = [];
+        
         for (const mode of paymentModes) {
           const revenueByMode = await getRevenueByPaymentMode(mode);
           const total = revenueByMode.reduce((sum, item) => sum + item.paid_amount, 0);
@@ -97,7 +98,17 @@ export default function Analytics() {
             total_amount: total,
           });
         }
+
+        // Sort by total_amount in descending order and add colors
+        revenueByModes = revenueByModes
+          .sort((a, b) => b.total_amount - a.total_amount)
+          .map((mode, index) => ({
+            ...mode,
+            color: paymentModeData[index].color
+          }));
+
         console.log('revenueByModes', revenueByModes);
+        setRevenueByPaymentMode(revenueByModes); // TODO: fix type error
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -288,25 +299,24 @@ export default function Analytics() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={paymentMethodData}
+                    data={revenueByPaymentMode}
                     innerRadius={35}
                     outerRadius={80}
-                    dataKey="value"
+                    dataKey="total_amount"
                   >
-                    {paymentMethodData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    {revenueByPaymentMode.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={paymentModeData[index].color} />
                     ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
             </div>
-
             {/* Legend */}
             <div className="flex flex-col justify-center">
-              {paymentMethodData.map((method, index) => (
-                <div key={index} className="flex items-center gap-2 text-xs mb-2 text-gray-500">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: method.color }}></div>
-                  <span>{method.name}</span>
+              {revenueByPaymentMode.map((entry: any) => ( // TODO: fix type error
+                <div key={entry.mode_of_payment} className="flex items-center gap-2 text-xs mb-2 text-gray-500">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
+                  <span>{entry.mode_of_payment}</span>
                 </div>
               ))}
             </div>
