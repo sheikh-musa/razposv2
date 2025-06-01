@@ -86,18 +86,27 @@ export default function Analytics() {
         console.log('totalRevenue', totalRevenue); // ! console log
         setRevenue(totalRevenue);
 
-        const revenueByPaymentMode: RevenueByPaymentMode[] = await getRevenueByPaymentMode(paymentModeData[3].name);
-        console.log('Revenue by payment mode:', revenueByPaymentMode);
-        setRevenueByPaymentMode(revenueByPaymentMode);
+        // Get revenue by payment mode
+        const paymentModes = paymentModeData.map(mode => mode.name);
+        let revenueByModes = [];
+        for (const mode of paymentModes) {
+          const revenueByMode = await getRevenueByPaymentMode(mode);
+          const total = revenueByMode.reduce((sum, item) => sum + item.paid_amount, 0);
+          revenueByModes.push({
+            mode_of_payment: mode,
+            total_amount: total,
+          });
+        }
+        console.log('revenueByModes', revenueByModes);
       } catch (error) {
-        console.error('Error fetching sales data:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
   }, []);
 /* eslint-enable */
-  // Update the process function with proper typing
+  // Update the process function with proper typingf
   const processDataForChart = (data: SalesData[]) => {
     return data.map(month => ({
       name: new Date(2024, month.month - 1).toLocaleString('default', { month: 'short' }),
