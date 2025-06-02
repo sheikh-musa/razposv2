@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Area } from 'recharts';
 import { useApi } from '../../context/ApiContext';
-import { RevenueEntry, MonthlyRevenue, RevenueByPaymentMode } from '../../context/types/ERPNext';
+import { RevenueEntry, MonthlyRevenue, RevenueByPaymentMode, SalesInvoice } from '../../context/types/ERPNext';
 
 // Add these type definitions at the top of the file
 type SalesData = {
@@ -11,13 +11,14 @@ type SalesData = {
 };
 
 export default function Analytics() {
-  const { getRevenue, getRevenueByPaymentMode } = useApi();
+  const { getRevenue, getRevenueByPaymentMode, getAllPaidSalesInvoice, getSalesInvoiceByName } = useApi();
   const [salesData, setSalesData] = useState<SalesData[]>([]);
   // const [currentRevenue, setCurrentRevenue] = useState(0); // ! mock api data
   const [lastRevenue, setLastRevenue] = useState(0);
   const [percentageIncrease, setPercentageIncrease] = useState(0);
   const [revenue, setRevenue] = useState(0);
   const [revenueByPaymentMode, setRevenueByPaymentMode] = useState([]);
+
   const paymentModeData = [
     { name: 'Cash', color: '#7C3AED' },
     { name: 'Debit/Credit Card', color: '#9461FB' },
@@ -109,6 +110,14 @@ export default function Analytics() {
 
         console.log('revenueByModes', revenueByModes);
         setRevenueByPaymentMode(revenueByModes); // TODO: fix type error
+
+        const salesInvoice: SalesInvoice[] = await getAllPaidSalesInvoice();
+        console.log('salesInvoice', salesInvoice); // ! console log
+        
+        salesInvoice.forEach(async (invoice) => {
+          const salesInvoiceItems = await getSalesInvoiceByName(invoice.name);
+          console.log('salesInvoiceItems', salesInvoiceItems.items); // ! console log
+        });
       } catch (error) {
         console.error('Error fetching data:', error);
       }

@@ -47,7 +47,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 : '[["has_variants","=",0],["is_purchase_item","=",1],["disabled","=",0]]';
                 
             const response = await fetch(
-                `http://localhost:8080/api/resource/Item?limit_page_length=1000&filters=${filters}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item?limit_page_length=1000&filters=${filters}`,
                 {
                     headers: {
                         'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -72,7 +72,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             if (fetchVariants) {
                 // 1. First fetch basic variant information
                 const variantsResponse = await fetch(
-                    `http://localhost:8080/api/resource/Item?limit_page_length=1000&filters=[["variant_of","=","${itemName}"],["is_purchase_item","=",1]]`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item?limit_page_length=1000&filters=[["variant_of","=","${itemName}"],["is_purchase_item","=",1]]`,
                     {
                         headers: {
                             'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -90,7 +90,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                     variantsData.data.map(async (variant: ItemTemplate) => {
                         // Fetch detailed item information
                         const itemResponse = await fetch(
-                            `http://localhost:8080/api/resource/Item/${variant.name}`,
+                            `${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item/${variant.name}`,
                             {
                                 headers: {
                                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -106,7 +106,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
                         // Fetch stock information
                         const stockResponse = await fetch(
-                            `http://localhost:8080/api/resource/Bin?filters=[["item_code","=","${variant.name}"]]&fields=["item_code","actual_qty","warehouse","valuation_rate"]`,
+                            `${process.env.NEXT_PUBLIC_API_URL}/api/resource/Bin?filters=[["item_code","=","${variant.name}"]]&fields=["item_code","actual_qty","warehouse","valuation_rate"]`,
                             {
                                 headers: {
                                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -139,7 +139,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
 
             // For single item details (non-variant case)
-            const itemResponse = await fetch(`http://localhost:8080/api/resource/Item/${itemName}`, {
+            const itemResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item/${itemName}`, {
                 headers: {
                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
                 }
@@ -153,7 +153,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             
             // Fetch stock information
             const stockResponse = await fetch(
-                `http://localhost:8080/api/resource/Bin?filters=[["item_code","=","${itemName}"]]&fields=["item_code","actual_qty","warehouse","valuation_rate"]`, 
+                `${process.env.NEXT_PUBLIC_API_URL}/api/resource/Bin?filters=[["item_code","=","${itemName}"]]&fields=["item_code","actual_qty","warehouse","valuation_rate"]`, 
                 {
                     headers: {
                         'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -190,7 +190,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
     const disableItem = async (itemName: string) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/resource/Item/${itemName}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item/${itemName}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -213,7 +213,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     };
     const undoDisableItem = async (itemName: string) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/resource/Item/${itemName}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item/${itemName}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -241,7 +241,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
     const createItemAttribute = async (payload: ItemAttributePayload) => {
         try {
-            const response = await fetch('http://localhost:8080/api/resource/Item Attribute', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Attribute`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -263,7 +263,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
     const createItemTemplate = async (payload: ItemTemplatePayload) => {
         try {
-            const response = await fetch('http://localhost:8080/api/resource/Item', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -285,7 +285,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
     const createItemVariant = async (payload: ItemVariantPayload) => {
         try {
-            const response = await fetch('http://localhost:8080/api/resource/Item', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -311,7 +311,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
     const createItemPrice = async (payload: ItemPricePayload) => {
         try {
-            const response = await fetch('http://localhost:8080/api/resource/Item Price', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -331,7 +331,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     } 
     const fetchItemPrice = async (itemName: string) => {
-        const response = await fetch(`http://localhost:8080/api/resource/Item Price?filters=[["item_code","=","${itemName}"]]&fields=["item_name","price_list_rate","selling"]`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price?filters=[["item_code","=","${itemName}"]]&fields=["item_name","price_list_rate","selling"]`, {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
             }
@@ -347,7 +347,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //*                             API calls for Stock                            */
     //* -------------------------------------------------------------------------- */
     const createStockEntry = async (payload: StockEntryPayload) => {
-        const response = await fetch('http://localhost:8080/api/resource/Stock Entry', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Stock Entry`, {
             method: 'POST',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -361,7 +361,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     const fetchStockEntry = async (itemName: string) => {
-        const response = await fetch(`http://localhost:8080/api/resource/Bin?filters=[["item_code","=","${itemName}"]]&fields=["*"]`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Bin?filters=[["item_code","=","${itemName}"]]&fields=["*"]`, {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
             }
@@ -374,7 +374,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
    
     const stockReconciliation = async (payload: StockReconciliationPayload) => {
-        const response = await fetch('http://localhost:8080/api/resource/Stock Reconciliation', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Stock Reconciliation`, {
             method: 'POST',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -392,7 +392,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //* -------------------------------------------------------------------------- */
 
     const fetchKitchenOrderNames = async () => {
-        const response = await fetch('http://localhost:8080/api/resource/Sales Order?limit_page_length=1000', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order?limit_page_length=1000`, {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
             }
@@ -405,7 +405,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     const fetchKitchenOrderDetails = async (orderId: string) => {
-        const response = await fetch(`http://localhost:8080/api/resource/Sales Order/${orderId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order/${orderId}`, {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
             }
@@ -418,7 +418,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     const createKitchenOrder = async (payload: SalesOrderPayload) => {
-        const response = await fetch('http://localhost:8080/api/resource/Sales Order', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order`, {
             method: 'POST',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -432,7 +432,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     const updateKitchenOrder = async (orderName: string, payload: SalesOrderUpdatePayload) => {
-        const response = await fetch(`http://localhost:8080/api/resource/Sales Order/${orderName}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order/${orderName}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -444,7 +444,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     const updateKitchenOrderPayment = async (orderName: string, payload: PaymentUpdatePayload) => {
-        const response = await fetch(`http://localhost:8080/api/resource/Sales Order/${orderName}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order/${orderName}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -460,7 +460,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //* -------------------------------------------------------------------------- */
 
     const getAllPaidSalesInvoice = async () => {
-        const response = await fetch('http://localhost:8080/api/resource/Sales Invoice?filters=[["status", "=", "Paid"]]&fields=["name", "posting_date"]&limit_page_length=1000', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Invoice?filters=[["status", "=", "Paid"]]&fields=["name", "posting_date"]&limit_page_length=1000`, {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
             }
@@ -473,7 +473,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     const getSalesInvoiceByName = async (invoiceName: string) => {
-        const response = await fetch(`http://localhost:8080/api/resource/Sales Invoice/${invoiceName}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Invoice/${invoiceName}`, {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
             }
@@ -487,7 +487,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
     const createSalesInvoice = async (payload: SalesInvoicePayload) => {
         try {
-            const response = await fetch('http://localhost:8080/api/resource/Sales Invoice', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Invoice`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -507,7 +507,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     const createPaymentEntry = async (payload: PaymentEntryPayload) => {
-        const response = await fetch('http://localhost:8080/api/resource/Payment Entry', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Payment Entry`, {
             method: 'POST',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
@@ -528,7 +528,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             if (isStaging) {
                 return mockRevenueData;
             }
-            const response = await fetch(`http://localhost:8080/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date"]`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date"]`, {
                 headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
             }
@@ -545,7 +545,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
     
     const getRevenueByPaymentMode = async (paymentMode: string) => {
-        const response = await fetch(`http://localhost:8080/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date", "mode_of_payment"]&filters=[["mode_of_payment","=","${paymentMode}"]]`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date", "mode_of_payment"]&filters=[["mode_of_payment","=","${paymentMode}"]]`, {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
             }
