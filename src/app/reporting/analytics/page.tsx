@@ -2,13 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Area } from 'recharts';
 import { useApi } from '../../context/ApiContext';
-import { RevenueEntry, MonthlyRevenue, RevenueByPaymentMode, SalesInvoice } from '../../context/types/ERPNext';
+import { RevenueEntry, MonthlyRevenue, RevenueByPaymentMode, SalesInvoice, SalesItemRevenue } from '../../context/types/ERPNext';
 
 // Add these type definitions at the top of the file
 type SalesData = {
   month: number;
   totalSales: number;
 };
+
+type ItemRevenue = {
+    item_name: string;
+    total_amount: number;
+}
 
 export default function Analytics() {
   const { getRevenue, getRevenueByPaymentMode, getAllPaidSalesInvoice, getSalesInvoiceByName } = useApi();
@@ -111,13 +116,9 @@ export default function Analytics() {
         console.log('revenueByModes', revenueByModes);
         setRevenueByPaymentMode(revenueByModes); // TODO: fix type error
 
-        const salesInvoice: SalesInvoice[] = await getAllPaidSalesInvoice();
-        console.log('salesInvoice', salesInvoice); // ! console log
-        
-        salesInvoice.forEach(async (invoice) => {
-          const salesInvoiceItems = await getSalesInvoiceByName(invoice.name);
-          console.log('salesInvoiceItems', salesInvoiceItems.items); // ! console log
-        });
+        const salesInvoices: SalesInvoice[] = await getAllPaidSalesInvoice();
+        const itemRevenue = await consolidateItemRevenue(salesInvoices);
+        console.log('Consolidated Item Revenue:', itemRevenue);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -158,6 +159,29 @@ export default function Analytics() {
     // Convert map to array and sort by month
     return Array.from(monthlyGroups.values())
         .sort((a, b) => a.month.localeCompare(b.month));
+  };
+
+  const consolidateItemRevenue = async (salesInvoices: SalesInvoice[]) => {
+    const itemRevenueMap = new Map<string, number>();
+
+    // Process each invoice
+    for (const invoice of salesInvoices) {
+        const invoiceDetails = await getSalesInvoiceByName(invoice.name);
+        
+        // Process each item in the invoice
+        invoiceDetails.items.forEach((item: any) => {
+            const currentTotal = itemRevenueMap.get(item.item_name) || 0;
+            itemRevenueMap.set(item.item_name, currentTotal + item.amount);
+        });
+    }
+
+    // Convert map to array and sort by amount
+    const consolidatedRevenue: SalesItemRevenue[] = Array.from(itemRevenueMap).map(([item_name, total_amount]) => ({
+        item_name,
+        total_amount
+    })).sort((a, b) => b.total_amount - a.total_amount);
+
+    return consolidatedRevenue;
   };
 
   return (

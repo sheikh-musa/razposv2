@@ -212,6 +212,8 @@ export type ItemWithPrice = ItemDetailed & {
     price?: ItemPrice;  // Making it optional in case price isn't always available
 };
 
+//* --------------------------- Revenue Types ---------------------------- */
+
 export type RevenueEntry = {
     paid_amount: number;
     posting_date: string;
@@ -233,3 +235,7 @@ export type PaymentUpdatePayload = {
     custom_payment_mode: string;
 };
 
+export type SalesItemRevenue = {
+    item_name: string;
+    total_amount: number;
+}
