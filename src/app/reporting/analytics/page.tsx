@@ -167,7 +167,7 @@ export default function Analytics() {
     // Process each invoice
     for (const invoice of salesInvoices) {
         const invoiceDetails = await getSalesInvoiceByName(invoice.name);
-        
+        console.log('invoiceDetails', invoiceDetails); // ! console log
         // Process each item in the invoice
         invoiceDetails.items.forEach((item: any) => {
             const currentTotal = itemRevenueMap.get(item.item_name) || 0;

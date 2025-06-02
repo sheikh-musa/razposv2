@@ -14,10 +14,6 @@ export default function AddInventory() {
     const [loading, setLoading] = useState(false);
     const stockItems: StockEntryItem[] = [];
 
-    const capitalizeFirstLetter = (string: string) => {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    };
-
     const handleAddVariant = () => {
         const lastVariant = variants[variants.length - 1];
         if (!lastVariant.name.trim()) {
@@ -101,7 +97,7 @@ export default function AddInventory() {
                     const variantPayload = {
                         variant_of: itemName,
                         item_code: itemName + " - " + variant.name,
-                        item_name: itemName + " - " + variant.name,
+                        item_name: variant.name,
                         item_group: "Consumable",
                         stock_uom: "Nos",
                         opening_qty: variant.inventory,
@@ -114,7 +110,7 @@ export default function AddInventory() {
                     };
                     const itemPricePayload = {
                         item_code: itemName + " - " + variant.name,
-                        item_name: itemName + " - " + variant.name,
+                        item_name: variant.name,
                         stock_uom: "Nos",
                         price_list: "Standard Selling",
                         selling: 1,
@@ -180,7 +176,7 @@ export default function AddInventory() {
                         <input 
                             type="text"
                             value={itemName}
-                            onChange={(e) => setItemName(capitalizeFirstLetter(e.target.value))}
+                            onChange={(e) => setItemName(e.target.value)}
                             className="w-full p-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 border-slate-400 text-black"
                             placeholder="Enter item name"
                         />
@@ -218,7 +214,7 @@ export default function AddInventory() {
                                             value={variant.name}
                                             onChange={(e) => {
                                                 const newVariants = [...variants];
-                                                newVariants[index].name = capitalizeFirstLetter(e.target.value);
+                                                newVariants[index].name = e.target.value;
                                                 setVariants(newVariants);
                                             }}
                                             placeholder="Variant name"
