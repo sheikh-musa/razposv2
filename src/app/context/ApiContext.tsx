@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, RevenueByPaymentMode, SalesInvoiceItem } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, RevenueByPaymentMode, SalesInvoice } from './types/ERPNext';
 import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
@@ -25,7 +25,7 @@ interface ApiContextType {
     getRevenue: () => Promise<RevenueEntry[]>;
     updateKitchenOrderPayment: (orderName: string, payload: PaymentUpdatePayload) => Promise<Response>;
     getRevenueByPaymentMode: (paymentMode: string) => Promise<RevenueByPaymentMode[]>;
-    getAllPaidSalesInvoice: () => Promise<SalesInvoiceItem[]>;
+    getAllPaidSalesInvoice: () => Promise<SalesInvoice[]>;
     getSalesInvoiceByName: (invoiceName: string) => Promise<Response>;
 }
 
