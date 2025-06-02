@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, RevenueByPaymentMode } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, RevenueByPaymentMode, SalesInvoiceItem } from './types/ERPNext';
 import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
@@ -25,6 +25,8 @@ interface ApiContextType {
     getRevenue: () => Promise<RevenueEntry[]>;
     updateKitchenOrderPayment: (orderName: string, payload: PaymentUpdatePayload) => Promise<Response>;
     getRevenueByPaymentMode: (paymentMode: string) => Promise<RevenueByPaymentMode[]>;
+    getAllPaidSalesInvoice: () => Promise<SalesInvoiceItem[]>;
+    getSalesInvoiceByName: (invoiceName: string) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -457,6 +459,32 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //*                             API calls for Payment                          */
     //* -------------------------------------------------------------------------- */
 
+    const getAllPaidSalesInvoice = async () => {
+        const response = await fetch('http://localhost:8080/api/resource/Sales Invoice?filters=[["status", "=", "Paid"]]&fields=["name", "posting_date"]&limit_page_length=1000', {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch sales invoice');
+        }
+        const data = await response.json();
+        return data.data;
+    }
+
+    const getSalesInvoiceByName = async (invoiceName: string) => {
+        const response = await fetch(`http://localhost:8080/api/resource/Sales Invoice/${invoiceName}`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch sales invoice');
+        }
+        const data = await response.json();
+        return data.data;
+    }
+
     const createSalesInvoice = async (payload: SalesInvoicePayload) => {
         try {
             const response = await fetch('http://localhost:8080/api/resource/Sales Invoice', {
@@ -552,7 +580,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             createPaymentEntry,
             getRevenue,
             updateKitchenOrderPayment,
-            getRevenueByPaymentMode
+            getRevenueByPaymentMode,
+            getAllPaidSalesInvoice,
+            getSalesInvoiceByName
         }}>
             {children}
         </ApiContext.Provider>

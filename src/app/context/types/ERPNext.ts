@@ -145,6 +145,11 @@ export type SalesOrderUpdatePayload = {
 }
 //* --------------------------- Sales Invoice Types ---------------------------- */
 
+export type SalesInvoiceItem = {
+    name: string;
+    posting_date: string;
+}
+
 export type SalesInvoicePayload = {
     customer: string;
     items: {
