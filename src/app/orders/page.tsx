@@ -63,6 +63,7 @@ export default function Orders() {
         };
 
         loadProducts();
+        // eslint-disable-next-line
     }, []);
 
     const handleQuantityChange = (productName: string, variantName: string, change: number) => {

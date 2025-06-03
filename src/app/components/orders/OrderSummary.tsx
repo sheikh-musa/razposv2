@@ -30,7 +30,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
  // ! Not all items are based on Item Price
  // ! Status is always To Deliver and Bill will change to Overdue after 1 day
  // ! stock will be deducted when Sales Order converted to Sales Invoice
-console.log('items', items); // ! console log
+// console.log('items', items); // ! console log
   const handleConfirm = async () => {
     const payload: SalesOrderPayload = {
       customer: 'Guest',

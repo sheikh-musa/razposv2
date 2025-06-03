@@ -226,8 +226,7 @@ export type MonthlyRevenue = {
 }
 
 export type RevenueByPaymentMode = {
-    paid_amount: number;
-    posting_date: string;
+    total_amount: number;
     mode_of_payment: string;
 }
 
