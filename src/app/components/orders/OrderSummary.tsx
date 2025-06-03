@@ -46,14 +46,14 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       docstatus: 1,
     };
     console.log('payload', payload);
-    const response = await createKitchenOrder(payload);
-    if (response.ok) {
-      toast.success('Order created successfully');
-      clearCart();
-      onClose();
-    } else {
-      toast.error('Failed to create order');
-    }
+    // const response = await createKitchenOrder(payload);
+    // if (response.ok) {
+    //   toast.success('Order created successfully');
+    //   clearCart();
+    //   onClose();
+    // } else {
+    //   toast.error('Failed to create order');
+    // }
   };
 
   return (

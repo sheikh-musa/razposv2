@@ -10,11 +10,6 @@ type SalesData = {
   totalSales: number;
 };
 
-type ItemRevenue = {
-    item_name: string;
-    total_amount: number;
-}
-
 export default function Analytics() {
   const { getRevenue, getRevenueByPaymentMode, getAllPaidSalesInvoice, getSalesInvoiceByName } = useApi();
   const [salesData, setSalesData] = useState<SalesData[]>([]);
@@ -33,13 +28,13 @@ export default function Analytics() {
   ];
   
   //! Payment methods data (mock api data)
-  const paymentMethodData = [
-    { name: 'Cash', value: 35, color: '#7C3AED' },
-    { name: 'Debit/Credit Card', value: 25, color: '#9461FB' },
-    { name: 'PayNow', value: 20, color: '#B794FF' },
-    { name: 'NETS', value: 15, color: '#D4B5FF' },
-    { name: 'CDC', value: 5, color: '#EBD7FF' },
-  ];
+  // const paymentMethodData = [
+  //   { name: 'Cash', value: 35, color: '#7C3AED' },
+  //   { name: 'Debit/Credit Card', value: 25, color: '#9461FB' },
+  //   { name: 'PayNow', value: 20, color: '#B794FF' },
+  //   { name: 'NETS', value: 15, color: '#D4B5FF' },
+  //   { name: 'CDC', value: 5, color: '#EBD7FF' },
+  // ];
 
 
   //! Monthly revenue by item (mock api data)
