@@ -3,8 +3,8 @@ import React, { createContext, useContext, useState } from 'react';
 // import { SalesOrderItem } from './types/ERPNext';
 
 type CartItem = {
-  productId: string;
-  variantId: string;
+  itemTemplate: string; //* productId
+  itemVariant: string; //* variantId
   name: string;
   price: number;
   quantity: number;
@@ -18,8 +18,8 @@ type CartItem = {
 type CartContextType = {
   items: CartItem[];
   addItem: (item: CartItem) => void;
-  removeItem: (productId: string, variantId: string) => void;
-  updateQuantity: (productId: string, variantId: string, quantity: number) => void;
+  removeItem: (itemVariant: string, name: string) => void;
+  updateQuantity: (itemVariant: string, name: string, quantity: number) => void;
   clearCart: () => void;
   total: number;
 };
@@ -32,12 +32,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addItem = (newItem: CartItem) => {
     setItems(currentItems => {
       const existingItem = currentItems.find(
-        item => item.productId === newItem.productId && item.variantId === newItem.variantId
+          item => item.itemVariant === newItem.itemVariant && item.name === newItem.name
       );
 
       if (existingItem) {
         return currentItems.map(item =>
-          item.productId === newItem.productId && item.variantId === newItem.variantId
+          item.itemVariant === newItem.itemVariant && item.name === newItem.name
             ? { ...item, quantity: item.quantity + newItem.quantity }
             : item
         );
@@ -47,18 +47,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const removeItem = (productId: string, variantId: string) => {
+  const removeItem = (itemVariant: string, name: string) => {
     setItems(currentItems => 
       currentItems.filter(item => 
-        !(item.productId === productId && item.variantId === variantId)
+        !(item.itemVariant === itemVariant && item.name === name)
       )
     );
   };
 
-  const updateQuantity = (productId: string, variantId: string, quantity: number) => {
+  const updateQuantity = (itemVariant: string, name: string, quantity: number) => {
     setItems(currentItems =>
       currentItems.map(item =>
-        item.productId === productId && item.variantId === variantId
+        item.itemVariant === itemVariant && item.name === name
           ? { ...item, quantity }
           : item
       )

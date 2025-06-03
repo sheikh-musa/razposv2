@@ -36,7 +36,7 @@ console.log('items', items); // ! console log
       customer: 'Guest',
       delivery_date: getCurrentDate(), // TODO: Change to actual delivery date past 12am
       custom_order_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: '2-digit' }).replace(' ', ''),
-      items: items.map((item) => ({ item_code: item.variantId, qty: item.quantity })),
+      items: items.map((item) => ({ item_code: item.itemVariant, qty: item.quantity })),
       status: 'To Deliver and Bill',
       custom_kitchen_status: 'preparing',
       custom_remarks: remark,
@@ -78,14 +78,14 @@ console.log('items', items); // ! console log
         {/* Cart Items */}
         <div className="space-y-4 mb-6">
           {items.map((item) => (
-            <div key={`${item.productId}-${item.variantId}`} className="flex flex-col">
+            <div key={`${item.itemVariant}-${item.name}`} className="flex flex-col">
               <div className="flex justify-between items-start mb-1">
                 <div>
                   <p className="font-sm">{item.name}</p>
                   <p className="text-xs text-gray-500">{item.type}</p>
                 </div>
                 <button
-                  onClick={() => removeItem(item.productId, item.variantId)}
+                  onClick={() => removeItem(item.itemVariant, item.name)}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,13 +99,13 @@ console.log('items', items); // ! console log
                 <div className="flex items-center border rounded-md">
                   {item.quantity > 1 ?
                   <button
-                    onClick={() => updateQuantity(item.productId, item.variantId, Math.max(0, item.quantity - 1))}
+                    onClick={() => updateQuantity(item.itemVariant, item.name, Math.max(0, item.quantity - 1))}
                     className="px-3 py-1 text-gray-600 hover:bg-gray-50"
                   >
                     −
                   </button> : 
                   <button
-                  onClick={() => removeItem(item.productId, item.variantId)}
+                  onClick={() => removeItem(item.itemVariant, item.name)}
                   className="px-3 py-1 text-gray-400 hover:text-gray-600"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,7 +116,7 @@ console.log('items', items); // ! console log
                 </button>} 
                   <span className="px-3 py-1 min-w-[2rem] text-center">{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.productId, item.variantId, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.itemVariant, item.name, item.quantity + 1)}
                     className="px-3 py-1 text-gray-600 hover:bg-gray-50"
                   >
                     +
