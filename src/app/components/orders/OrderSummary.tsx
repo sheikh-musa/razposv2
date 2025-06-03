@@ -30,13 +30,13 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
  // ! Not all items are based on Item Price
  // ! Status is always To Deliver and Bill will change to Overdue after 1 day
  // ! stock will be deducted when Sales Order converted to Sales Invoice
-
+console.log('items', items); // ! console log
   const handleConfirm = async () => {
     const payload: SalesOrderPayload = {
       customer: 'Guest',
       delivery_date: getCurrentDate(), // TODO: Change to actual delivery date past 12am
       custom_order_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: '2-digit' }).replace(' ', ''),
-      items: items.map((item) => ({ item_code: item.name, qty: item.quantity })),
+      items: items.map((item) => ({ item_code: item.variantId, qty: item.quantity })),
       status: 'To Deliver and Bill',
       custom_kitchen_status: 'preparing',
       custom_remarks: remark,
@@ -46,14 +46,14 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       docstatus: 1,
     };
     console.log('payload', payload);
-    // const response = await createKitchenOrder(payload);
-    // if (response.ok) {
-    //   toast.success('Order created successfully');
-    //   clearCart();
-    //   onClose();
-    // } else {
-    //   toast.error('Failed to create order');
-    // }
+    const response = await createKitchenOrder(payload);
+    if (response.ok) {
+      toast.success('Order created successfully');
+      clearCart();
+      onClose();
+    } else {
+      toast.error('Failed to create order');
+    }
   };
 
   return (
