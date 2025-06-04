@@ -58,6 +58,11 @@ export default function Analytics() {
         
         const revenue: RevenueEntry[] = await getRevenue();
         console.log('Revenue:', revenue);
+
+        const totalRevenue = revenue.reduce((sum, item) => sum + item.paid_amount, 0);
+        console.log('totalRevenue', totalRevenue); // ! console log
+        setRevenue(totalRevenue);
+        
         const monthlyRevenue = groupRevenueByMonth(revenue);
         console.log('Monthly Revenue:', monthlyRevenue);
         
@@ -66,13 +71,12 @@ export default function Analytics() {
         const currentMonth = today.toISOString().substring(0, 7);
         
         // Get last month
-        const lastMonthDate = new Date(today.getFullYear(), today.getMonth() - 1);
+        const lastMonthDate = new Date(today.getFullYear(), today.getMonth());
         const lastMonth = lastMonthDate.toISOString().substring(0, 7);
-        
         // Find revenue for current and last month
         const currentMonthData = monthlyRevenue.find(m => m.month === currentMonth);
         const lastMonthData = monthlyRevenue.find(m => m.month === lastMonth);
-        
+
         // Set the revenues
         // setCurrentRevenue(currentMonthData?.total || 0);
         setLastRevenue(lastMonthData?.total || 0);
@@ -82,10 +86,6 @@ export default function Analytics() {
           const increase = ((currentMonthData.total - lastMonthData.total) / lastMonthData.total) * 100;
           setPercentageIncrease(increase);
         }
-
-        const totalRevenue = revenue.reduce((sum, item) => sum + item.paid_amount, 0);
-        console.log('totalRevenue', totalRevenue); // ! console log
-        setRevenue(totalRevenue);
 
         // Get revenue by payment mode
         const paymentModes = paymentModeData.map(mode => mode.name);
@@ -163,7 +163,7 @@ export default function Analytics() {
     // Process each invoice
     for (const invoice of salesInvoices) {
         const invoiceDetails = await getSalesInvoiceByName(invoice.name);
-        console.log('invoiceDetails', invoiceDetails); // ! console log
+        // console.log('invoiceDetails', invoiceDetails); // ! console log
         // @ts-ignore
         invoiceDetails.items.forEach((item) => {
             const currentTotal = itemRevenueMap.get(item.item_name) || 0;
