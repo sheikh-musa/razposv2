@@ -55,14 +55,37 @@ export default function Analytics() {
         const response = await fetch('/api/sales');
         const data = await response.json();
         setSalesData(data);
-        
-        const revenue: RevenueEntry[] = await getRevenue();
+
+        getAllRevenues();
+        getAllRevenueByPaymentMode();
+
+        const salesInvoices: SalesInvoice[] = await getAllPaidSalesInvoice();
+        const itemRevenue = await consolidateItemRevenue(salesInvoices);
+        console.log('Consolidated Item Revenue:', itemRevenue);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Update the process function with proper typingf
+  const processDataForChart = (data: SalesData[]) => {
+    return data.map(month => ({
+      name: new Date(2024, month.month - 1).toLocaleString('default', { month: 'short' }),
+      value: month.totalSales
+    }));
+  };
+
+  const getAllRevenues = async () => {
+    const revenue: RevenueEntry[] = await getRevenue();
         console.log('Revenue:', revenue);
 
         const totalRevenue = revenue.reduce((sum, item) => sum + item.paid_amount, 0);
         console.log('totalRevenue', totalRevenue); // ! console log
         setRevenue(totalRevenue);
-        
+
         const monthlyRevenue = groupRevenueByMonth(revenue);
         console.log('Monthly Revenue:', monthlyRevenue);
         
@@ -86,50 +109,7 @@ export default function Analytics() {
           const increase = ((currentMonthData.total - lastMonthData.total) / lastMonthData.total) * 100;
           setPercentageIncrease(increase);
         }
-
-        // Get revenue by payment mode
-        const paymentModes = paymentModeData.map(mode => mode.name);
-        let revenueByModes = [];
-        
-        for (const mode of paymentModes) {
-          const revenueByMode = await getRevenueByPaymentMode(mode);
-          console.log('revenueByMode', revenueByMode); // ! console log
-          const total = revenueByMode.reduce((sum, item) => sum + item.paid_amount, 0);
-          revenueByModes.push({
-            mode_of_payment: mode,
-            total_amount: total,
-          });
-        }
-
-        // Sort by total_amount in descending order and add colors
-        revenueByModes = revenueByModes
-          .sort((a, b) => b.total_amount - a.total_amount)
-          .map((mode, index) => ({
-            ...mode,
-            color: paymentModeData[index].color
-          }));
-
-        console.log('revenueByModes', revenueByModes); // ! console log
-        setRevenueByPaymentMode(revenueByModes); // TODO: fix type error
-
-        const salesInvoices: SalesInvoice[] = await getAllPaidSalesInvoice();
-        const itemRevenue = await consolidateItemRevenue(salesInvoices);
-        console.log('Consolidated Item Revenue:', itemRevenue);
-      } catch (error) {
-        console.error('Error fetching data:', error);
       }
-    };
-
-    fetchData();
-  }, []);
-
-  // Update the process function with proper typingf
-  const processDataForChart = (data: SalesData[]) => {
-    return data.map(month => ({
-      name: new Date(2024, month.month - 1).toLocaleString('default', { month: 'short' }),
-      value: month.totalSales
-    }));
-  };
 
   const groupRevenueByMonth = (revenue: RevenueEntry[]): MonthlyRevenue[] => {
     // Create a map to group entries by month
@@ -157,6 +137,33 @@ export default function Analytics() {
         .sort((a, b) => a.month.localeCompare(b.month));
   };
 
+  const getAllRevenueByPaymentMode = async () => {
+    // Get revenue by payment mode
+    const paymentModes = paymentModeData.map(mode => mode.name);
+    let revenueByModes = [];
+    
+    for (const mode of paymentModes) {
+      const revenueByMode = await getRevenueByPaymentMode(mode);
+      console.log('revenueByMode', revenueByMode); // ! console log
+      const total = revenueByMode.reduce((sum, item) => sum + item.paid_amount, 0);
+      revenueByModes.push({
+        mode_of_payment: mode,
+        total_amount: total,
+      });
+    }
+
+    // Sort by total_amount in descending order and add colors
+    revenueByModes = revenueByModes
+      .sort((a, b) => b.total_amount - a.total_amount)
+      .map((mode, index) => ({
+        ...mode,
+        color: paymentModeData[index].color
+      }));
+
+    console.log('revenueByModes', revenueByModes); // ! console log
+    setRevenueByPaymentMode(revenueByModes); 
+  }
+  
   const consolidateItemRevenue = async (salesInvoices: SalesInvoice[]) => {
     const itemRevenueMap = new Map<string, number>();
 
