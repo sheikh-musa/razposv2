@@ -235,6 +235,6 @@ export type PaymentUpdatePayload = {
 };
 
 export type SalesItemRevenue = {
-    item_name: string;
+    item_code: string;
     total_amount: number;
 }

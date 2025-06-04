@@ -19,6 +19,7 @@ export default function Analytics() {
   const [percentageIncrease, setPercentageIncrease] = useState(0);
   const [revenue, setRevenue] = useState(0);
   const [revenueByPaymentMode, setRevenueByPaymentMode] = useState<RevenueByPaymentMode[]>([]);
+  const [itemRevenue, setItemRevenue] = useState<SalesItemRevenue[]>([]);
 
   const paymentModeData = [
     { name: 'Cash', color: '#7C3AED' },
@@ -39,14 +40,14 @@ export default function Analytics() {
 
 
   //! Monthly revenue by item (mock api data)
-  const itemRevenue = [
-    { name: 'Croissant', value: 148.40, color: '#7C3AED' },
-    { name: 'Baguette', value: 642.48, color: '#9461FB' },
-    { name: 'Focaccia', value: 614.16, color: '#B794FF' },
-    { name: 'Sour Dough', value: 290.00, color: '#D4B5FF' },
-    { name: 'Pain Au Custard', value: 824.28, color: '#EBD7FF' },
-    { name: 'Other', value: 48.44, color: '#F3E8FF' },
-  ];
+  // const itemRevenue = [
+  //   { name: 'Croissant', value: 148.40, color: '#7C3AED' },
+  //   { name: 'Baguette', value: 642.48, color: '#9461FB' },
+  //   { name: 'Focaccia', value: 614.16, color: '#B794FF' },
+  //   { name: 'Sour Dough', value: 290.00, color: '#D4B5FF' },
+  //   { name: 'Pain Au Custard', value: 824.28, color: '#EBD7FF' },
+  //   { name: 'Other', value: 48.44, color: '#F3E8FF' },
+  // ];
 
   // Add useEffect for data fetching
   useEffect(() => {
@@ -57,11 +58,12 @@ export default function Analytics() {
         setSalesData(data);
 
         getAllRevenues();
-        getAllRevenueByPaymentMode();
+        getAllRevenueByPaymentModes();
 
         const salesInvoices: SalesInvoice[] = await getAllPaidSalesInvoice();
         const itemRevenue = await consolidateItemRevenue(salesInvoices);
         console.log('Consolidated Item Revenue:', itemRevenue);
+        setItemRevenue(itemRevenue);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -137,14 +139,14 @@ export default function Analytics() {
         .sort((a, b) => a.month.localeCompare(b.month));
   };
 
-  const getAllRevenueByPaymentMode = async () => {
+  const getAllRevenueByPaymentModes = async () => {
     // Get revenue by payment mode
     const paymentModes = paymentModeData.map(mode => mode.name);
     let revenueByModes = [];
     
     for (const mode of paymentModes) {
       const revenueByMode = await getRevenueByPaymentMode(mode);
-      console.log('revenueByMode', revenueByMode); // ! console log
+      // console.log('revenueByMode', revenueByMode); // ! console log
       const total = revenueByMode.reduce((sum, item) => sum + item.paid_amount, 0);
       revenueByModes.push({
         mode_of_payment: mode,
@@ -173,14 +175,14 @@ export default function Analytics() {
         // console.log('invoiceDetails', invoiceDetails); // ! console log
         // @ts-ignore
         invoiceDetails.items.forEach((item) => {
-            const currentTotal = itemRevenueMap.get(item.item_name) || 0;
-            itemRevenueMap.set(item.item_name, currentTotal + item.amount);
+            const currentTotal = itemRevenueMap.get(item.item_code) || 0;
+            itemRevenueMap.set(item.item_code, currentTotal + item.amount);
         });
     }
 
     // Convert map to array and sort by amount
-    const consolidatedRevenue: SalesItemRevenue[] = Array.from(itemRevenueMap).map(([item_name, total_amount]) => ({
-        item_name,
+    const consolidatedRevenue: SalesItemRevenue[] = Array.from(itemRevenueMap).map(([item_code, total_amount]) => ({
+        item_code,
         total_amount
     })).sort((a, b) => b.total_amount - a.total_amount);
 
@@ -400,12 +402,12 @@ export default function Analytics() {
                     outerRadius={120}
                     startAngle={90}
                     endAngle={-270}
-                    dataKey="value"
+                    dataKey="total_amount"
                   >
-                    {itemRevenue.map((entry, index) => (
+                    {itemRevenue.filter((item, index) => index < 5).map((item, index) => (
                       <Cell 
                         key={`cell-${index}`} 
-                        fill={entry.color}
+                        fill={paymentModeData[index].color}
                         strokeWidth={0}
                       />
                     ))}
@@ -421,13 +423,13 @@ export default function Analytics() {
 
           {/* Revenue Figures */}
           <div className="flex-1 grid grid-cols-3 gap-y-6 items-start content-start">
-            {itemRevenue.map((item, index) => (
+            {itemRevenue.filter((item, index) => index < 5).map((item, index) => (
               <div key={index} className="flex flex-col">
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
-                  <span className="text-gray-600 text-sm">{item.name}</span>
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: paymentModeData[index].color }}></div>
+                  <span className="text-gray-600 text-sm">{item.item_code}</span>
                 </div>
-                <span className="text-base font-bold text-black">${item.value.toFixed(2)}</span>
+                <span className="text-base font-bold text-black">${item.total_amount.toFixed(2)}</span>
               </div>
             ))}
           </div>
