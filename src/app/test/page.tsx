@@ -39,10 +39,12 @@ export default function TestPage() {
 
     const fetchItems = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/resource/Item?filters=[["has_variants","=",0],["disabled","=",0]]', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item?filters=[["has_variants","=",0],["disabled","=",0]]`, {
                 headers: {
-                    'Authorization': 'token cd5d3c21aa5851e:7481d281f6f0090'  // Replace with your actual API credentials
-                }
+                    'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
             });
             
             if (!response.ok) {

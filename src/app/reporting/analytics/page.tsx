@@ -27,6 +27,7 @@ export default function Analytics() {
     { name: 'PayNow', color: '#B794FF' },
     { name: 'NETS', color: '#D4B5FF' },
     { name: 'CDC', color: '#EBD7FF' },
+    { name: 'Other', color: '#F3E8FF' },
   ];
   
   //! Payment methods data (mock api data)
@@ -423,7 +424,7 @@ export default function Analytics() {
 
           {/* Revenue Figures */}
           <div className="flex-1 grid grid-cols-3 gap-y-6 items-start content-start">
-            {itemRevenue.filter((item, index) => index < 5).map((item, index) => (
+            {itemRevenue.filter((item, index) => index <= 5).map((item, index) => (
               <div key={index} className="flex flex-col">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: paymentModeData[index].color }}></div>
