@@ -64,7 +64,7 @@ export default function Analytics() {
         const salesInvoices: SalesInvoice[] = await getAllPaidSalesInvoice();
         const itemRevenue = await consolidateItemRevenue(salesInvoices);
         console.log('Consolidated Item Revenue:', itemRevenue);
-        setItemRevenue(itemRevenue);
+        setItemRevenue(itemRevenue.slice(0, 6));
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -404,20 +404,31 @@ export default function Analytics() {
                     startAngle={90}
                     endAngle={-270}
                     dataKey="total_amount"
+                    nameKey="item_code"
                   >
-                    {itemRevenue.filter((item, index) => index < 5).map((item, index) => (
+                    {itemRevenue.filter((item, index) => index <= 5).map((item, index) => (
                       <Cell 
                         key={`cell-${index}`} 
                         fill={paymentModeData[index].color}
-                        strokeWidth={0}
+                        strokeWidth={0.5}
                       />
                     ))}
                   </Pie>
+                  <Tooltip
+                    formatter={(value: number, name: string) => [`$${value.toFixed(2)}`, name]}
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      color: 'black'
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                 <p className="text-sm text-gray-500">Total</p>
-                <p className="text-2xl text-black font-bold">$2,280</p>
+                <p className="text-2xl text-black font-bold">${itemRevenue.reduce((sum, item) => sum + item.total_amount, 0).toFixed(2)}</p>
               </div>
             </div>
           </div>
@@ -425,6 +436,7 @@ export default function Analytics() {
           {/* Revenue Figures */}
           <div className="flex-1 grid grid-cols-3 gap-y-6 items-start content-start">
             {itemRevenue.filter((item, index) => index <= 5).map((item, index) => (
+              console.log(index, item),
               <div key={index} className="flex flex-col">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: paymentModeData[index].color }}></div>
