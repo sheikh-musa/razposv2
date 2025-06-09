@@ -30,7 +30,7 @@ type Order = {
 };
 
 
-export default function Transaction() {
+export default function TransactionHistory() {
     const [latestOrders, setLatestOrders] = useState<Order[]>([]);
 
     useEffect(() => {

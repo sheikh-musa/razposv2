@@ -1,7 +1,11 @@
+/* eslint-disable */
 'use client'
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import Transaction from './transaction/page';
+import { useApi } from '@/app/context/ApiContext';
+import TransactionHistory from '../components/home/TransactionHistory';
+import { processRevenueData, processDataForChart } from '../utils/revenueUtils';
+import { MonthlyRevenue, RevenueEntry } from '../context/types/ERPNext';
 
 type TimeRange = '12 months' | '30 days' | '7 days' | '24 hours';
 type Transaction = {
@@ -16,74 +20,42 @@ type Transaction = {
   type: string;
 };
 
-type DailySale = {
-  date: string;
-  totalSales: number;
-};
-
-type MonthlySale = {
-  month: number;
-  totalSales: number;
-  dailySales: DailySale[];
-};
-
 export default function Home() {
   const [selectedRange, setSelectedRange] = useState<TimeRange>('12 months');
   const [salesData, setSalesData] = useState<{ name: string; value: number }[]>([]);
   const [currentRevenue, setCurrentRevenue] = useState(0);
   const [lastRevenue, setLastRevenue] = useState(0);
   const [percentageIncrease, setPercentageIncrease] = useState(0);
-  // const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [monthlyRevenue, setMonthlyRevenue] = useState<MonthlyRevenue[]>([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const { getRevenue } = useApi();
 
   useEffect(() => {
-    fetch('/api/sales')
-      .then(res => res.json())
-      .then(data => {
-        // Process data based on selected range
-        const processedData = processDataForRange(data, selectedRange);
-        setSalesData(processedData as { name: string; value: number }[]);
-        
-        // Calculate current and previous period revenues
-        calculateRevenues(data, selectedRange);
-      });
-  }, [selectedRange]);
+    fetchRevenue();
+  }, []);
 
-  const processDataForRange = (data: MonthlySale[], range: TimeRange) => {
-    switch (range) {
-      case '12 months':
-        return data.map(month => ({
-          name: new Date(2024, month.month - 1).toLocaleString('default', { month: 'short' }),
-          value: month.totalSales
-        }));
-      case '30 days':
-        const last30Days = data[data.length - 1].dailySales.slice(-30);
-        return last30Days.map((day: DailySale) => ({
-          name: new Date(day.date).getDate().toString(),
-          value: day.totalSales
-        }));
-      case '7 days':
-        const last7Days = data[data.length - 1].dailySales.slice(-7);
-        return last7Days.map((day: DailySale) => ({
-          name: new Date(day.date).getDate().toString(),
-          value: day.totalSales
-        }));
-      case '24 hours':
-        return Array.from({ length: 24 }, (_, i) => ({
-          name: `${i}:00`,
-          value: Math.floor(Math.random() * 1000) + 500
-        }));
-      default:
-        return data;
-    }
-  };
+  const fetchRevenue = async () => {
+    try {
+      const revenue = await getRevenue();
+      const {
+        totalRevenue,
+        currentMonthRevenue,
+        lastMonthRevenue,
+        percentageIncrease: increase,
+        monthlyRevenue: monthly
+      } = processRevenueData(revenue);
 
-  const calculateRevenues = (data: MonthlySale[], range: TimeRange) => {
-    if (range === '12 months') {
-      const currentMonth = data[data.length - 1].totalSales;
-      const lastMonth = data[data.length - 2].totalSales;
-      setCurrentRevenue(currentMonth);
-      setLastRevenue(lastMonth);
-      setPercentageIncrease(((currentMonth - lastMonth) / lastMonth) * 100);
+      setTotalRevenue(totalRevenue);
+      setCurrentRevenue(currentMonthRevenue);
+      setLastRevenue(lastMonthRevenue);
+      setPercentageIncrease(increase);
+      setMonthlyRevenue(monthly);
+
+      // Process data for chart
+      const chartData = processDataForChart(monthly);
+      setSalesData(chartData);
+    } catch (error) {
+      console.error('Error fetching revenue:', error);
     }
   };
 
@@ -115,10 +87,12 @@ export default function Home() {
           {/* Total Income */}
           <div className="mb-6">
             <h3 className="text-gray-600 text-sm mb-1">Total Income</h3>
-            {/* <div className="flex items-baseline gap-2"> */}
-              <span className="text-2xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
-              <span className="text-green-500 text-xs ml-1">↑ 7.4%</span>
-            {/* </div> */}
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-black">${totalRevenue.toLocaleString()}</span>
+              <span className={`text-sm ${percentageIncrease >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}%
+              </span>
+            </div>
           </div>
         </div>
         <div className='flex-1'>
@@ -163,8 +137,7 @@ export default function Home() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        
-          </div>
+        </div>
         {/* Right side - Stats */}
         <div className="w-64 flex flex-col pl-3 h-4/6">
           <div className="space-y-6">
@@ -173,7 +146,9 @@ export default function Home() {
               <h3 className="text-gray-600 text-sm mb-1">Current Revenue</h3>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
-                <span className="text-green-500 text-sm">↑ 9.2%</span>
+                <span className={`text-sm ${percentageIncrease >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}%
+                </span>
               </div>
             </div>
 
@@ -181,7 +156,9 @@ export default function Home() {
               <h3 className="text-gray-600 text-sm mb-1">Last Month Revenue</h3>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-black">${lastRevenue.toLocaleString()}</span>
-                <span className="text-green-500 text-sm">↑ 6.6%</span>
+                <span className={`text-sm ${percentageIncrease >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}%
+                </span>
               </div>
             </div>
 
@@ -189,13 +166,15 @@ export default function Home() {
               <h3 className="text-gray-600 text-sm mb-1">Percentage increase</h3>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
-                <span className="text-green-500 text-sm">↑ 8.1%</span>
+                <span className={`text-sm ${percentageIncrease >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}%
+                </span>
               </div>
             </div>
           </div>
           <div className="flex gap-2 mt-10">
-              <button className="px-3 py-2 text-xs text-gray-600 border border-gray-400 rounded-md">Download</button>
-              <button className="px-3 py-2 text-xs bg-purple-600 text-white rounded-md">View all</button>
+            <button className="px-3 py-2 text-xs text-gray-600 border border-gray-400 rounded-md">Download</button>
+            <button className="px-3 py-2 text-xs bg-purple-600 text-white rounded-md">View all</button>
           </div>
         </div>
       </div>
@@ -203,15 +182,12 @@ export default function Home() {
       {/* Transaction History and Recent Activity */}
       <div className="grid grid-cols-3 -mt-6">
         <div>
-          <Transaction />
-          {/* Add transaction list here */}
+          <TransactionHistory />
         </div>
         <div className='col-span-2'>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-md text-gray-500 font-semibold">Recent activity</h2>
-            
           </div>
-          {/* Add activity list here */}
         </div>
       </div>
     </div>
