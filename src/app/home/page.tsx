@@ -35,6 +35,13 @@ export default function Home() {
     fetchRevenue();
   }, []);
 
+  useEffect(() => {
+    if (monthlyRevenue.length > 0) {
+      const chartData = processDataForChart(monthlyRevenue, selectedRange);
+      setSalesData(chartData);
+    }
+  }, [selectedRange, monthlyRevenue]);
+
   const fetchRevenue = async () => {
     try {
       const revenue = await getRevenue();
@@ -46,21 +53,23 @@ export default function Home() {
         monthlyRevenue: monthly
       } = processRevenueData(revenue);
 
-
-
       setTotalRevenue(totalRevenue);
       setCurrentRevenue(currentMonthRevenue);
       setLastRevenue(lastMonthRevenue);
       setPercentageIncrease(increase);
       setMonthlyRevenue(monthly);
-      console.log("🚀 ~ fetchRevenue ~ monthly:", monthly)
 
       // Process data for chart
-      const chartData = processDataForChart(monthly);
+      const chartData = processDataForChart(monthly, selectedRange);
       setSalesData(chartData);
     } catch (error) {
       console.error('Error fetching revenue:', error);
     }
+  };
+
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().substring(0, 10);
   };
 
   return (
@@ -69,7 +78,7 @@ export default function Home() {
       <div className="mb-6">
         <h1 className="text-2xl text-black font-bold mb-4">Welcome back, User</h1>
         <div className="flex bg-gray-100 rounded-lg border border-gray-300 w-fit">
-          {(['12 months', '30 days', '7 days', '24 hours'] as TimeRange[]).map((range) => (
+          {(['12 months', '30 days', '7 days'] as TimeRange[]).map((range) => (
             <button
               key={range}
               onClick={() => setSelectedRange(range)}
@@ -208,5 +217,4 @@ export default function Home() {
       </div>
     </div>
   );
-                    console.log("🚀 ~ Home ~ value:", value)
 }
