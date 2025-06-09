@@ -60,6 +60,6 @@ export const processRevenueData = (revenue: RevenueEntry[]) => {
 export const processDataForChart = (monthlyRevenue: MonthlyRevenue[]) => {
     return monthlyRevenue.map(month => ({
         name: new Date(month.month + '-01').toLocaleString('default', { month: 'short' }),
-        value: month.total
+        value: month.total.toFixed(2)
     }));
 }; 

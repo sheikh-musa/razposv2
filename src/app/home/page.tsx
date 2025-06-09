@@ -1,11 +1,12 @@
 /* eslint-disable */
 'use client'
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
 import { useApi } from '@/app/context/ApiContext';
 import TransactionHistory from '../components/home/TransactionHistory';
 import { processRevenueData, processDataForChart } from '../utils/revenueUtils';
 import { MonthlyRevenue, RevenueEntry } from '../context/types/ERPNext';
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 type TimeRange = '12 months' | '30 days' | '7 days' | '24 hours';
 type Transaction = {
@@ -22,7 +23,7 @@ type Transaction = {
 
 export default function Home() {
   const [selectedRange, setSelectedRange] = useState<TimeRange>('12 months');
-  const [salesData, setSalesData] = useState<{ name: string; value: number }[]>([]);
+  const [salesData, setSalesData] = useState<{ name: string; value: number; }[]>([]);
   const [currentRevenue, setCurrentRevenue] = useState(0);
   const [lastRevenue, setLastRevenue] = useState(0);
   const [percentageIncrease, setPercentageIncrease] = useState(0);
@@ -45,11 +46,14 @@ export default function Home() {
         monthlyRevenue: monthly
       } = processRevenueData(revenue);
 
+
+
       setTotalRevenue(totalRevenue);
       setCurrentRevenue(currentMonthRevenue);
       setLastRevenue(lastMonthRevenue);
       setPercentageIncrease(increase);
       setMonthlyRevenue(monthly);
+      console.log("🚀 ~ fetchRevenue ~ monthly:", monthly)
 
       // Process data for chart
       const chartData = processDataForChart(monthly);
@@ -88,9 +92,9 @@ export default function Home() {
           <div className="mb-6">
             <h3 className="text-gray-600 text-sm mb-1">Total Income</h3>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-black">${totalRevenue.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-black">${totalRevenue.toFixed(2)}</span>
               <span className={`text-sm ${percentageIncrease >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}%
+                {/* {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}% */}
               </span>
             </div>
           </div>
@@ -125,6 +129,18 @@ export default function Home() {
                     borderRadius: '8px',
                     fontSize: '12px'
                   }}
+                  content={({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
+                    if (!active || !payload || !payload.length) return null;
+                    
+                    const value = payload[0].value as number;
+                    return (
+                      <div className="bg-white p-2 rounded-lg shadow-md">
+                        <p className="text-sm text-gray-600">
+                          {label}: ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                    );
+                  }}
                 />
                 <Line
                   type="monotone"
@@ -145,7 +161,7 @@ export default function Home() {
             <div>
               <h3 className="text-gray-600 text-sm mb-1">Current Revenue</h3>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-black">${currentRevenue.toLocaleString()}</span>
+                <span className="text-2xl font-bold text-black">${currentRevenue.toFixed(2)}</span>
                 <span className={`text-sm ${percentageIncrease >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                   {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}%
                 </span>
@@ -155,7 +171,7 @@ export default function Home() {
             <div>
               <h3 className="text-gray-600 text-sm mb-1">Last Month Revenue</h3>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-black">${lastRevenue.toLocaleString()}</span>
+                <span className="text-2xl font-bold text-black">${lastRevenue.toFixed(2)}</span>
                 <span className={`text-sm ${percentageIncrease >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                   {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}%
                 </span>
@@ -167,7 +183,7 @@ export default function Home() {
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
                 <span className={`text-sm ${percentageIncrease >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}%
+                  {/* {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}% */}
                 </span>
               </div>
             </div>
@@ -192,4 +208,5 @@ export default function Home() {
       </div>
     </div>
   );
+                    console.log("🚀 ~ Home ~ value:", value)
 }
