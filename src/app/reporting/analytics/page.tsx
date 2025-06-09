@@ -226,7 +226,7 @@ export default function Analytics() {
         {/* Sales Graph Section */}
         <div className="col-span-2">
           <h2 className="text-sm text-gray-500 font-semibold mb-1">Sales over time</h2>
-          <p className="text-gray-500 text-xs mb-2">Track how your sales over time.</p>
+          <p className="text-gray-500 text-xs mb-2">Track your sales over time.</p>
           <div className="mb-2">
             <span className="text-2xl font-bold text-black">${revenue.toLocaleString()}</span>
             <span className="text-green-500 text-sm ml-2">↑ 7.4%</span>
@@ -352,7 +352,7 @@ export default function Analytics() {
             </div>
             {/* Legend */}
             <div className="flex flex-col justify-center">
-              {revenueByPaymentMode.map((entry: any) => ( // TODO: fix type error
+              {revenueByPaymentMode.slice(0, 5).map((entry: any) => ( // TODO: fix type error
                 <div key={entry.mode_of_payment} className="flex items-center gap-2 text-xs mb-2 text-gray-500">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
                   <span>{entry.mode_of_payment}</span>
