@@ -179,7 +179,7 @@ export default function Home() {
             </div>
 
             <div>
-              <h3 className="text-gray-600 text-sm mb-1">Percentage increase</h3>
+              <h3 className="text-gray-600 text-sm mb-1">Percentage {percentageIncrease >= 0 ? 'increase' : 'decrease'}</h3>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
                 <span className={`text-sm ${percentageIncrease >= 0 ? 'text-green-500' : 'text-red-500'}`}>
