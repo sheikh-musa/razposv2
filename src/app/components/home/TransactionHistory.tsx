@@ -42,7 +42,7 @@ export default function TransactionHistory() {
     const fetchOrders = async () => {
         try {
             const data = await getCompletedSalesOrder();
-            const completedOrders = data.map((order) => ({
+            const completedOrders = data.reverse().map((order) => ({
                 name: order.name.substring(14),
                 customer: order.customer,
                 date: order.date,
@@ -59,7 +59,7 @@ export default function TransactionHistory() {
             <h2 className="text-md text-gray-500 font-semibold">Transaction history</h2>
           </div>
           <hr className="border-gray-200 w-5/6 mb-2"/>
-          <div className="space-y-4 w-5/6">
+          <div className="space-y-4 w-5/6 overflow-y-auto h-full">
                 {latestOrders.map((order, index) => (
                     <div key={index} className="flex justify-between items-start pb-4 border-b last:border-b-0">
                         <div>

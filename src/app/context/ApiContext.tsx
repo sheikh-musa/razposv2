@@ -632,7 +632,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
     
     const getCompletedSalesOrder = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order?limit_page_length=1000&fields=["name", "customer", "transaction_date", "total", "items"]&filters=[["custom_order_complete", "=", 1]]`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order?fields=["name", "customer", "transaction_date", "total", "items"]&filters=[["custom_order_complete", "=", 1]]`, {
             credentials: 'include',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,

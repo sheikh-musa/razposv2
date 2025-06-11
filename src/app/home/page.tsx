@@ -202,11 +202,11 @@ export default function Home() {
       </div>
 
       {/* Transaction History and Recent Activity */}
-      <div className="grid grid-cols-3 -mt-6">
-        <div>
+      <div className="grid grid-cols-3 -mt-6 h-[300px]">
+        <div className='h-2/3'>
           <TransactionHistory />
         </div>
-        <div className='col-span-2'>
+        <div className='col-span-2 h-2/3'>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-md text-gray-500 font-semibold">Recent activity</h2>
           </div>
