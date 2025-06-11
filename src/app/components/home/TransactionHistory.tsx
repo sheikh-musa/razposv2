@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react"
 import { useApi } from "@/app/context/ApiContext"
 import { CompletedSalesOrder } from "@/app/context/types/ERPNext"
 
-
 // Define types
 type Variant = {
     productId: number;
@@ -43,14 +42,12 @@ export default function TransactionHistory() {
     const fetchOrders = async () => {
         try {
             const data = await getCompletedSalesOrder();
-            console.log("🚀 ~ fetchOrders ~ data:", data)
-            const completedOrders = data.map((order: CompletedSalesOrder) => ({
+            const completedOrders = data.map((order) => ({
                 name: order.name.substring(14),
                 customer: order.customer,
-                date: order.transaction_date,
+                date: order.date,
                 total: order.total,
             }));
-            console.log("🚀 ~ fetchOrders ~ completedOrders:", completedOrders)
             setLatestOrders(completedOrders);
         } catch (error) {
             console.error('Error fetching orders:', error);

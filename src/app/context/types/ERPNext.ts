@@ -147,9 +147,8 @@ export type SalesOrderUpdatePayload = {
 export type CompletedSalesOrder = {
     name: string;
     customer: string;
-    transaction_date: string;
+    date: string;
     total: number
-    items: SalesOrderItem[];
 }
 //* --------------------------- Sales Invoice Types ---------------------------- */
 
