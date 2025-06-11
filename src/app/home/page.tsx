@@ -33,20 +33,16 @@ export default function Home() {
 
   useEffect(() => {
     fetchRevenue();
-  }, []);
-
-  useEffect(() => {
-    if (monthlyRevenue.length > 0) {
-      const chartData = processDataForChart(monthlyRevenue, selectedRange);
-      setSalesData(chartData);
-    }
-  }, [selectedRange, monthlyRevenue]);
+    
+    const chartData = processDataForChart(monthlyRevenue, selectedRange);
+    setSalesData(chartData);
+    
+  }, [selectedRange]);
 
   const fetchRevenue = async () => {
     try {
       const revenue = await getRevenue();
-      const {
-        totalRevenue,
+      const {totalRevenue,
         currentMonthRevenue,
         lastMonthRevenue,
         percentageIncrease: increase,
@@ -58,9 +54,10 @@ export default function Home() {
       setLastRevenue(lastMonthRevenue);
       setPercentageIncrease(increase);
       setMonthlyRevenue(monthly);
-
+      
       // Process data for chart
       const chartData = processDataForChart(monthly, selectedRange);
+
       setSalesData(chartData);
     } catch (error) {
       console.error('Error fetching revenue:', error);

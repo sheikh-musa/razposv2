@@ -22,7 +22,6 @@ export const groupRevenueByMonth = (revenue: RevenueEntry[]): MonthlyRevenue[] =
         
         return groups;
     }, new Map<string, MonthlyRevenue>());
-
     // Convert map to array and sort by month
     return Array.from(monthlyGroups.values())
         .sort((a, b) => a.month.localeCompare(b.month));
@@ -78,18 +77,26 @@ const groupEntriesByDay = (entries: RevenueEntry[]) => {
 };
 
 export const processDataForChart = (monthlyRevenue: MonthlyRevenue[], timeRange: TimeRange = '12 months') => {
+    const date = new Date();
+    const currentMonth = date.toISOString().substring(0, 7);
+    const currentDay = date.toISOString().substring(0, 10);
+
     switch (timeRange) {
         case '12 months':
-            return monthlyRevenue.map(month => ({
-                name: new Date(month.month + '-01').toLocaleString('default', { month: 'short' }),
-                value: month.total
-            }));
+            return monthlyRevenue.map(month => (
+                console.log(month),
+                {
+                    name: new Date(month.month + '-01').toLocaleString('default', { month: 'short' }),
+                    value: month.total,
+                }
+            ));
 
         case '30 days': {
             // Get all entries from the last month and current month
             const allEntries = monthlyRevenue.flatMap(month => month.entries);
+
             const sortedEntries = allEntries.sort((a, b) => b.posting_date.localeCompare(a.posting_date));
-            
+
             // Get unique dates and sum values for each date
             const last30Days = groupEntriesByDay(sortedEntries.slice(0, 30));
 

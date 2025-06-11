@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, CompletedSalesOrder } from './types/ERPNext';
 import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
@@ -27,6 +27,7 @@ interface ApiContextType {
     getRevenueByPaymentMode: (paymentMode: string) => Promise<RevenueEntry[]>;
     getAllPaidSalesInvoice: () => Promise<SalesInvoice[]>;
     getSalesInvoiceByName: (invoiceName: string) => Promise<Response>;
+    getCompletedSalesOrder: () => Promise<CompletedSalesOrder[]>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -595,7 +596,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             if (isStaging) {
                 return mockRevenueData;
             }
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date"]`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date", "creation"]`, {
                 credentials: 'include',
                 headers: {
                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -630,6 +631,21 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return data.data;
     }
     
+    const getCompletedSalesOrder = async () => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order?limit_page_length=1000&fields=["name", "customer", "transaction_date", "total", "items"]&filters=[["custom_order_complete", "=", 1]]`, {
+            credentials: 'include',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch completed sales order');
+        }
+        const data = await response.json();
+        return data.data;
+    }
 
     return (
         <ApiContext.Provider value={{ 
@@ -655,7 +671,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             updateKitchenOrderPayment,
             getRevenueByPaymentMode,
             getAllPaidSalesInvoice,
-            getSalesInvoiceByName
+            getSalesInvoiceByName,
+            getCompletedSalesOrder
         }}>
             {children}
         </ApiContext.Provider>

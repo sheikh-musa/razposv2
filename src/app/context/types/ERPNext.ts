@@ -143,6 +143,14 @@ export type SalesOrderUpdatePayload = {
     custom_order_complete: number;
     custom_payment_complete: number;
 }
+
+export type CompletedSalesOrder = {
+    name: string;
+    customer: string;
+    transaction_date: string;
+    total: number
+    items: SalesOrderItem[];
+}
 //* --------------------------- Sales Invoice Types ---------------------------- */
 
 export type SalesInvoice = {
@@ -217,6 +225,7 @@ export type ItemWithPrice = ItemDetailed & {
 export type RevenueEntry = {
     paid_amount: number;
     posting_date: string;
+    creation: string;
 }
 
 export type MonthlyRevenue = {

@@ -1,6 +1,10 @@
+/* eslint-disable */
 'use client'
 
 import React, { useEffect, useState } from "react"
+import { useApi } from "@/app/context/ApiContext"
+import { CompletedSalesOrder } from "@/app/context/types/ERPNext"
+
 
 // Define types
 type Variant = {
@@ -31,26 +35,27 @@ type Order = {
 
 
 export default function TransactionHistory() {
-    const [latestOrders, setLatestOrders] = useState<Order[]>([]);
-
+    const [latestOrders, setLatestOrders] = useState<CompletedSalesOrder[]>([]);
+    const { getCompletedSalesOrder } = useApi();
     useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await fetch('/api/orders');
-                const data = await response.json();
-                // Filter completed orders and get latest 8
-                const completedOrders = data
-                    .filter((order: Order) => order.completed)
-                    .slice(0, 8);
-                setLatestOrders(completedOrders);
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-            }
-        };
-
         fetchOrders();
     }, []);
-
+    const fetchOrders = async () => {
+        try {
+            const data = await getCompletedSalesOrder();
+            console.log("🚀 ~ fetchOrders ~ data:", data)
+            const completedOrders = data.map((order: CompletedSalesOrder) => ({
+                name: order.name.substring(14),
+                customer: order.customer,
+                date: order.transaction_date,
+                total: order.total,
+            }));
+            console.log("🚀 ~ fetchOrders ~ completedOrders:", completedOrders)
+            setLatestOrders(completedOrders);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        }
+    };
     return (
         <>
           <div className="flex justify-between items-center mb-2 mt-1">
@@ -58,15 +63,15 @@ export default function TransactionHistory() {
           </div>
           <hr className="border-gray-200 w-5/6 mb-2"/>
           <div className="space-y-4 w-5/6">
-                {latestOrders.map((order) => (
-                    <div key={order.id} className="flex justify-between items-start pb-4 border-b last:border-b-0">
+                {latestOrders.map((order, index) => (
+                    <div key={index} className="flex justify-between items-start pb-4 border-b last:border-b-0">
                         <div>
                             <div className="flex items-center gap-2">
-                                <h3 className="font-medium text-sm text-black">Order #{order.id}</h3>
+                                <h3 className="font-medium text-sm text-black">Order #{order.name}</h3>
                             </div>
-                            <p className="text-xs text-gray-500">olivia@untitledui.com</p>
+                            <p className="text-xs text-gray-500">{order.customer}</p>
                         </div>
-                        <span className="text-gray-700 text-sm">- ${order.totalPrice.toFixed(2)}</span>
+                        <span className="text-gray-700 text-sm">- ${order.total.toFixed(2)}</span>
                     </div>
                 ))}
             </div>
