@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, CompletedSalesOrder } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, CompletedSalesOrder, RecentActivity } from './types/ERPNext';
 import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
@@ -28,6 +28,7 @@ interface ApiContextType {
     getAllPaidSalesInvoice: () => Promise<SalesInvoice[]>;
     getSalesInvoiceByName: (invoiceName: string) => Promise<Response>;
     getCompletedSalesOrder: () => Promise<CompletedSalesOrder[]>;
+    getActivityLog: () => Promise<RecentActivity[]>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -588,7 +589,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return response;
     }
     //* -------------------------------------------------------------------------- */
-    //*                             Get revenue from Payment Entry                 */
+    //*                             API calls for Revenue                         */
     //* -------------------------------------------------------------------------- */
 
     const getRevenue = async () => {
@@ -647,6 +648,25 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return data.data;
     }
 
+    //* -------------------------------------------------------------------------- */
+    //*                             API calls for Activity Log                     */
+    //* -------------------------------------------------------------------------- */
+    const getActivityLog = async () => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Version?fields=["modified_by", "creation", "ref_doctype", "docname", "data"]&limit_page_length=1000`, {
+            credentials: 'include',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch activity log');
+        }
+        const data = await response.json();
+        return data.data;
+    }
+
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
@@ -672,7 +692,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             getRevenueByPaymentMode,
             getAllPaidSalesInvoice,
             getSalesInvoiceByName,
-            getCompletedSalesOrder
+            getCompletedSalesOrder,
+            getActivityLog
         }}>
             {children}
         </ApiContext.Provider>

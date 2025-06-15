@@ -29,11 +29,11 @@ export default function Home() {
   const [percentageIncrease, setPercentageIncrease] = useState(0);
   const [monthlyRevenue, setMonthlyRevenue] = useState<MonthlyRevenue[]>([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
-  const { getRevenue } = useApi();
+  const { getRevenue, getActivityLog } = useApi();
 
   useEffect(() => {
     fetchRevenue();
-    
+    console.log('activityLog', getActivityLog());
     const chartData = processDataForChart(monthlyRevenue, selectedRange);
     setSalesData(chartData);
     

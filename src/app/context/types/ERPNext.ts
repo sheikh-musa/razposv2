@@ -246,3 +246,13 @@ export type SalesItemRevenue = {
     item_code: string;
     total_amount: number;
 }
+
+//* --------------------------- Recent Activity Types ---------------------------- */
+
+export type RecentActivity = {
+    modified_by: string;
+    creation: string;
+    reference_doctype: string;
+    docname: string;
+    data: string;
+}
