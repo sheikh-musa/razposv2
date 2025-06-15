@@ -652,7 +652,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //*                             API calls for Activity Log                     */
     //* -------------------------------------------------------------------------- */
     const getActivityLog = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Version?fields=["modified_by", "creation", "ref_doctype", "docname", "data"]&limit_page_length=1000`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Version?fields=["modified_by", "creation", "ref_doctype", "docname", "data"]&limit_page_length=1000`, {
             credentials: 'include',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,

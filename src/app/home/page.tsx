@@ -5,7 +5,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, TooltipPro
 import { useApi } from '@/app/context/ApiContext';
 import TransactionHistory from '../components/home/TransactionHistory';
 import { processRevenueData, processDataForChart } from '../utils/revenueUtils';
-import { MonthlyRevenue, RevenueEntry } from '../context/types/ERPNext';
+import { MonthlyRevenue, RevenueEntry, RecentActivity } from '../context/types/ERPNext';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 type TimeRange = '12 months' | '30 days' | '7 days' | '24 hours';
@@ -29,11 +29,12 @@ export default function Home() {
   const [percentageIncrease, setPercentageIncrease] = useState(0);
   const [monthlyRevenue, setMonthlyRevenue] = useState<MonthlyRevenue[]>([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
+  const [activityLog, setActivityLog] = useState<RecentActivity[]>([]);
   const { getRevenue, getActivityLog } = useApi();
 
   useEffect(() => {
     fetchRevenue();
-    console.log('activityLog', getActivityLog());
+    fetchActivityLog();
     const chartData = processDataForChart(monthlyRevenue, selectedRange);
     setSalesData(chartData);
     
@@ -69,6 +70,10 @@ export default function Home() {
     return today.toISOString().substring(0, 10);
   };
 
+  const fetchActivityLog = async () => {
+    const activityLog = await getActivityLog();
+    setActivityLog(activityLog);
+  }
   return (
     <div className="p-3 max-w-7xl mx-auto">
       {/* Header */}
@@ -209,6 +214,17 @@ export default function Home() {
         <div className='col-span-2 h-2/3'>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-md text-gray-500 font-semibold">Recent activity</h2>
+            <div className="flex flex-col gap-2">
+              {activityLog.filter((activity, index) => index < 5).map((activity, index) => (
+                <div key={index} className='flex flex-col gap-2 text-black'>
+                  <p>{activity.modified_by}</p>
+                  <p>{activity.creation}</p>
+                  <p>{activity.reference_doctype}</p>
+                  <p>{activity.docname}</p>
+                  <p>{activity.data}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
