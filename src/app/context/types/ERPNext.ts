@@ -252,7 +252,7 @@ export type SalesItemRevenue = {
 export type RecentActivity = {
     modified_by: string;
     creation: string;
-    reference_doctype: string;
+    ref_doctype: string;
     docname: string;
     data: string;
 }
