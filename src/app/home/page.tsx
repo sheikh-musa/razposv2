@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
 import { useApi } from '@/app/context/ApiContext';
 import TransactionHistory from '../components/home/TransactionHistory';
+import RecentActivity from '../components/home/RecentActivity';
 import { processRevenueData, processDataForChart } from '../utils/revenueUtils';
-import { MonthlyRevenue, RevenueEntry, RecentActivity } from '../context/types/ERPNext';
+import { MonthlyRevenue, RevenueEntry, RecentActivity as RecentActivityType } from '../context/types/ERPNext';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 type TimeRange = '12 months' | '30 days' | '7 days' | '24 hours';
@@ -29,7 +30,7 @@ export default function Home() {
   const [percentageIncrease, setPercentageIncrease] = useState(0);
   const [monthlyRevenue, setMonthlyRevenue] = useState<MonthlyRevenue[]>([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
-  const [activityLog, setActivityLog] = useState<RecentActivity[]>([]);
+  const [activityLog, setActivityLog] = useState<RecentActivityType[]>([]);
   const { getRevenue, getActivityLog } = useApi();
 
   useEffect(() => {
@@ -72,6 +73,7 @@ export default function Home() {
 
   const fetchActivityLog = async () => {
     const activityLog = await getActivityLog();
+    console.log('activityLog', activityLog);
     setActivityLog(activityLog);
   }
   return (
@@ -96,7 +98,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-row w-full gap-4">
+      <div className="flex flex-row w-full gap-4 mb-8 border-b border-gray-300 pb-3">
         {/* Left side - Graph */}
         <div>
           {/* Total Income */}
@@ -205,27 +207,14 @@ export default function Home() {
           </div>
         </div>
       </div>
-
+      
       {/* Transaction History and Recent Activity */}
       <div className="grid grid-cols-3 -mt-6 h-[300px]">
         <div className='h-2/3'>
           <TransactionHistory />
         </div>
         <div className='col-span-2 h-2/3'>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-md text-gray-500 font-semibold">Recent activity</h2>
-            <div className="flex flex-col gap-2">
-              {activityLog.filter((activity, index) => index < 5).map((activity, index) => (
-                <div key={index} className='flex flex-col gap-2 text-black'>
-                  <p>{activity.modified_by}</p>
-                  <p>{activity.creation}</p>
-                  <p>{activity.reference_doctype}</p>
-                  <p>{activity.docname}</p>
-                  <p>{activity.data}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <RecentActivity activityLog={activityLog} />
         </div>
       </div>
     </div>
