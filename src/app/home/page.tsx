@@ -201,10 +201,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="flex gap-2 mt-10">
-            <button className="px-3 py-2 text-xs text-gray-600 border border-gray-400 rounded-md">Download</button>
-            <button className="px-3 py-2 text-xs bg-purple-600 text-white rounded-md">View all</button>
-          </div>
         </div>
       </div>
       

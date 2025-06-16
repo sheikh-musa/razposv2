@@ -1,4 +1,5 @@
 import { RecentActivity as RecentActivityType } from "@/app/context/types/ERPNext";
+import { useState } from "react";
 
 type ActivityData = {
     added: unknown[];
@@ -100,7 +101,19 @@ const getDocStatus = (status: number) => {
     }
 };
 
+const Tooltip = ({ content }: { content: string }) => {
+    return (
+        <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-xs bg-gray-900 text-white rounded-md shadow-lg whitespace-pre-wrap max-w-xs">
+            <div className="max-h-48 overflow-auto">
+                {JSON.stringify(JSON.parse(content), null, 2)}
+            </div>
+            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+        </div>
+    );
+};
+
 export default function RecentActivity({ activityLog }: { activityLog: RecentActivityType[] }) {
+    const [hoveredActivity, setHoveredActivity] = useState<string | null>(null);
     const imageUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
     
     return (
@@ -113,7 +126,7 @@ export default function RecentActivity({ activityLog }: { activityLog: RecentAct
                 </div>
             </div>
             <div className="space-y-4">
-                {activityLog.reverse().filter((activity, index) => index < 10).map((activity, index) => (
+                {activityLog.filter((activity, index) => index < 10).map((activity, index) => (
                     <div key={index} className="flex items-start gap-3 py-3">
                         <img 
                             src={imageUrl} 
@@ -133,11 +146,18 @@ export default function RecentActivity({ activityLog }: { activityLog: RecentAct
                                 </span>
                             </div>
                             <div className="mt-1">
-                                <span className={`text-sm hover:${activity.data} cursor-pointer`} >
+                                <span 
+                                    className="text-sm relative inline-block cursor-help"
+                                    onMouseEnter={() => setHoveredActivity(activity.data)}
+                                    onMouseLeave={() => setHoveredActivity(null)}
+                                >
                                     {formatActivityData(activity.data)}
+                                    {hoveredActivity === activity.data && (
+                                        <Tooltip content={activity.data} />
+                                    )}
                                 </span>
                                 <div className="mt-1 text-xs text-gray-500">
-                                    Document: {activity.ref_doctype}: {activity.docname}
+                                    {activity.ref_doctype}: {activity.docname}
                                 </div>
                             </div>
                         </div>
