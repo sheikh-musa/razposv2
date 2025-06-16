@@ -117,52 +117,56 @@ export default function RecentActivity({ activityLog }: { activityLog: RecentAct
     const imageUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
     
     return (
-        <div>
-            <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-3">
+        <div className="flex flex-col h-[600px]">
+            <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-3 flex-shrink-0">
                 <h2 className="text-md text-gray-500 font-semibold">Recent activity</h2>
                 <div className="flex gap-2">
                     <button className="px-3 py-2 text-xs text-gray-600 border border-gray-400 rounded-md">Download</button>
                     <button className="px-3 py-2 text-xs bg-purple-600 text-white rounded-md">View all</button>
                 </div>
             </div>
-            <div className="space-y-4">
-                {activityLog.filter((activity, index) => index < 10).map((activity, index) => (
-                    <div key={index} className="flex items-start gap-3 py-3">
-                        <img 
-                            src={imageUrl} 
-                            alt={activity.modified_by} 
-                            width={32} 
-                            height={32} 
-                            className="rounded-full"
-                        />
-                        <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                                <span className="font-medium text-sm text-black">
-                                    {activity.modified_by.split('@')[0]}
-                                </span>
-                                <span className="text-gray-400">•</span>
-                                <span className="text-xs text-gray-500">
-                                    {formatDate(activity.creation)}
-                                </span>
-                            </div>
-                            <div className="mt-1">
-                                <span 
-                                    className="text-sm relative inline-block cursor-help"
-                                    onMouseEnter={() => setHoveredActivity(activity.data)}
-                                    onMouseLeave={() => setHoveredActivity(null)}
-                                >
-                                    {formatActivityData(activity.data)}
-                                    {hoveredActivity === activity.data && (
-                                        <Tooltip content={activity.data} />
-                                    )}
-                                </span>
-                                <div className="mt-1 text-xs text-gray-500">
-                                    {activity.ref_doctype}: {activity.docname}
+            <div className="flex-1 overflow-hidden">
+                <div className="h-full overflow-y-auto pr-2">
+                    <div className="space-y-4">
+                        {activityLog.map((activity, index) => (
+                            <div key={index} className="flex items-start gap-3 py-3 hover:bg-gray-50 rounded-lg px-2">
+                                <img 
+                                    src={imageUrl} 
+                                    alt={activity.modified_by} 
+                                    width={32} 
+                                    height={32} 
+                                    className="rounded-full flex-shrink-0"
+                                />
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium text-sm text-black truncate">
+                                            {activity.modified_by.split('@')[0]}
+                                        </span>
+                                        <span className="text-gray-400 flex-shrink-0">•</span>
+                                        <span className="text-xs text-gray-500 flex-shrink-0">
+                                            {formatDate(activity.creation)}
+                                        </span>
+                                    </div>
+                                    <div className="mt-1">
+                                        <span 
+                                            className="text-sm relative inline-block cursor-help"
+                                            onMouseEnter={() => setHoveredActivity(activity.data)}
+                                            onMouseLeave={() => setHoveredActivity(null)}
+                                        >
+                                            {formatActivityData(activity.data)}
+                                            {hoveredActivity === activity.data && (
+                                                <Tooltip content={activity.data} />
+                                            )}
+                                        </span>
+                                        <div className="mt-1 text-xs text-gray-500">
+                                            {activity.ref_doctype}: {activity.docname}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
-                ))}
+                </div>
             </div>
         </div>
     );
