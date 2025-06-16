@@ -133,11 +133,11 @@ export default function RecentActivity({ activityLog }: { activityLog: RecentAct
                                 </span>
                             </div>
                             <div className="mt-1">
-                                <span className="text-sm">
+                                <span className={`text-sm hover:${activity.data} cursor-pointer`} >
                                     {formatActivityData(activity.data)}
                                 </span>
                                 <div className="mt-1 text-xs text-gray-500">
-                                    {activity.ref_doctype} #{activity.docname}
+                                    Document: {activity.ref_doctype}: {activity.docname}
                                 </div>
                             </div>
                         </div>
