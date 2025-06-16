@@ -102,7 +102,7 @@ export type StockEntry = {
 export type SalesOrders = {
     name: string;
     customer: string;
-    transaction_date: string;
+    creation: string;
     total_qty: number;
     total: number
     custom_kitchen_status: string;

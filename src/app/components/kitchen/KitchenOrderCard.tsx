@@ -122,7 +122,13 @@ export default function KitchenOrderCard({
             <div className='border-b pb-3'>
                 <p className='font-bold text-xl'>Order No: #{order.name}</p>
                 <p className='text-sm my-2'>Order placed <span className='text-slate-500'>
-                    {new Date(order.transaction_date).toLocaleTimeString()}
+                    {new Date(order.creation).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}
                 </span></p>
                 <div className='flex gap-2 mt-4'>
                     <button 

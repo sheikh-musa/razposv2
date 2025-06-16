@@ -1,5 +1,6 @@
 import { RecentActivity as RecentActivityType } from "@/app/context/types/ERPNext";
 import { useState } from "react";
+import Image from "next/image";
 
 type ActivityData = {
     added: unknown[];
@@ -51,6 +52,24 @@ const formatActivityData = (dataString: string) => {
             return (
                 <span className="text-gray-600">
                     Changed document status from {getDocStatus(docStatusChange[1] as number)} to {getDocStatus(docStatusChange[2] as number)}
+                </span>
+            );
+        }
+
+        const orderCompleteChange = data.changed.find(change => change[0] === 'custom_order_complete');
+        if (orderCompleteChange) {
+            return (
+                <span className="text-gray-600">
+                    Updated Sales Order status to completed
+                </span>
+            );
+        }
+
+        const paymentModeChange = data.changed.find(change => change[0] === 'custom_payment_mode');
+        if (paymentModeChange) {
+            return (
+                <span className="text-gray-600">
+                    Updated payment mode from {paymentModeChange[1]} to {paymentModeChange[2]}
                 </span>
             );
         }
@@ -130,7 +149,7 @@ export default function RecentActivity({ activityLog }: { activityLog: RecentAct
                     <div className="space-y-4">
                         {activityLog.map((activity, index) => (
                             <div key={index} className="flex items-start gap-3 py-3 hover:bg-gray-50 rounded-lg px-2">
-                                <img 
+                                <Image 
                                     src={imageUrl} 
                                     alt={activity.modified_by} 
                                     width={32} 
