@@ -256,3 +256,21 @@ export type RecentActivity = {
     docname: string;
     data: string;
 }
+
+//* --------------------------- Transaction History Types ---------------------------- */
+
+export type TransactionHistoryItem = {
+    item_code: string;
+    qty: number;
+    rate: number;
+    amount: number;
+}
+
+export type TransactionHistory = {
+    name: string;
+    total: number;
+    creation: string;
+    custom_payment_mode: string;
+    total_qty: number;
+    items: TransactionHistoryItem[];
+}

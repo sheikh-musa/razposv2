@@ -5,44 +5,20 @@ import React, { useEffect, useState } from "react"
 import { useApi } from "@/app/context/ApiContext"
 import { CompletedSalesOrder } from "@/app/context/types/ERPNext"
 
-// Define types
-type Variant = {
-    productId: number;
-    name: string;
-    price: number;
-    orderQuantity: number;
-};
-
-type Product = {
-    type: string;
-    variants: Variant[];
-};
-
-type Order = {
-    id: number;
-    itemsType: number;
-    variantType: number;
-    product: Product[];
-    totalPrice: number;
-    date: string; // Format: YYYY-MM-DD
-    time: string; // Format: HH:mm:ss
-    paymentBy: string;
-    paymentReceived: boolean;
-    completed: boolean;
-    remarks: string;
-};
-
 
 export default function TransactionHistory() {
     const [latestOrders, setLatestOrders] = useState<CompletedSalesOrder[]>([]);
     const { getCompletedSalesOrder } = useApi();
+
     useEffect(() => {
         fetchOrders();
     }, []);
     const fetchOrders = async () => {
         try {
             const data = await getCompletedSalesOrder();
-            const completedOrders = data.reverse().map((order) => ({
+            console.log('data', data);
+            const completedOrders = data.map((order) => (
+                {
                 name: order.name.substring(14),
                 customer: order.customer,
                 date: order.date,

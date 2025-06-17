@@ -29,6 +29,7 @@ interface ApiContextType {
     getSalesInvoiceByName: (invoiceName: string) => Promise<Response>;
     getCompletedSalesOrder: () => Promise<CompletedSalesOrder[]>;
     getActivityLog: () => Promise<RecentActivity[]>;
+    getCompletedSalesOrderItems: (orderName: string) => Promise<SalesOrderItem[]>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -633,7 +634,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
     
     const getCompletedSalesOrder = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order?fields=["name", "customer", "transaction_date", "total", "items"]&filters=[["custom_order_complete", "=", 1]]`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order?filters=[["custom_order_complete", "=", 1]]&fields=["name", "customer", "transaction_date", "total"]&limit_page_length=1000&order_by=creation+desc`, {
             credentials: 'include',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -643,6 +644,22 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         });
         if (!response.ok) {
             throw new Error('Failed to fetch completed sales order');
+        }
+        const data = await response.json();
+        return data.data;
+    }
+
+    const getCompletedSalesOrderItems = async (orderName: string) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order/${orderName}?fields=["items"]`, {
+            credentials: 'include',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch completed sales order items');
         }
         const data = await response.json();
         return data.data;
@@ -693,6 +710,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             getAllPaidSalesInvoice,
             getSalesInvoiceByName,
             getCompletedSalesOrder,
+            getCompletedSalesOrderItems,
             getActivityLog
         }}>
             {children}
