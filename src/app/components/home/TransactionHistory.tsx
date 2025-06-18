@@ -17,7 +17,7 @@ export default function TransactionHistory() {
         try {
             const data = await getCompletedSalesOrder();
             console.log('data', data);
-            const completedOrders = data.map((order) => (
+            const completedOrders = data.map((order: CompletedSalesOrder) => (
                 {
                 name: order.name.substring(14),
                 customer: order.customer,

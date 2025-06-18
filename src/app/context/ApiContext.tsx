@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder } from './types/ERPNext';
 import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
@@ -28,7 +28,7 @@ interface ApiContextType {
     getAllPaidSalesInvoice: () => Promise<SalesInvoice[]>;
     getSalesInvoiceByName: (invoiceName: string) => Promise<Response>;
     getActivityLog: () => Promise<RecentActivity[]>;
-    getCompletedSalesOrder: () => Promise<Response>;
+    getCompletedSalesOrder: () => Promise<CompletedSalesOrder[]>;
     getCompletedSalesOrderItems: (orderName: string) => Promise<SalesHistoryOrder[]>;
 }
 
@@ -634,7 +634,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
     
     const getCompletedSalesOrder = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order?filters=[["custom_order_complete", "=", 1]]&limit_page_length=1000&order_by=creation+desc`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order?filters=[["custom_order_complete", "=", 1]]&fields=["name", "customer", "transaction_date", "total"]&limit_page_length=1000&order_by=creation+desc`, {
             credentials: 'include',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
