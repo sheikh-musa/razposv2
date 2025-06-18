@@ -261,12 +261,14 @@ export type RecentActivity = {
 
 export type TransactionHistoryItem = {
     item_code: string;
+    item_name: string;
+    name: string;
     qty: number;
     rate: number;
     amount: number;
 }
 
-export type TransactionHistory = {
+export type SalesHistoryOrder = {
     name: string;
     total: number;
     creation: string;

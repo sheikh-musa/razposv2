@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import OrderDetails from '../../components/transactionHistory/OrderDetails';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import { SalesHistoryOrder} from '@/app/context/types/ERPNext';
+import { useApi } from '@/app/context/ApiContext';
 
 type Variant = {
   name: string;
@@ -31,7 +33,8 @@ type Order = {
 };
 
 export default function TransactionHistory() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const { getCompletedSalesOrderItems, getCompletedSalesOrder } = useApi();
+  const [orders, setOrders] = useState<SalesHistoryOrder[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [timeRange, setTimeRange] = useState('All');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -77,21 +80,47 @@ export default function TransactionHistory() {
   };
 /* eslint-disable */
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await fetch('/api/orders');
-        const data = await response.json();
-        const completedOrders = data.filter((order: Order) => order.completed);
-        setOrders(completedOrders);
-        filterOrdersByTimeRange('All', completedOrders); // Changed from 'Today' to 'All'
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      }
-    };
+    // const fetchOrders = async () => {
+    //   try {
+    //     const response = await fetch('/api/orders');
+    //     const data = await response.json();
+    //     const completedOrders = data.filter((order: Order) => order.completed);
+    //     setOrders(completedOrders);
+    //     filterOrdersByTimeRange('All', completedOrders); // Changed from 'Today' to 'All'
+    //   } catch (error) {
+    //     console.error('Error fetching orders:', error);
+    //   }
+    // };
 
     fetchOrders();
   }, []);
 /* eslint-enable */
+
+const fetchOrders = async () => {
+  try {
+    const data = await getCompletedSalesOrder();
+    const orders = await Promise.all(data.map(async (order) => { 
+      const items = await getCompletedSalesOrderItems(order.name);
+      return items
+    }));
+    setOrders(orders);
+    console.log(orders);
+    // setOrders(orders as unknown as SalesHistoryOrder[]);
+
+    
+    // const completedOrders = data.filter((order: TransactionHistoryType) => order.custom_order_complete);
+    // console.log(completedOrders);
+    // setOrders(completedOrders);
+    // filterOrdersByTimeRange('All', completedOrders); // Changed from 'Today' to 'All'
+    // const completedOrders = data.filter((order: TransactionHistory) => order.custom_order_complete);
+    // console.log(completedOrders);
+    // setOrders(completedOrders);
+    // filterOrdersByTimeRange('All', completedOrders); // Changed from 'Today' to 'All'
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+  }
+}
+
   const filterOrdersByTimeRange = (range: string, ordersList = orders) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -236,41 +265,43 @@ export default function TransactionHistory() {
             </tr>
           </thead>
           <tbody>
-            {currentOrders.map((order) => (
+            {orders.map((order) => (
               <tr key={order.id} className="border-b text-sm">
                 <td className="p-3">
                   <div>
-                    <div className="font-sm text-black">Order #{order.id}</div>
+                    <div className="font-sm text-black">Order #{order.name}</div>
                   </div>
                 </td>
-                <td className="p-3 text-gray-600">${order.totalPrice.toFixed(2)}</td>
+                <td className="p-3 text-gray-600">${order.total.toFixed(2)}</td>
                 <td className="p-2 text-gray-600">
-                  <div>{order.date}</div>
-                  <div className="text-sm text-gray-500">{order.time}</div>
+                  <div>{order.creation}</div>
+                  <div className="text-sm text-gray-500">{order.creation}</div>
                 </td>
                 <td className="p-2 w-[100px]">
                    <span className={`px-2 py-1 rounded-full text-xs ${
-                    order.paymentBy === 'Credit Card' ? 'bg-blue-100 text-blue-600' : 
-                    order.paymentBy === 'Cash' ? 'bg-green-100 text-green-600' :
-                    order.paymentBy === 'PayNow' ? 'bg-red-100 text-red-600' :
+                    // order.paymentBy === 'Credit Card' ? 'bg-blue-100 text-blue-600' : 
+                    // order.paymentBy === 'Cash' ? 'bg-green-100 text-green-600' :
+                    // order.paymentBy === 'PayNow' ? 'bg-red-100 text-red-600' :
                     'bg-gray-100 text-gray-600'
                   }`}>
-                    {order.paymentBy}
+                    {order.custom_payment_mode}
                   </span>
                 </td>
                 <td className="p-3">
                   <div className="flex gap-1 flex-wrap">
-                    {order.product.map((prod, prodIndex) => 
-                      prod.variants.map((variant, varIndex) => (
-                        variant.orderQuantity > 0 && (
-                          <span 
-                            key={`${prodIndex}-${varIndex}`} 
-                            className="px-2 py-1 bg-purple-50 text-purple-600 rounded-full text-xs"
-                          >
-                            {prod.type} ({variant.name}) × {variant.orderQuantity}
-                          </span>
-                        )
-                      ))
+                    {order.items.map((item: any, prodIndex: any) => 
+                      console.log(item),
+                      // item.map((variant: any, varIndex: any) => (
+                      //   console.log(item),
+                      //   variant.qty > 0 && (
+                      //     <span 
+                      //       key={`${prodIndex}-${varIndex}`} 
+                      //       className="px-2 py-1 bg-purple-50 text-purple-600 rounded-full text-xs"
+                      //     >
+                      //       {variant.item_code} ({variant.item_name}) × {variant.qty}
+                      //     </span>
+                      //   )
+                      // ))
                     )}
                   </div>
                 </td>
