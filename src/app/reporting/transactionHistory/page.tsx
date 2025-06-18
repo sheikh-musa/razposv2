@@ -43,17 +43,28 @@ export default function TransactionHistory() {
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
-
   const fetchOrders = async () => {
     try {
       const data = await getCompletedSalesOrder() as unknown as { name: string }[];
       const orders = await Promise.all(data.map(async (order) => {
         const orderDetails = await getCompletedSalesOrderItems(order.name) as unknown as SalesHistoryOrder;
-        
+        //@ts-expect-error creation is not a property of SalesHistoryOrder
+        const date = new Date(orderDetails.creation).toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        });
+        //@ts-expect-error creation is not a property of SalesHistoryOrder
+        const time = new Date(orderDetails.creation).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
         return {
           name: orderDetails.name,
           total: orderDetails.total,
-          creation: orderDetails.creation,
+          date: date,
+          time: time,
           custom_payment_mode: orderDetails.custom_payment_mode,
           total_qty: orderDetails.total_qty,
           items: orderDetails.items.map((item: TransactionHistoryItem) => ({
@@ -223,13 +234,13 @@ export default function TransactionHistory() {
               <tr key={index} className="border-b text-sm">
                 <td className="p-3">
                   <div>
-                    <div className="font-sm text-black">Order #{order.name}</div>
+                    <div className="font-sm text-black">Order #{order.name.split('-')[1]}</div>
                   </div>
                 </td>
                 <td className="p-3 text-gray-600">${order.total}</td>
                 <td className="p-2 text-gray-600">
-                  <div>{order.creation}</div>
-                  <div className="text-sm text-gray-500">{order.creation}</div>
+                  <div>{order.date}</div>
+                  <div className="text-sm text-gray-500">{order.time}</div>
                 </td>
                 <td className="p-2 w-[100px]">
                   <span className={`px-2 py-1 rounded-full text-xs ${

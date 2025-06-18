@@ -271,7 +271,8 @@ export type TransactionHistoryItem = {
 export type SalesHistoryOrder = {
     name: string;
     total: number;
-    creation: string;
+    date: string;
+    time: string;
     custom_payment_mode: string;
     total_qty: number;
     items: TransactionHistoryItem[];
