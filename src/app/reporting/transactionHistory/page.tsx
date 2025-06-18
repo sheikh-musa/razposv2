@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import OrderDetails from '../../components/transactionHistory/OrderDetails';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { SalesHistoryOrder} from '@/app/context/types/ERPNext';
+import { SalesHistoryOrder, TransactionHistoryItem } from '@/app/context/types/ERPNext';
 import { useApi } from '@/app/context/ApiContext';
 
 type Variant = {
@@ -35,24 +35,79 @@ type Order = {
 export default function TransactionHistory() {
   const { getCompletedSalesOrderItems, getCompletedSalesOrder } = useApi();
   const [orders, setOrders] = useState<SalesHistoryOrder[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<SalesHistoryOrder[]>([]);
   const [timeRange, setTimeRange] = useState('All');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<SalesHistoryOrder | null>(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const ordersPerPage = 8;
+  const ordersPerPage = 10;
 
-  // Calculate pagination values
+  const fetchOrders = async () => {
+    try {
+      const data = await getCompletedSalesOrder() as unknown as { name: string }[];
+      const orders = await Promise.all(data.map(async (order) => {
+        const orderDetails = await getCompletedSalesOrderItems(order.name) as unknown as SalesHistoryOrder;
+        
+        return {
+          name: orderDetails.name,
+          total: orderDetails.total,
+          creation: orderDetails.creation,
+          custom_payment_mode: orderDetails.custom_payment_mode,
+          total_qty: orderDetails.total_qty,
+          items: orderDetails.items.map((item: TransactionHistoryItem) => ({
+            item_code: item.item_code,
+            item_name: item.item_name,
+            name: item.name,
+            qty: item.qty,
+            rate: item.rate,
+            amount: item.amount
+          }))
+        } as SalesHistoryOrder;
+      }));
+
+      setOrders(orders);
+      setFilteredOrders(orders);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    }
+  }
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  // Filter orders by date
+  const filterOrdersByDate = (date: Date | null) => {
+    if (!date || !orders.length) {
+      setFilteredOrders(orders);
+      return;
+    }
+
+    const filtered = orders.filter(order => {
+      const orderDate = new Date(order.creation);
+      return (
+        orderDate.getFullYear() === date.getFullYear() &&
+        orderDate.getMonth() === date.getMonth() &&
+        orderDate.getDate() === date.getDate()
+      );
+    });
+
+    setFilteredOrders(filtered);
+    setSelectedDate(date);
+    setTimeRange('');
+  };
+
+  // Get current orders for pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const paginatedOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
 
-  // Generate page numbers
+  // Generate page numbers for pagination
   const getPageNumbers = () => {
-    const pages = [];
+    const pages: (number | string)[] = [];
     if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -77,108 +132,6 @@ export default function TransactionHistory() {
       }
     }
     return pages;
-  };
-/* eslint-disable */
-  useEffect(() => {
-    // const fetchOrders = async () => {
-    //   try {
-    //     const response = await fetch('/api/orders');
-    //     const data = await response.json();
-    //     const completedOrders = data.filter((order: Order) => order.completed);
-    //     setOrders(completedOrders);
-    //     filterOrdersByTimeRange('All', completedOrders); // Changed from 'Today' to 'All'
-    //   } catch (error) {
-    //     console.error('Error fetching orders:', error);
-    //   }
-    // };
-
-    fetchOrders();
-  }, []);
-/* eslint-enable */
-
-const fetchOrders = async () => {
-  try {
-    const data = await getCompletedSalesOrder();
-    const orders = await Promise.all(data.map(async (order) => { 
-      const items = await getCompletedSalesOrderItems(order.name);
-      return items
-    }));
-    setOrders(orders);
-    console.log(orders);
-    // setOrders(orders as unknown as SalesHistoryOrder[]);
-
-    
-    // const completedOrders = data.filter((order: TransactionHistoryType) => order.custom_order_complete);
-    // console.log(completedOrders);
-    // setOrders(completedOrders);
-    // filterOrdersByTimeRange('All', completedOrders); // Changed from 'Today' to 'All'
-    // const completedOrders = data.filter((order: TransactionHistory) => order.custom_order_complete);
-    // console.log(completedOrders);
-    // setOrders(completedOrders);
-    // filterOrdersByTimeRange('All', completedOrders); // Changed from 'Today' to 'All'
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-  }
-}
-
-  const filterOrdersByTimeRange = (range: string, ordersList = orders) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    if (range === 'All') {
-      setFilteredOrders(ordersList);
-      setTimeRange(range);
-      setSelectedDate(null);
-      setCurrentPage(1);
-      return;
-    }
-
-    const filtered = ordersList.filter(order => {
-      const orderDate = new Date(order.date);
-      
-      switch (range) {
-        case 'Today':
-          return orderDate.toDateString() === today.toDateString();
-        
-        case '7 days': {
-          const sevenDaysAgo = new Date(today);
-          sevenDaysAgo.setDate(today.getDate() - 7);
-          return orderDate >= sevenDaysAgo;
-        }
-        
-        case '30 days': {
-          const thirtyDaysAgo = new Date(today);
-          thirtyDaysAgo.setDate(today.getDate() - 30);
-          return orderDate >= thirtyDaysAgo;
-        }
-        
-        case '6 months': {
-          const sixMonthsAgo = new Date(today);
-          sixMonthsAgo.setMonth(today.getMonth() - 6);
-          return orderDate >= sixMonthsAgo;
-        }
-        
-        default:
-          return true;
-      }
-    });
-
-    setFilteredOrders(filtered);
-    setTimeRange(range);
-    setSelectedDate(null); // Reset date picker when changing time range
-  };
-
-  const filterOrdersByDate = (date: Date | null) => {
-    if (!date) return;
-    
-    const filtered = orders.filter(order => {
-      const orderDate = new Date(order.date);
-      return orderDate.toDateString() === date.toDateString();
-    });
-
-    setFilteredOrders(filtered);
-    setSelectedDate(date);
-    setTimeRange(''); // Reset time range when picking specific date
   };
 
   return (
@@ -265,23 +218,24 @@ const fetchOrders = async () => {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} className="border-b text-sm">
+            {paginatedOrders.map((order, index) => (
+              console.log(order),
+              <tr key={index} className="border-b text-sm">
                 <td className="p-3">
                   <div>
                     <div className="font-sm text-black">Order #{order.name}</div>
                   </div>
                 </td>
-                <td className="p-3 text-gray-600">${order.total.toFixed(2)}</td>
+                <td className="p-3 text-gray-600">${order.total}</td>
                 <td className="p-2 text-gray-600">
                   <div>{order.creation}</div>
                   <div className="text-sm text-gray-500">{order.creation}</div>
                 </td>
                 <td className="p-2 w-[100px]">
-                   <span className={`px-2 py-1 rounded-full text-xs ${
-                    // order.paymentBy === 'Credit Card' ? 'bg-blue-100 text-blue-600' : 
-                    // order.paymentBy === 'Cash' ? 'bg-green-100 text-green-600' :
-                    // order.paymentBy === 'PayNow' ? 'bg-red-100 text-red-600' :
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    order.custom_payment_mode === 'Credit Card' ? 'bg-blue-100 text-blue-600' : 
+                    order.custom_payment_mode === 'Cash' ? 'bg-green-100 text-green-600' :
+                    order.custom_payment_mode === 'PayNow' ? 'bg-red-100 text-red-600' :
                     'bg-gray-100 text-gray-600'
                   }`}>
                     {order.custom_payment_mode}
@@ -289,20 +243,14 @@ const fetchOrders = async () => {
                 </td>
                 <td className="p-3">
                   <div className="flex gap-1 flex-wrap">
-                    {order.items.map((item: any, prodIndex: any) => 
-                      console.log(item),
-                      // item.map((variant: any, varIndex: any) => (
-                      //   console.log(item),
-                      //   variant.qty > 0 && (
-                      //     <span 
-                      //       key={`${prodIndex}-${varIndex}`} 
-                      //       className="px-2 py-1 bg-purple-50 text-purple-600 rounded-full text-xs"
-                      //     >
-                      //       {variant.item_code} ({variant.item_name}) × {variant.qty}
-                      //     </span>
-                      //   )
-                      // ))
-                    )}
+                    {order.items.map((item, itemIndex) => (
+                      <span 
+                        key={itemIndex} 
+                        className="px-2 py-1 bg-purple-50 text-purple-600 rounded-full text-xs"
+                      >
+                        {item.item_code} ({item.item_name}) × {item.qty}
+                      </span>
+                    ))}
                   </div>
                 </td>
                 <td className="p-4">
