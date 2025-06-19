@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react';
+import { SalesHistoryOrder } from '@/app/context/types/ERPNext';
 
 type Order = {
   id: number;
@@ -17,13 +18,13 @@ type Order = {
 };
 
 type OrderDetailsProps = {
-  order: Order;
+  order: SalesHistoryOrder;
   onClose: () => void;
 };
 
 export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
-  const [paymentMethod, setPaymentMethod] = useState(order?.paymentBy || 'Cash');
-  const [paymentStatus, setPaymentStatus] = useState(order?.paymentReceived ? 'Paid' : 'Unpaid');
+  const [paymentMethod, setPaymentMethod] = useState(order?.custom_payment_mode || 'Cash');
+  // const [paymentStatus, setPaymentStatus] = useState(order?.custom_payment_complete ? 'Paid' : 'Unpaid');
 
   if (!order) return null;
 
@@ -32,7 +33,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
       {/* Header */}
       <div className="flex flex-col justify-between items-center p-2 border-b">
         <div className='flex justify-between w-full'>
-          <span className='text-base text-black p-2 font-semibold'>Order #{order.id}</span>
+          <span className='text-base text-black p-2 font-semibold'>Order #{order.name}</span>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full text-black">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -40,24 +41,22 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
           </button>
         </div>
         <div className="flex items-center gap-2 justify-between w-full">
-          <span className="text-sm text-gray-500 p-2">• {order.product.reduce((acc, prod) => 
-            acc + prod.variants.reduce((sum, variant) => sum + variant.orderQuantity, 0), 0)} items
+          <span className="text-sm text-gray-500 p-2">• {order.total_qty} items
           </span>
-          <span className="text-lg font-semibold text-gray-700 p-2">${order.totalPrice.toFixed(2)}</span>
+          <span className="text-lg font-semibold text-gray-700 p-2">${order.total.toFixed(2)}</span>
         </div>
       </div>
 
       {/* Order Items - Make this section scrollable */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-4 space-y-4">
-          {order.product.map((prod, prodIndex) => 
-            prod.variants.map((variant, varIndex) => (
-              variant.orderQuantity > 0 && (
-                <div key={`${prodIndex}-${varIndex}`}>
+          {order.items.map((item, index) => (
+            item.item_code && (
+                <div key={index}>
                   <div className="flex items-start mb-2 h-8">
                     <div className='w-1/3'>
-                      <h3 className="font-semibold text-sm text-black">{prod.type}</h3>
-                      <p className="text-xs text-gray-600">{variant.name}</p>
+                      <h3 className="font-semibold text-sm text-black">{item.item_code}</h3>
+                      <p className="text-xs text-gray-600">{item.item_name}</p>
                     </div>
                     <div className='flex h-full items-center justify-center w-1/3'>
                     <div className='border rounded-md'>
@@ -66,7 +65,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
                       </svg>
                     </button>
-                    <span className="text-center text-black text-sm mx-1">{variant.orderQuantity}</span>
+                    <span className="text-center text-black text-sm mx-1">{item.qty}</span>
                     <button className="p-1 hover:bg-gray-200 text-black border-l">
                       <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -75,7 +74,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                     </div>
                     </div>
                     <div className="text-right w-1/3">
-                      <p className="text-sm text-black">${variant.price.toFixed(2)}/ea</p>
+                      <p className="text-sm text-black">${item.rate.toFixed(2)}/ea</p>
                       <button className="ml-auto text-black">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -84,11 +83,11 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                     </div>
                   </div>
                       <div className="items-center bg-gray-50 rounded-lg py-2 text-end">
-                      <p className="text-sm text-gray-600 font-semibold">${(variant.price * variant.orderQuantity).toFixed(2)}</p>
+                      <p className="text-sm text-gray-600 font-semibold">${(item.rate * item.qty).toFixed(2)}</p>
                       </div>
                 </div>
               )
-            ))
+            )
           )}
         </div>
       </div>
@@ -109,7 +108,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
               <option>E-payment</option>
             </select>
           </div>
-          <div>
+          {/* <div>
             <label className="block text-xs text-gray-600 mb-1 font-semibold">Payment status</label>
             <select 
               value={paymentStatus}
@@ -119,7 +118,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
               <option>Paid</option>
               <option>Unpaid</option>
             </select>
-          </div>
+          </div> */}
           <button className="w-full py-3 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
             Save
           </button>

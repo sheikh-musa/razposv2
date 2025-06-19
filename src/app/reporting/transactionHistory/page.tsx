@@ -97,7 +97,7 @@ export default function TransactionHistory() {
     }
 
     const filtered = orders.filter(order => {
-      const orderDate = new Date(order.creation);
+      const orderDate = new Date(order.date);
       return (
         orderDate.getFullYear() === date.getFullYear() &&
         orderDate.getMonth() === date.getMonth() &&
