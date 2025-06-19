@@ -234,7 +234,7 @@ export default function TransactionHistory() {
               <tr key={index} className="border-b text-sm">
                 <td className="p-3">
                   <div>
-                    <div className="font-sm text-black">Order #{order.name.split('-')[1]}</div>
+                    <div className="font-sm text-black">Order #{order.name}</div>
                   </div>
                 </td>
                 <td className="p-3 text-gray-600">${order.total}</td>

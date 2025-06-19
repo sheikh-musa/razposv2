@@ -36,7 +36,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       customer: 'Guest',
       delivery_date: getCurrentDate(), // TODO: Change to actual delivery date past 12am
       custom_order_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: '2-digit' }).replace(' ', ''),
-      items: items.map((item) => ({ item_code: item.itemVariant, qty: item.quantity })),
+      items: items.map((item) => ({ item_code: item.name, qty: item.quantity })),
       status: 'To Deliver and Bill',
       custom_kitchen_status: 'preparing',
       custom_remarks: remark,
@@ -45,7 +45,8 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       custom_payment_complete: paymentComplete,
       docstatus: 1,
     };
-    console.log('payload', payload);
+  
+    console.log('payload', JSON.stringify(payload, null, 2));
     const response = await createKitchenOrder(payload);
     if (response.ok) {
       toast.success('Order created successfully');
@@ -78,6 +79,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
         {/* Cart Items */}
         <div className="space-y-4 mb-6">
           {items.map((item) => (
+            console.log('item', item),
             <div key={`${item.itemVariant}-${item.name}`} className="flex flex-col">
               <div className="flex justify-between items-start mb-1">
                 <div>
