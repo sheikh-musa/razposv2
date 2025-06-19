@@ -37,21 +37,6 @@ const ApiContext = createContext<ApiContextType | undefined>(undefined);
 export function ApiProvider({ children }: { children: ReactNode }) {
     const isStaging = process.env.NEXT_PUBLIC_ENV === 'staging';
 
-    const getCSRFToken = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/method/frappe.auth.get_csrf_token`, {
-            headers: {
-                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Failed to fetch CSRF token');
-        }
-        const data = await response.json();
-        console.log('csrf token', data);
-        return data.data.csrf_token;
-    }
     //* -------------------------------------------------------------------------- */
     //*                          API calls for fetching Items                      */
     //* -------------------------------------------------------------------------- */
@@ -544,7 +529,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     const createSalesInvoice = async (payload: SalesInvoicePayload) => {
-        try {
+        
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Invoice`, {
                 method: 'POST',
                 headers: {
@@ -556,14 +541,12 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             });
             
             if (!response.ok) {
-                throw new Error('Failed to create sales invoice');
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`Failed to create sales invoice: ${JSON.stringify(errorData)}`);
             }
     
             return response;
-        } catch (error) {
-            console.error('Error creating sales invoice:', error);
-            throw error;
-        }
     }
 
     const createPaymentEntry = async (payload: PaymentEntryPayload) => {
@@ -590,7 +573,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             if (isStaging) {
                 return mockRevenueData;
             }
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date", "creation"]`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date", "creation"]&order_by=creation+desc`, {
                 headers: {
                     'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
                     'Accept': 'application/json',
@@ -609,7 +592,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
     
     const getRevenueByPaymentMode = async (paymentMode: string) => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date", "mode_of_payment"]&filters=[["mode_of_payment","=","${paymentMode}"]]`, {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date", "mode_of_payment"]&filters=[["mode_of_payment","=","${paymentMode}"]]`, {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
                 'Accept': 'application/json',
@@ -621,6 +605,10 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
         const data = await response.json();
         return data.data;
+        } catch (error) {
+            console.error('Error fetching revenue by payment mode:', error);
+            throw error;
+        }
     }
     
     const getCompletedSalesOrder = async () => {
