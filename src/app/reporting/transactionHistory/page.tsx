@@ -260,6 +260,7 @@ export default function TransactionHistory() {
           </thead>
           <tbody>
             {paginatedOrders.map((order, index) => (
+              console.log(order),
               <tr key={index} className="border-b text-sm">
                 <td className="p-3">
                   <div>
@@ -288,7 +289,7 @@ export default function TransactionHistory() {
                         key={itemIndex} 
                         className="px-2 py-1 bg-purple-50 text-purple-600 rounded-full text-xs"
                       >
-                        {item.item_code} ({item.item_name}) × {item.qty}
+                         {item.item_name} ({item.item_code.split('-')[0]}) × {item.qty}
                       </span>
                     ))}
                   </div>
