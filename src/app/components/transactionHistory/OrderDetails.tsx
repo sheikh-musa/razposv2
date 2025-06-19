@@ -2,20 +2,6 @@
 import { useState } from 'react';
 import { SalesHistoryOrder } from '@/app/context/types/ERPNext';
 
-type Order = {
-  id: number;
-  paymentBy?: string;
-  paymentReceived?: boolean;
-  totalPrice: number;
-  product: {
-    type: string;
-    variants: {
-      name: string;
-      price: number;
-      orderQuantity: number;
-    }[];
-  }[];
-};
 
 type OrderDetailsProps = {
   order: SalesHistoryOrder;
@@ -108,7 +94,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
               <option>E-payment</option>
             </select>
           </div>
-          {/* <div>
+           {/* <div>
             <label className="block text-xs text-gray-600 mb-1 font-semibold">Payment status</label>
             <select 
               value={paymentStatus}

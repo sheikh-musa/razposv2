@@ -6,32 +6,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { SalesHistoryOrder, TransactionHistoryItem } from '@/app/context/types/ERPNext';
 import { useApi } from '@/app/context/ApiContext';
 
-type Variant = {
-  name: string;
-  price: number;
-  productId: number;
-  orderQuantity: number;
-};
-
-type Product = {
-  type: string;
-  variants: Variant[];
-};
-
-type Order = {
-  id: number;
-  itemsType: number;
-  variantType: number;
-  product: Product[];
-  totalPrice: number;
-  date: string;
-  time: string;
-  completed: boolean;
-  paymentBy: string;
-  paymentReceived: boolean;
-  remarks: string;
-};
-
 export default function TransactionHistory() {
   const { getCompletedSalesOrderItems, getCompletedSalesOrder } = useApi();
   const [orders, setOrders] = useState<SalesHistoryOrder[]>([]);
@@ -87,6 +61,7 @@ export default function TransactionHistory() {
 
   useEffect(() => {
     fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Filter orders by date
@@ -108,6 +83,61 @@ export default function TransactionHistory() {
     setFilteredOrders(filtered);
     setSelectedDate(date);
     setTimeRange('');
+  };
+
+  // Filter orders by time range
+  const filterOrdersByTimeRange = (range: string) => {
+    if (!orders.length) {
+      setFilteredOrders(orders);
+      return;
+    }
+
+    const now = new Date();
+    let filtered: SalesHistoryOrder[] = [];
+
+    switch (range) {
+      case 'All':
+        filtered = orders;
+        break;
+      case 'Today':
+        filtered = orders.filter(order => {
+          const orderDate = new Date(order.date);
+          return (
+            orderDate.getFullYear() === now.getFullYear() &&
+            orderDate.getMonth() === now.getMonth() &&
+            orderDate.getDate() === now.getDate()
+          );
+        });
+        break;
+      case '7 days':
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        console.log(sevenDaysAgo);
+        filtered = orders.filter(order => {
+          const orderDate = new Date(order.date);
+          return orderDate >= sevenDaysAgo;
+        });
+        break;
+      case '30 days':
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        filtered = orders.filter(order => {
+          const orderDate = new Date(order.date);
+          return orderDate >= thirtyDaysAgo;
+        });
+        break;
+      case '6 months':
+        const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
+        filtered = orders.filter(order => {
+          const orderDate = new Date(order.date);
+          return orderDate >= sixMonthsAgo;
+        });
+        break;
+      default:
+        filtered = orders;
+    }
+
+    setFilteredOrders(filtered);
+    setTimeRange(range);
+    setSelectedDate(null);
   };
 
   // Get current orders for pagination
@@ -230,7 +260,6 @@ export default function TransactionHistory() {
           </thead>
           <tbody>
             {paginatedOrders.map((order, index) => (
-              console.log(order),
               <tr key={index} className="border-b text-sm">
                 <td className="p-3">
                   <div>
