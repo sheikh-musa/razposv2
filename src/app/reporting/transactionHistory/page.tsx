@@ -260,23 +260,24 @@ export default function TransactionHistory() {
           </thead>
           <tbody>
             {paginatedOrders.map((order, index) => (
-              console.log(order),
               <tr key={index} className="border-b text-sm">
                 <td className="p-3">
                   <div>
-                    <div className="font-sm text-black">Order #{order.name}</div>
+                    <div className="font-sm text-black">Order #{order.name.slice(14)}</div>
                   </div>
                 </td>
-                <td className="p-3 text-gray-600">${order.total}</td>
+                <td className="p-3 text-gray-600">${order.total.toFixed(2)}</td>
                 <td className="p-2 text-gray-600">
                   <div>{order.date}</div>
                   <div className="text-sm text-gray-500">{order.time}</div>
                 </td>
                 <td className="p-2 w-[100px]">
                   <span className={`px-2 py-1 rounded-full text-xs ${
-                    order.custom_payment_mode === 'Credit Card' ? 'bg-blue-100 text-blue-600' : 
-                    order.custom_payment_mode === 'Cash' ? 'bg-green-100 text-green-600' :
+                    order.custom_payment_mode === 'Debit/Credit Card' ? 'bg-blue-100 text-blue-600' : 
+                    order.custom_payment_mode === 'NETS' ? 'bg-green-100 text-green-600' :
                     order.custom_payment_mode === 'PayNow' ? 'bg-red-100 text-red-600' :
+                    order.custom_payment_mode === 'Cash' ? 'bg-yellow-100 text-yellow-600' :
+                    order.custom_payment_mode === 'CDC' ? 'bg-purple-100 text-purple-600' :
                     'bg-gray-100 text-gray-600'
                   }`}>
                     {order.custom_payment_mode}
