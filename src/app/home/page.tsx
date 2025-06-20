@@ -10,17 +10,6 @@ import { MonthlyRevenue, RevenueEntry, RecentActivity as RecentActivityType } fr
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 type TimeRange = '12 months' | '30 days' | '7 days' | '24 hours';
-type Transaction = {
-  id: string;
-  user: {
-    name: string;
-    email: string;
-    avatar?: string;
-  };
-  amount: number;
-  timestamp: string;
-  type: string;
-};
 
 export default function Home() {
   const [selectedRange, setSelectedRange] = useState<TimeRange>('12 months');
@@ -31,9 +20,11 @@ export default function Home() {
   const [monthlyRevenue, setMonthlyRevenue] = useState<MonthlyRevenue[]>([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [activityLog, setActivityLog] = useState<RecentActivityType[]>([]);
-  const { getRevenue, getActivityLog } = useApi();
+  const { getRevenue, getActivityLog, getCompanyName } = useApi();
+  const [companyName, setCompanyName] = useState<string>('');
 
   useEffect(() => {
+    fetchCompanyName();
     fetchRevenue();
     fetchActivityLog();
     const chartData = processDataForChart(monthlyRevenue, selectedRange);
@@ -66,10 +57,11 @@ export default function Home() {
     }
   };
 
-  const getTodayDate = () => {
-    const today = new Date();
-    return today.toISOString().substring(0, 10);
-  };
+  const fetchCompanyName = async () => {
+    const company = await getCompanyName();
+    // @ts-ignore
+    setCompanyName(company);
+  }
 
   const fetchActivityLog = async () => {
     const activityLog = await getActivityLog();
@@ -80,7 +72,7 @@ export default function Home() {
     <div className="p-3 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl text-black font-bold mb-4">Welcome back, User</h1>
+        <h1 className="text-2xl text-black font-bold mb-4">Welcome back, User {companyName ? `(${companyName})` : ''}</h1>
         <div className="flex bg-gray-100 rounded-lg border border-gray-300 w-fit">
           {(['12 months', '30 days', '7 days'] as TimeRange[]).map((range) => (
             <button

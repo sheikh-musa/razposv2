@@ -30,6 +30,7 @@ interface ApiContextType {
     getActivityLog: () => Promise<RecentActivity[]>;
     getCompletedSalesOrder: () => Promise<CompletedSalesOrder[]>;
     getCompletedSalesOrderItems: (orderName: string) => Promise<SalesHistoryOrder[]>;
+    getCompanyName: () => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -661,6 +662,21 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return data.data;
     }
 
+    const getCompanyName = async () => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Company`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+            }
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to get company name: ${JSON.stringify(errorData)}`);
+        }
+        const data = await response.json();
+        return data.data[0].name;
+    }
+
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
@@ -688,7 +704,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             getSalesInvoiceByName,
             getCompletedSalesOrder,
             getCompletedSalesOrderItems,
-            getActivityLog
+            getActivityLog,
+            getCompanyName
         }}>
             {children}
         </ApiContext.Provider>
