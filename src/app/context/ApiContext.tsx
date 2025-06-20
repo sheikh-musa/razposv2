@@ -411,7 +411,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             body: JSON.stringify(payload)
         });
         if (!response.ok) {
-            throw new Error('Failed to reconcile stock');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to reconcile stock: ${JSON.stringify(errorData)}`);
         }
         return response;
     }
