@@ -271,7 +271,7 @@ export default function TransactionHistory() {
                   <div>{order.date}</div>
                   <div className="text-sm text-gray-500">{order.time}</div>
                 </td>
-                <td className="p-2 w-[100px]">
+                <td className="p-1 w-[120px]">
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     order.custom_payment_mode === 'Debit/Credit Card' ? 'bg-blue-100 text-blue-600' : 
                     order.custom_payment_mode === 'NETS' ? 'bg-green-100 text-green-600' :
