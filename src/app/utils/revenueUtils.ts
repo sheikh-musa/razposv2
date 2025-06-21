@@ -77,9 +77,6 @@ const groupEntriesByDay = (entries: RevenueEntry[]) => {
 };
 
 export const processDataForChart = (monthlyRevenue: MonthlyRevenue[], timeRange: TimeRange = '12 months') => {
-    const date = new Date();
-    const currentMonth = date.toISOString().substring(0, 7);
-    const currentDay = date.toISOString().substring(0, 10);
 
     switch (timeRange) {
         case '12 months':
