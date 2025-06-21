@@ -17,6 +17,23 @@ export default function TransactionHistory() {
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
+  
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({
+    amount: [0, 0],
+    paymentTypes: [] as string[],
+    items: [] as string[],
+  });
+  const [tempFilters, setTempFilters] = useState({
+    amount: [0, 0],
+    paymentTypes: [] as string[],
+    items: [] as string[],
+  });
+
+  const [uniquePaymentTypes, setUniquePaymentTypes] = useState<string[]>([]);
+  const [uniqueItemNames, setUniqueItemNames] = useState<string[]>([]);
+  const [maxAmount, setMaxAmount] = useState(0);
+
   const fetchOrders = async () => {
     try {
       const data = await getCompletedSalesOrder() as unknown as { name: string }[];
@@ -52,8 +69,19 @@ export default function TransactionHistory() {
         } as SalesHistoryOrder;
       }));
 
+      const uniquePayments = [...new Set(orders.map(o => o.custom_payment_mode).filter(Boolean))] as string[];
+      const uniqueItems = [...new Set(orders.flatMap(o => o.items.map(i => i.item_name)))] as string[];
+      const max = Math.ceil(Math.max(...orders.map(o => o.total), 0));
+
       setOrders(orders);
       setFilteredOrders(orders);
+      setUniquePaymentTypes(uniquePayments);
+      setUniqueItemNames(uniqueItems);
+      setMaxAmount(max);
+
+      const initialFilters = { amount: [0, max], paymentTypes: [], items: [] };
+      setAdvancedFilters(initialFilters);
+      setTempFilters(initialFilters);
     } catch (error) {
       console.error('Error fetching orders:', error);
     }
@@ -64,80 +92,98 @@ export default function TransactionHistory() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Filter orders by date
-  const filterOrdersByDate = (date: Date | null) => {
-    if (!date || !orders.length) {
-      setFilteredOrders(orders);
-      return;
+  useEffect(() => {
+    let newFilteredOrders = [...orders];
+
+    if (timeRange !== 'All' && timeRange !== '') {
+      const now = new Date();
+      let startDate: Date;
+
+      switch (timeRange) {
+        case 'Today':
+          startDate = new Date(now.setHours(0, 0, 0, 0));
+          break;
+        case '7 days':
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case '30 days':
+          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        case '6 months':
+          startDate = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
+          break;
+        default:
+          startDate = new Date(0);
+      }
+      
+      newFilteredOrders = newFilteredOrders.filter(order => new Date(order.date) >= startDate);
+    }
+    
+    if (selectedDate) {
+      newFilteredOrders = newFilteredOrders.filter(order => {
+        const orderDate = new Date(order.date);
+        return (
+          orderDate.getFullYear() === selectedDate.getFullYear() &&
+          orderDate.getMonth() === selectedDate.getMonth() &&
+          orderDate.getDate() === selectedDate.getDate()
+        );
+      });
     }
 
-    const filtered = orders.filter(order => {
-      const orderDate = new Date(order.date);
-      return (
-        orderDate.getFullYear() === date.getFullYear() &&
-        orderDate.getMonth() === date.getMonth() &&
-        orderDate.getDate() === date.getDate()
-      );
-    });
+    // Advanced filters
+    newFilteredOrders = newFilteredOrders.filter(o => o.total >= advancedFilters.amount[0] && o.total <= advancedFilters.amount[1]);
 
-    setFilteredOrders(filtered);
-    setSelectedDate(date);
-    setTimeRange('');
-  };
-
-  // Filter orders by time range
-  const filterOrdersByTimeRange = (range: string) => {
-    if (!orders.length) {
-      setFilteredOrders(orders);
-      return;
+    if (advancedFilters.paymentTypes.length > 0) {
+      newFilteredOrders = newFilteredOrders.filter(o => advancedFilters.paymentTypes.includes(o.custom_payment_mode));
     }
 
-    const now = new Date();
-    let filtered: SalesHistoryOrder[] = [];
-
-    switch (range) {
-      case 'All':
-        filtered = orders;
-        break;
-      case 'Today':
-        filtered = orders.filter(order => {
-          const orderDate = new Date(order.date);
-          return (
-            orderDate.getFullYear() === now.getFullYear() &&
-            orderDate.getMonth() === now.getMonth() &&
-            orderDate.getDate() === now.getDate()
-          );
-        });
-        break;
-      case '7 days':
-        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        console.log(sevenDaysAgo);
-        filtered = orders.filter(order => {
-          const orderDate = new Date(order.date);
-          return orderDate >= sevenDaysAgo;
-        });
-        break;
-      case '30 days':
-        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        filtered = orders.filter(order => {
-          const orderDate = new Date(order.date);
-          return orderDate >= thirtyDaysAgo;
-        });
-        break;
-      case '6 months':
-        const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
-        filtered = orders.filter(order => {
-          const orderDate = new Date(order.date);
-          return orderDate >= sixMonthsAgo;
-        });
-        break;
-      default:
-        filtered = orders;
+    if (advancedFilters.items.length > 0) {
+      newFilteredOrders = newFilteredOrders.filter(o => o.items.some(item => advancedFilters.items.includes(item.item_name)));
     }
 
-    setFilteredOrders(filtered);
+    setFilteredOrders(newFilteredOrders);
+    setCurrentPage(1);
+  }, [orders, timeRange, selectedDate, advancedFilters]);
+
+  const handleTimeRangeChange = (range: string) => {
     setTimeRange(range);
     setSelectedDate(null);
+  };
+
+  const handleDateChange = (date: Date | null) => {
+    setSelectedDate(date);
+    setTimeRange('');
+    setIsDatePickerOpen(false);
+  };
+
+  const handleApplyFilters = () => {
+    setAdvancedFilters(tempFilters);
+    setIsFilterOpen(false);
+  };
+  
+  const handleResetFilters = () => {
+    const initialFilters = { amount: [0, maxAmount], paymentTypes: [], items: [] };
+    setTempFilters(initialFilters);
+    setAdvancedFilters(initialFilters);
+    setIsFilterOpen(false);
+  };
+
+  const handlePaymentTypeChange = (paymentType: string) => {
+    setTempFilters(prev => {
+      const newPaymentTypes = prev.paymentTypes.includes(paymentType)
+        ? prev.paymentTypes.filter(p => p !== paymentType)
+        : [...prev.paymentTypes, paymentType];
+      return { ...prev, paymentTypes: newPaymentTypes };
+    });
+  };
+
+  const handleItemChange = (item: string) => {
+    setTempFilters(prev => {
+      const newItems = prev.items.includes(item)
+        ? prev.items.filter(i => i !== item)
+        : [...prev.items, item];
+      return { ...prev, items: newItems };
+    });
   };
 
   // Get current orders for pagination
@@ -204,7 +250,7 @@ export default function TransactionHistory() {
               className={`px-4 py-2 rounded-lg text-sm ${
                 timeRange === range ? 'bg-purple-100 text-purple-600' : 'text-gray-600'
               }`}
-              onClick={() => filterOrdersByTimeRange(range)}
+              onClick={() => handleTimeRangeChange(range)}
             >
               {range}
             </button>
@@ -225,10 +271,7 @@ export default function TransactionHistory() {
               <div className="absolute right-0 mt-1 z-10">
                 <DatePicker
                   selected={selectedDate}
-                  onChange={(date) => {
-                    filterOrdersByDate(date);
-                    setIsDatePickerOpen(false);
-                  }}
+                  onChange={handleDateChange}
                   inline
                   maxDate={new Date()}
                   calendarClassName="border rounded-lg shadow-lg"
@@ -236,12 +279,87 @@ export default function TransactionHistory() {
               </div>
             )}
           </div>
-          <button className="px-4 py-2 border rounded-lg text-sm text-gray-600 border-gray-300 flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
-            Filters
-          </button>
+          <div className="relative">
+            <button 
+              className="px-4 py-2 border rounded-lg text-sm text-gray-600 border-gray-300 flex items-center gap-2"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Filters
+            </button>
+            {isFilterOpen && (
+              <div className="absolute right-0 mt-2 w-80 bg-white border rounded-lg shadow-lg z-20 p-4 text-black">
+                <h3 className="font-semibold mb-2">Filters</h3>
+                
+                {/* Amount Filter */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="number"
+                      value={tempFilters.amount[0]}
+                      onChange={e => setTempFilters(f => ({...f, amount: [Number(e.target.value), f.amount[1]]}))}
+                      className="w-full border-gray-300 rounded-md shadow-sm p-1"
+                      placeholder="Min"
+                    />
+                    <span>-</span>
+                    <input
+                      type="number"
+                      value={tempFilters.amount[1]}
+                      onChange={e => setTempFilters(f => ({...f, amount: [f.amount[0], Number(e.target.value)]}))}
+                      className="w-full border-gray-300 rounded-md shadow-sm p-1"
+                      placeholder="Max"
+                    />
+                  </div>
+                </div>
+
+                {/* Payment Type Filter */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Payment Type</label>
+                  <div className="max-h-32 overflow-y-auto">
+                    {uniquePaymentTypes.map(pt => (
+                      <div key={pt} className="flex items-center">
+                        <input 
+                          type="checkbox"
+                          id={`payment-${pt}`}
+                          checked={tempFilters.paymentTypes.includes(pt)}
+                          onChange={() => handlePaymentTypeChange(pt)}
+                          className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <label htmlFor={`payment-${pt}`} className="ml-2 block text-sm text-gray-900">{pt}</label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Items Filter */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Items</label>
+                  <div className="max-h-32 overflow-y-auto">
+                  {uniqueItemNames.map(item => (
+                      <div key={item} className="flex items-center">
+                        <input 
+                          type="checkbox"
+                          id={`item-${item}`}
+                          checked={tempFilters.items.includes(item)}
+                          onChange={() => handleItemChange(item)}
+                          className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <label htmlFor={`item-${item}`} className="ml-2 block text-sm text-gray-900">{item}</label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4 border-t">
+                  <button onClick={handleResetFilters} className="px-4 py-2 text-sm rounded-lg border">Reset</button>
+                  <button onClick={handleApplyFilters} className="px-4 py-2 text-sm rounded-lg bg-purple-600 text-white">Apply Filters</button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
