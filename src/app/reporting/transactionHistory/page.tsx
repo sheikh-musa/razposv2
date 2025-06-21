@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import OrderDetails from '../../components/transactionHistory/OrderDetails';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -33,6 +33,9 @@ export default function TransactionHistory() {
   const [uniquePaymentTypes, setUniquePaymentTypes] = useState<string[]>([]);
   const [uniqueItemNames, setUniqueItemNames] = useState<string[]>([]);
   const [maxAmount, setMaxAmount] = useState(0);
+
+  const datePickerContainerRef = useRef<HTMLDivElement>(null);
+  const filterContainerRef = useRef<HTMLDivElement>(null);
 
   const fetchOrders = async () => {
     try {
@@ -90,6 +93,21 @@ export default function TransactionHistory() {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (datePickerContainerRef.current && !datePickerContainerRef.current.contains(event.target as Node)) {
+        setIsDatePickerOpen(false);
+      }
+      if (filterContainerRef.current && !filterContainerRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
@@ -257,7 +275,7 @@ export default function TransactionHistory() {
           ))}
         </div>
         <div className="flex gap-2">
-          <div className="relative">
+          <div className="relative" ref={datePickerContainerRef}>
             <button 
               className="px-4 py-2 border rounded-lg text-sm text-gray-600 border-gray-300 flex items-center gap-2"
               onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
@@ -279,7 +297,7 @@ export default function TransactionHistory() {
               </div>
             )}
           </div>
-          <div className="relative">
+          <div className="relative" ref={filterContainerRef}>
             <button 
               className="px-4 py-2 border rounded-lg text-sm text-gray-600 border-gray-300 flex items-center gap-2"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
