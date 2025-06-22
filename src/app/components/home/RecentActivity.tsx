@@ -133,7 +133,8 @@ const Tooltip = ({ content }: { content: string }) => {
 
 export default function RecentActivity({ activityLog }: { activityLog: RecentActivityType[] }) {
     const [hoveredActivity, setHoveredActivity] = useState<string | null>(null);
-    const imageUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+    // const imageUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+    const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}/files/capture_2025_06_23_01_12_06.png`;
     
     return (
         <div className="flex flex-col h-[600px]">
