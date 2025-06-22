@@ -20,7 +20,8 @@ export default function OrderCard({ product, onQuantityChange, onAddToOrder }: O
           <div key={variant.name} className="flex items-center gap-4">
             <div className="w-32 h-24 relative rounded-lg overflow-hidden">
               <Image
-                src="https://www.spatuladesserts.com/wp-content/uploads/2024/03/Chocolate-Puff-Pastry-00418.jpg"
+                // src="https://www.spatuladesserts.com/wp-content/uploads/2024/03/Chocolate-Puff-Pastry-00418.jpg"
+                src={variant.image ? `${process.env.NEXT_PUBLIC_API_URL}/${variant.image}` : 'https://www.spatuladesserts.com/wp-content/uploads/2024/03/Chocolate-Puff-Pastry-00418.jpg'}
                 alt={variant.item_name}
                 fill
                 className="object-cover"

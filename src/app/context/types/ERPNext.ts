@@ -194,6 +194,7 @@ export type ItemDetailed = {
     name: string;
     item_name: string;
     item_code: string;
+    image: string;
     description: string;
     stock_uom: string;
     valuation_rate: number;
