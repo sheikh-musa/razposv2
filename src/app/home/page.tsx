@@ -140,9 +140,9 @@ export default function Home() {
                     const value = payload[0].value as number;
                     return (
                       <div className="bg-white p-2 rounded-lg shadow-md">
-                        <p className="text-sm text-gray-600">
-                          {label}: ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </p>
+                        <p className="text-md text-black font-semibold">{label}</p>
+                        <p className="text-sm font-semibold text-purple-600">Revenue: ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <p className="text-sm font-semibold text-purple-600">Orders: {payload[0].payload.orderCount}</p>
                       </div>
                     );
                   }}

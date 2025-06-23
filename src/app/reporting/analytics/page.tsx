@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Area } from 'recharts';
 import { useApi } from '../../context/ApiContext';
 import { RevenueEntry, MonthlyRevenue, RevenueByPaymentMode, SalesInvoice, SalesItemRevenue } from '../../context/types/ERPNext';
+import { processRevenueData, processDataForChart } from '../../utils/revenueUtils';
 
 // Add these type definitions at the top of the file
 type SalesData = {
@@ -11,9 +12,23 @@ type SalesData = {
   totalSales: number;
 };
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const dataPoint = payload[0].payload;
+    return (
+      <div className="bg-white p-3 border rounded shadow">
+        <p className="text-md text-black font-semibold">{`${label}`}</p>
+        <p className="text-sm font-semibold text-purple-600">{`Revenue: $${payload[0].value}`}</p>
+        <p className="text-sm font-semibold text-purple-600">{`Orders: ${dataPoint.orderCount}`}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function Analytics() {
   const { getRevenue, getRevenueByPaymentMode, getAllPaidSalesInvoice, getSalesInvoiceByName } = useApi();
-  const [salesData, setSalesData] = useState<SalesData[]>([]);
+  const [salesData, setSalesData] = useState<{ name: string; value: number; }[]>([]);
   // const [currentRevenue, setCurrentRevenue] = useState(0); // ! mock api data
   const [lastRevenue, setLastRevenue] = useState(0);
   const [percentageIncrease, setPercentageIncrease] = useState(0);
@@ -54,9 +69,9 @@ export default function Analytics() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/sales');
-        const data = await response.json();
-        setSalesData(data);
+        // const response = await fetch('/api/sales');
+        // const data = await response.json();
+        // setSalesData(data);
 
         getAllRevenues();
         getAllRevenueByPaymentModes();
@@ -73,13 +88,13 @@ export default function Analytics() {
     fetchData();
   }, []);
 
-  // Update the process function with proper typingf
-  const processDataForChart = (data: SalesData[]) => {
-    return data.map(month => ({
-      name: new Date(2024, month.month - 1).toLocaleString('default', { month: 'short' }),
-      value: month.totalSales
-    }));
-  };
+  // // Update the process function with proper typingf
+  // const processDataForChart = (data: SalesData[]) => {
+  //   return data.map(month => ({
+  //     name: new Date(2024, month.month - 1).toLocaleString('default', { month: 'short' }),
+  //     value: month.totalSales
+  //   }));
+  // };
 
   const getAllRevenues = async () => {
     const revenue: RevenueEntry[] = await getRevenue();
@@ -91,6 +106,9 @@ export default function Analytics() {
 
         const monthlyRevenue = groupRevenueByMonth(revenue);
         console.log('Monthly Revenue:', monthlyRevenue);
+        const chartData = processDataForChart(monthlyRevenue, '12 months');
+        console.log('Chart Data:', chartData);
+        setSalesData(chartData);
         
         // Get current and last month in YYYY-MM format
         const today = new Date();
@@ -205,7 +223,7 @@ export default function Analytics() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            Jan 12, 2024
+            Select date
           </div>
           <button className="px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2 text-xs">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +255,7 @@ export default function Analytics() {
             <div className="w-4/5">
               <div className="bg-white rounded-lg h-[240px] p-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={processDataForChart(salesData)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                  <LineChart data={salesData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                     <defs>
                       <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#8884d8" stopOpacity={0.1}/>
@@ -259,15 +277,7 @@ export default function Analytics() {
                       fontSize={12}
                       tick={{ fill: '#666' }}
                     />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'white',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '8px',
-                        fontSize: '12px',
-                        color: 'black'
-                      }}
-                    />
+                    <Tooltip content={<CustomTooltip />} />
                     <Area
                       type="monotone"
                       dataKey="value"
@@ -436,7 +446,6 @@ export default function Analytics() {
           {/* Revenue Figures */}
           <div className="flex-1 grid grid-cols-3 gap-y-6 items-start content-start">
             {itemRevenue.filter((item, index) => index <= 5).map((item, index) => (
-              console.log(index, item),
               <div key={index} className="flex flex-col">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: paymentModeData[index].color }}></div>

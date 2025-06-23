@@ -81,10 +81,11 @@ export const processDataForChart = (monthlyRevenue: MonthlyRevenue[], timeRange:
     switch (timeRange) {
         case '12 months':
             return monthlyRevenue.map(month => (
-                console.log(month),
                 {
                     name: new Date(month.month + '-01').toLocaleString('default', { month: 'short' }),
                     value: month.total,
+                    orderCount: month.entries.length,
+                    // totalQty: month.entries.reduce((sum, entry) => sum + entry.total_qty, 0)
                 }
             ));
 
