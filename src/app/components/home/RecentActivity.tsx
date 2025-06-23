@@ -1,6 +1,8 @@
+'use client'
 import { RecentActivity as RecentActivityType } from "@/app/context/types/ERPNext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { createPortal } from 'react-dom';
 
 type ActivityData = {
     added: unknown[];
@@ -120,19 +122,31 @@ const getDocStatus = (status: number) => {
     }
 };
 
-const Tooltip = ({ content }: { content: string }) => {
-    return (
-        <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-xs bg-gray-900 text-white rounded-md shadow-lg whitespace-pre-wrap max-w-xs">
+const Tooltip = ({ content, targetRect }: { content: string; targetRect: DOMRect | null }) => {
+    const [isBrowser, setIsBrowser] = useState(false);
+    useEffect(() => { setIsBrowser(true); }, []);
+
+    if (!targetRect || !isBrowser) return null;
+
+    const style = {
+        position: 'fixed' as const,
+        top: `${targetRect.top}px`,
+        left: `${targetRect.left + targetRect.width / 2}px`,
+    };
+
+    return createPortal(
+        <div style={style} className="z-50 transform -translate-x-1/2 -translate-y-full -mt-2 px-3 py-2 text-xs bg-gray-900 text-white rounded-md shadow-lg whitespace-pre-wrap max-w-xs">
             <div className="max-h-48 overflow-auto">
                 {JSON.stringify(JSON.parse(content), null, 2)}
             </div>
             <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
 export default function RecentActivity({ activityLog }: { activityLog: RecentActivityType[] }) {
-    const [hoveredActivity, setHoveredActivity] = useState<string | null>(null);
+    const [hoveredActivity, setHoveredActivity] = useState<{ data: string; rect: DOMRect } | null>(null);
     // const imageUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
     const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}/files/capture_2025_06_23_01_12_06.png`;
     
@@ -170,13 +184,10 @@ export default function RecentActivity({ activityLog }: { activityLog: RecentAct
                                     <div className="mt-1">
                                         <span 
                                             className="text-sm relative inline-block cursor-help"
-                                            onMouseEnter={() => setHoveredActivity(activity.data)}
+                                            onMouseEnter={(e) => setHoveredActivity({ data: activity.data, rect: e.currentTarget.getBoundingClientRect() })}
                                             onMouseLeave={() => setHoveredActivity(null)}
                                         >
                                             {formatActivityData(activity.data)}
-                                            {hoveredActivity === activity.data && (
-                                                <Tooltip content={activity.data} />
-                                            )}
                                         </span>
                                         <div className="mt-1 text-xs text-gray-500">
                                             {activity.ref_doctype}: {activity.docname}
@@ -185,6 +196,9 @@ export default function RecentActivity({ activityLog }: { activityLog: RecentAct
                                 </div>
                             </div>
                         ))}
+                        {hoveredActivity && (
+                            <Tooltip content={hoveredActivity.data} targetRect={hoveredActivity.rect} />
+                        )}
                     </div>
                 </div>
             </div>
