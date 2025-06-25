@@ -31,6 +31,7 @@ interface ApiContextType {
     getCompletedSalesOrder: () => Promise<CompletedSalesOrder[]>;
     getCompletedSalesOrderItems: (orderName: string) => Promise<SalesHistoryOrder[]>;
     getCompanyName: () => Promise<Response>;
+    updateItemPrice: (price: number) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -367,6 +368,24 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return data.data;
     }
 
+    const updateItemPrice = async (payload: ItemPricePayload) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to update item price: ${JSON.stringify(errorData)}`);
+        }
+        return response;
+    }
+
     //* -------------------------------------------------------------------------- */
     //*                             API calls for Stock                            */
     //* -------------------------------------------------------------------------- */
@@ -688,6 +707,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             createItemVariant,
             createItemPrice,
             fetchItemPrice,
+            updateItemPrice,
             createStockEntry,
             fetchStockEntry,
             stockReconciliation,
@@ -705,7 +725,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             getCompletedSalesOrder,
             getCompletedSalesOrderItems,
             getActivityLog,
-            getCompanyName
+            getCompanyName,
         }}>
             {children}
         </ApiContext.Provider>
