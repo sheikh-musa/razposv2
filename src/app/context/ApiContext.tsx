@@ -1,7 +1,7 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
 import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder } from './types/ERPNext';
-import { mockRevenueData } from './MockData';
+// import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
     fetchItems: (includeDeleted?: boolean, templatesOnly?: boolean) => Promise<ItemTemplate[]>;
@@ -31,7 +31,7 @@ interface ApiContextType {
     getCompletedSalesOrder: () => Promise<CompletedSalesOrder[]>;
     getCompletedSalesOrderItems: (orderName: string) => Promise<SalesHistoryOrder[]>;
     getCompanyName: () => Promise<Response>;
-    updateItemPrice: (price: number) => Promise<Response>;
+    updateItemPrice: (itemName: string, price: number) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -368,15 +368,17 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return data.data;
     }
 
-    const updateItemPrice = async (payload: ItemPricePayload) => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price`, {
+    const updateItemPrice = async (itemName: string, price: number) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price/${itemName}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                price_list_rate: price
+            })
         });
         if (!response.ok) {
             const errorData = await response.json();
@@ -593,7 +595,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     const getRevenue = async () => {
         try {
             if (isStaging) {
-                return mockRevenueData;
+                // return mockRevenueData;
             }
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Payment Entry?limit_page_length=1000&fields=["paid_amount", "posting_date", "creation"]&order_by=creation+desc`, {
                 headers: {
