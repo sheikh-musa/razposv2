@@ -369,7 +369,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     const updateItemPrice = async (itemName: string, price: number) => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price/${itemName}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price?filters=[["item_code","=","${itemName}"]]`, {
             method: 'PUT',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,

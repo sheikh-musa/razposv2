@@ -87,10 +87,11 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
           {/* Stock Information */}
           <div className="space-y-3">
             <h3 className="font-semibold text-sm text-black">Stock Information</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 w-full">
               <div className="text-xs">
-                <p className="text-gray-500">Available Quantity</p>
-                <div className="flex items-center mt-1 text-black">
+                <p className="text-gray-500">Current quantity: {item.actual_qty}</p>
+                <div className="flex items-center mt-1 text-black w-full">
+                  <p className="text-gray-500 mr-2 whitespace-nowrap">Update quantity:</p>
                   <button 
                     className="p-1 border rounded-l hover:bg-gray-100"
                     onClick={() => setQuantity(prev => Math.max(0, prev - 1))}
@@ -127,9 +128,10 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
           <div className="space-y-3">
             <h3 className="font-semibold text-sm text-black">Price Information</h3>
             <div className="text-xs">
-              <p className="text-gray-500">Price</p>
+              <p className="text-gray-500">Current price: ${item.price?.price_list_rate.toFixed(2)}</p>
               <div className="flex items-center mt-1">
-                <span className="text-black mr-2">$</span>
+              <p className="text-gray-500 mr-2">Update price:</p>
+                <span className="text-black mr-1">$</span>
                 <input
                   type="number"
                   value={price}
