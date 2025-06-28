@@ -368,13 +368,13 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return data.data;
     }
 
-    const updateItemPrice = async (ItemPriceName: string, price: number) => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price?${ItemPriceName}`, {
+    const updateItemPrice = async (itemPriceName: string, price: number) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price/${itemPriceName}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 price_list_rate: price
