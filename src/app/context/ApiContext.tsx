@@ -354,7 +354,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     } 
     const fetchItemPrice = async (itemName: string) => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price?filters=[["item_code","=","${itemName}"]]&fields=["item_name","price_list_rate","selling"]`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price?filters=[["item_code","=","${itemName}"]]&fields=["name","item_name","price_list_rate","selling"]`, {
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
                 'Accept': 'application/json',
@@ -368,8 +368,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return data.data;
     }
 
-    const updateItemPrice = async (itemName: string, price: number) => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price?filters=[["item_code","=","${itemName}"]]`, {
+    const updateItemPrice = async (ItemPriceName: string, price: number) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Price?${ItemPriceName}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,

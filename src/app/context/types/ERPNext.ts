@@ -54,6 +54,7 @@ export type ItemPricePayload = {
 }
 
 export type ItemPrice = {
+    name: string;
     item_name: string;
     price_list_rate: number;
     selling: number;

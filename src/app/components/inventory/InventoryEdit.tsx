@@ -11,30 +11,40 @@ type InventoryDetailsProps = {
 };
 
 export default function InventoryDetails({ item, onClose, onUpdate }: InventoryDetailsProps) {
-  const { stockReconciliation } = useApi();
-  const [quantity, setQuantity] = useState(item?.actual_qty || 0);
+  const { stockReconciliation, updateItemPrice } = useApi();
+  const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(item?.price?.price_list_rate || 0);
   const [loading, setLoading] = useState(false);
 
   if (!item) return null;
 
   const handleSave = async () => {
+    if (quantity === 0 && price === item.price?.price_list_rate) {
+      toast.error('No changes to save');
+      return;
+    }
     try {
       setLoading(true);
+      if (quantity > 0) {
       const payload: StockReconciliationPayload = {
         purpose: "Stock Reconciliation",
         items: [{
           item_code: item.name,
           warehouse: "Stores - R",
-          qty: quantity,
-          valuation_rate: item.price?.price_list_rate || 0
+          qty: quantity + item.actual_qty,
+          valuation_rate: price
         }],
         docstatus: 1
       };
 
-      await stockReconciliation(payload);
+        await stockReconciliation(payload);
+      }
+      if (price !== item.price?.price_list_rate) {
+          await updateItemPrice(item.price?.name || '', price);
+      }
       toast.success('Inventory updated successfully');
-      
+
+
       if (onUpdate) {
         await onUpdate();
       }
@@ -62,7 +72,7 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
         </div>
         <div className="flex items-center gap-2 justify-between w-full">
           <span className="text-sm text-gray-500 p-2">Item Code: {item.name}</span>
-          <span className="text-lg font-semibold text-gray-700 p-2">${price.toFixed(2)}</span>
+          <span className="text-lg font-semibold text-gray-700 p-2">${item.price?.price_list_rate.toFixed(2)}</span>
         </div>
       </div>
 
@@ -91,7 +101,7 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
               <div className="text-xs">
                 <p className="text-gray-500">Current quantity: {item.actual_qty}</p>
                 <div className="flex items-center mt-1 text-black w-full">
-                  <p className="text-gray-500 mr-2 whitespace-nowrap">Update quantity:</p>
+                  <p className="text-gray-500 mr-2 whitespace-nowrap">Add quantity:</p>
                   <button 
                     className="p-1 border rounded-l hover:bg-gray-100"
                     onClick={() => setQuantity(prev => Math.max(0, prev - 1))}
@@ -115,6 +125,7 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
                     </svg>
                   </button>
                 </div>
+                  <p className="text-gray-500 mt-2">New quantity: {item.actual_qty + quantity}</p>
               </div>
               {/* <div className="text-xs"> */}
                 {/* <p className="text-gray-500">Reorder Level</p>
