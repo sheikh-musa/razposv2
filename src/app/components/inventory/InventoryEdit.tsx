@@ -11,7 +11,7 @@ type InventoryDetailsProps = {
 };
 
 export default function InventoryDetails({ item, onClose, onUpdate }: InventoryDetailsProps) {
-  const { stockReconciliation, updateItemPrice } = useApi();
+  const { stockReconciliation, updateItemPrice, getCompanyName } = useApi();
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(item?.price?.price_list_rate || 0);
   const [loading, setLoading] = useState(false);
@@ -26,11 +26,14 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
     try {
       setLoading(true);
       if (quantity > 0) {
+        let companyName = await getCompanyName();
+        // @ts-expect-error - companyName is a string
+        companyName = companyName.charAt(0);
       const payload: StockReconciliationPayload = {
         purpose: "Stock Reconciliation",
         items: [{
           item_code: item.name,
-          warehouse: "Stores - R",
+          warehouse: `Stores - ${companyName}`,
           qty: quantity + item.actual_qty,
           valuation_rate: price
         }],
