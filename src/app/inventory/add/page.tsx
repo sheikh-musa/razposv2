@@ -8,7 +8,7 @@ import { StockEntryItem, StockEntryPayload } from '@/app/context/types/ERPNext';
 
 export default function AddInventory() {
     const router = useRouter();
-    const { createItemAttribute, createItemTemplate, createItemVariant, createItemPrice, createStockEntry } = useApi();
+    const { createItemAttribute, createItemTemplate, createItemVariant, createItemPrice, createStockEntry, getCompanyName } = useApi();
     const [itemName, setItemName] = useState('');
     const [variants, setVariants] = useState([{ name: '', inventory: 0, price: 0 }]);
     const [loading, setLoading] = useState(false);
@@ -57,6 +57,9 @@ export default function AddInventory() {
 
         try {
             setLoading(true);
+            const companyName = await getCompanyName();
+            // @ts-expect-error - companyName is a string
+            const companyNameString = companyName.charAt(0);
 
             // * -----------------------  1. Create Item Attribute ---------------------- */
             const attributePayload = {
@@ -137,7 +140,7 @@ export default function AddInventory() {
                     stockItems.push({
                         item_code: itemName + " - " + variant.name,
                         qty: variant.inventory,
-                        t_warehouse: "Stores - R",
+                        t_warehouse: `Stores - ${companyNameString}`,
                         uom: "Nos"
                     })
                     

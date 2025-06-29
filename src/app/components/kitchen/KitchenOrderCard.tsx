@@ -15,7 +15,7 @@ export default function KitchenOrderCard({
     onItemComplete,
     onOrderComplete
 }: KitchenOrderCardProps) {
-    const { createSalesInvoice, createPaymentEntry, updateKitchenOrder, updateKitchenOrderPayment } = useApi();
+    const { createSalesInvoice, createPaymentEntry, updateKitchenOrder, updateKitchenOrderPayment, getCompanyName } = useApi();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
     const [isCompleting, setIsCompleting] = useState(false);
@@ -57,13 +57,16 @@ export default function KitchenOrderCard({
         try {
             setIsCompleting(true);
             // const today = new Date().toISOString().split('T')[0];
+            const companyName = await getCompanyName();
+            // @ts-expect-error - companyName is a string
+            const companyNameString = companyName.charAt(0);
             
             const invoicePayload: SalesInvoicePayload = {
                 customer: order.customer,
                 items: order.items.map(item => ({
                     item_code: item.item_code,
                     qty: item.qty,
-                    warehouse: "Stores - R",
+                    warehouse: `Stores - ${companyNameString}`,
                     income_account: "Sales Income - R",
                     sales_order: order.name,
                 })),
