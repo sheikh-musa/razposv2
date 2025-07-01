@@ -32,6 +32,7 @@ interface ApiContextType {
     getCompletedSalesOrderItems: (orderName: string) => Promise<SalesHistoryOrder[]>;
     getCompanyName: () => Promise<Response>;
     updateItemPrice: (itemName: string, price: number) => Promise<Response>;
+    initializeCustomFields: () => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -698,6 +699,131 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return data.data[0].name;
     }
 
+    //* -------------------------------------------------------------------------- */
+    //*                             API calls for Custom Fields                     */
+    //* -------------------------------------------------------------------------- */
+
+    const checkCustomFieldExists = async (fieldname: string): Promise<boolean> => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/resource/Custom Field?filters=[["fieldname","=","${fieldname}"],["dt","=","Sales Order"]]`,
+                {
+                    headers: {
+                        'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            
+            if (!response.ok) {
+                return false;
+            }
+            
+            const data = await response.json();
+            return data.data && data.data.length > 0;
+        } catch (error) {
+            console.error('Error checking custom field existence:', error);
+            return false;
+        }
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const createCustomField = async (payload: any): Promise<Response> => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Custom Field`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error creating custom field:', errorData);
+                throw new Error(`Failed to create custom field: ${JSON.stringify(errorData)}`);
+            }
+
+            return response;
+        } catch (error) {
+            console.error('Error creating custom field:', error);
+            throw error;
+        }
+    };
+
+    const initializeCustomFields = async () => {
+        try {
+            const customFields = [
+                {
+                    dt: "Sales Order",
+                    label: "kitchen_status",
+                    fieldname: "custom_kitchen_status",
+                    insert_after: "per_delivered",
+                    fieldtype: "Small Text",
+                    default: "preparing",
+                    translatable: 1
+                },
+                {
+                    dt: "Sales Order",
+                    label: "remarks",
+                    fieldname: "custom_remarks",
+                    insert_after: "custom_kitchen_status",
+                    fieldtype: "Small Text",
+                    translatable: 1
+                },
+                {
+                    dt: "Sales Order",
+                    label: "order_time",
+                    fieldname: "custom_time",
+                    insert_after: "delivery_date",
+                    fieldtype: "Time"
+                },
+                {
+                    dt: "Sales Order",
+                    label: "order_complete",
+                    fieldname: "custom_order_complete",
+                    insert_after: "billing_status",
+                    fieldtype: "Check",
+                    allow_on_submit: 1
+                },
+                {
+                    dt: "Sales Order",
+                    label: "payment_mode",
+                    fieldname: "custom_payment_mode",
+                    insert_after: "custom_order_complete",
+                    fieldtype: "Small Text",
+                    allow_on_submit: 1,
+                    translatable: 1
+                },
+                {
+                    dt: "Sales Order",
+                    label: "payment_complete",
+                    fieldname: "custom_payment_complete",
+                    insert_after: "custom_payment_mode",
+                    fieldtype: "Check",
+                    allow_on_submit: 1
+                }
+            ];
+
+            for (const field of customFields) {
+                const exists = await checkCustomFieldExists(field.fieldname);
+                if (!exists) {
+                    console.log(`Creating custom field: ${field.fieldname}`);
+                    await createCustomField(field);
+                } else {
+                    console.log(`Custom field already exists: ${field.fieldname}`);
+                }
+            }
+
+            console.log('Custom fields initialization completed');
+        } catch (error) {
+            console.error('Error initializing custom fields:', error);
+            throw error;
+        }
+    };
+
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
@@ -728,6 +854,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             getCompletedSalesOrderItems,
             getActivityLog,
             getCompanyName,
+            initializeCustomFields,
         }}>
             {children}
         </ApiContext.Provider>
@@ -741,3 +868,57 @@ export function useApi() {
     }
     return context;
 } 
+
+//* -------------------------------------------------------------------------- */
+//*                             API calls for Custom Fields                     */
+//* -------------------------------------------------------------------------- */
+
+// ! custom_kitchen_status
+// "dt": "Sales Order",
+// "label": "kitchen_status",
+// "fieldname": "custom_kitchen_status",
+// "insert_after": "per_delivered",
+// "fieldtype": "Small Text",
+// "default": "preparing",
+// "translatable": 1,
+
+// !! custom_remarks
+// "dt": "Sales Order",
+// "label": "remarks",
+// "fieldname": "custom_remarks",
+// "insert_after": "custom_kitchen_status",
+// "fieldtype": "Small Text",
+// "translatable": 1,
+
+// ! custom_time`
+// "dt": "Sales Order",
+// "label": "order_time",
+// "fieldname": "custom_time",
+// "insert_after": "delivery_date",
+// "fieldtype": "Time",
+
+// ! custom_order_complete
+// "dt": "Sales Order",
+// "label": "order_complete",
+// "fieldname": "custom_order_complete",
+// "insert_after": "billing_status",
+// "fieldtype": "Check",
+// "allow_on_submit": 1,
+// "doctype": "Custom Field"
+
+// ! custom_payment_mode
+// "dt": "Sales Order",
+// "label": "payment_mode",
+// "fieldname": "custom_payment_mode",
+// "insert_after": "custom_order_complete",
+// "fieldtype": "Small Text",
+// "allow_on_submit": 1,
+// "translatable": 1,
+
+// ! custom_payment_complete
+// "dt": "Sales Order",
+// "label": "payment_complete",
+// "fieldname": "custom_payment_complete",
+// "insert_after": "custom_payment_mode",
+// "fieldtype": "Check",
+// "allow_on_submit": 1,

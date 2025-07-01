@@ -6,6 +6,7 @@ import { CartProvider } from './context/CartContext';
 import { ApiProvider } from './context/ApiContext';
 import { Toaster } from 'react-hot-toast';
 
+
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
 //   variable: "--font-geist-sans",
@@ -54,3 +55,4 @@ export default function RootLayout({
     </html>
   );
 }
+
