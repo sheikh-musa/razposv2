@@ -67,7 +67,7 @@ export default function KitchenOrderCard({
                     item_code: item.item_code,
                     qty: item.qty,
                     warehouse: `Stores - ${companyNameString}`,
-                    income_account: "Sales Income - R",
+                    income_account: `Sales Income - ${companyNameString}`,
                     sales_order: order.name,
                 })),
                 update_stock: 1,
@@ -84,7 +84,7 @@ export default function KitchenOrderCard({
                 payment_type: "Receive",
                 party_type: "Customer",
                 party: order.customer,
-                paid_to: "Petty Cash - R", // ! if Bank Account - R, then reference no. needed regardless of mode of payment
+                paid_to: `Petty Cash - ${companyNameString}`, // ! if Bank Account - R, then reference no. needed regardless of mode of payment
                 received_amount: order.total,
                 paid_amount: order.total,
                 references: [{
