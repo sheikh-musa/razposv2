@@ -206,7 +206,10 @@ export default function KitchenOrderCard({
                 )}
             </div>
             <div className='mt-4 pt-3 border-t'>
-                <button 
+                {order.custom_order_complete === 1 ? (
+                    <p className='text-green-500 font-medium'>Order completed</p>
+                ) : (
+                    <button 
                     onClick={handleCompleteOrder}
                     disabled={!canComplete || isCompleting}
                     className={`w-full px-4 py-2 rounded-md text-white text-sm font-medium transition-colors
@@ -226,6 +229,7 @@ export default function KitchenOrderCard({
                                 : 'Complete Order'
                     }
                 </button>
+                )}
                 {!canComplete && (
                     <div className='mt-2 text-xs text-gray-500'>
                         {!paymentStatus && '• Payment required'}
