@@ -221,7 +221,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to disable item');
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`Failed to disable item: ${JSON.stringify(errorData)}`);
             }
 
             return response;
@@ -245,7 +247,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to restore item');
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`Failed to restore item: ${JSON.stringify(errorData)}`);
             }
 
             return response;
@@ -272,7 +276,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to create item attribute');
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`Failed to create item attribute: ${JSON.stringify(errorData)}`);
             }
 
             return response;
@@ -295,7 +301,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to create item template');
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`Failed to create item template: ${JSON.stringify(errorData)}`);
             }
 
             return response;
@@ -318,7 +326,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to create item variant');
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`Failed to create item variant: ${JSON.stringify(errorData)}`);
             }
 
             return response;
@@ -345,7 +355,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to create item price');
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`Failed to create item price: ${JSON.stringify(errorData)}`);
             }
 
             return response;
@@ -403,7 +415,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             body: JSON.stringify(payload)
         });
         if (!response.ok) {
-            throw new Error('Failed to create stock entry');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to create stock entry: ${JSON.stringify(errorData)}`);
         }
         return response;
     }
@@ -417,7 +431,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch stock entry');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch stock entry: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         return data.data;
@@ -454,7 +470,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch kitchen orders');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch kitchen orders: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         return data.data;
@@ -469,7 +487,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch kitchen order details');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch kitchen order details: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         return data.data;
@@ -503,6 +523,11 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             },
             body: JSON.stringify(payload)
         });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to update kitchen order: ${JSON.stringify(errorData)}`);
+        }
         return response;
     }
 
@@ -516,6 +541,11 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             },
             body: JSON.stringify(payload)
         });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to update kitchen order payment: ${JSON.stringify(errorData)}`);
+        }
         return response;
     }
 
@@ -532,7 +562,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch sales invoice');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch sales invoice: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         return data.data;
@@ -547,7 +579,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch sales invoice');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch sales invoice: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         return data.data;
@@ -585,7 +619,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             body: JSON.stringify(payload)
         });
         if (!response.ok) {
-            throw new Error('Failed to create payment entry');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to create payment entry: ${JSON.stringify(errorData)}`);
         }
         return response;
     }
@@ -606,7 +642,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 }
             });
         if (!response.ok) {
-            throw new Error('Failed to fetch revenue');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch revenue: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         return data.data;
@@ -626,7 +664,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch revenue by payment mode');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch revenue by payment mode: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         return data.data;
@@ -645,7 +685,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch completed sales order');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch completed sales order: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         return data.data;
@@ -660,7 +702,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch completed sales order items');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch completed sales order items: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         return data.data;
@@ -678,7 +722,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch activity log');
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch activity log: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         return data.data;
