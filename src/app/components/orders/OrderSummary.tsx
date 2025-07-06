@@ -17,6 +17,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
   const [remark, setRemark] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [paymentComplete, setPaymentComplete] = useState<number>(0);
+  const [discount, setDiscount] = useState<number>(0);
 //   const shippingFee = 3.99;
 
   const getCurrentDate = () => {
@@ -44,6 +45,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       custom_order_complete: 0,
       custom_payment_complete: paymentComplete,
       docstatus: 1,
+      discount_amount: discount,
     };
   
     console.log('payload', JSON.stringify(payload, null, 2));
@@ -208,6 +210,12 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
               <option value="0">Pending</option>
               <option value="1">Paid</option>
             </select>
+          </div>
+
+          {/* Discount */}
+          <div>
+            <label className="block text-sm mb-1">Discount (%)</label>
+            <input type="number" max={100} min={0} value={discount} onChange={(e) => setDiscount(Number(e.target.value))} className="w-full p-2 border rounded-md text-sm" />
           </div>
         </div>
       </div>
