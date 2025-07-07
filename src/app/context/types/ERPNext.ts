@@ -138,7 +138,7 @@ export type SalesOrderPayload = {
     custom_order_complete: number;
     custom_payment_complete: number;
     docstatus: number;
-    discount_amount?: number;
+    additional_discount_percentage?: number;
   }
 
 export type SalesOrderUpdatePayload = {
@@ -273,7 +273,7 @@ export type TransactionHistoryItem = {
 
 export type SalesHistoryOrder = {
     name: string;
-    total: number;
+    net_total: number;
     date: string;
     time: string;
     custom_payment_mode: string;

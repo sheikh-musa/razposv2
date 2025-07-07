@@ -56,7 +56,7 @@ export default function TransactionHistory() {
 
         return {
           name: orderDetails.name,
-          total: orderDetails.total,
+          total: orderDetails.net_total,
           date: date,
           time: time,
           custom_payment_mode: orderDetails.custom_payment_mode,

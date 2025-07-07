@@ -18,6 +18,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [paymentComplete, setPaymentComplete] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
+  const [discountError, setDiscountError] = useState<string>('');
 //   const shippingFee = 3.99;
 
   const getCurrentDate = () => {
@@ -45,7 +46,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       custom_order_complete: 0,
       custom_payment_complete: paymentComplete,
       docstatus: 1,
-      discount_amount: discount,
+      ...(discount > 0 && { additional_discount_percentage: discount }),
     };
   
     console.log('payload', JSON.stringify(payload, null, 2));
@@ -215,7 +216,25 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
           {/* Discount */}
           <div>
             <label className="block text-sm mb-1">Discount (%)</label>
-            <input type="number" max={100} min={0} value={discount} onChange={(e) => setDiscount(Number(e.target.value))} className="w-full p-2 border rounded-md text-sm" />
+            <input 
+              type="number" 
+              max={100} 
+              min={0} 
+              value={discount} 
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                if (value > 100) {
+                  setDiscountError('Discount percentage cannot exceed 100%');
+                  setDiscount(100);
+                  return;
+                }
+                setDiscountError('');
+                setDiscount(value);
+              }} 
+              className="w-full p-2 border rounded-md text-sm" 
+            />
+            <p className="text-xs text-gray-400">Please enter percentage between 0 to 100</p>
+            {discountError && <p className="text-xs text-red-500">{discountError}</p>}
           </div>
         </div>
       </div>
@@ -232,6 +251,10 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
             <span className="font-medium">${(total).toFixed(2)}</span>
           </div>
         </div>
+        {discount > 0 && <div className="flex justify-between text-sm">
+            <span>Less {discount}% discount</span>
+            <span className="font-medium">${(total * (1 - discount / 100)).toFixed(2)}</span>
+          </div>}
         <button 
           onClick={handleConfirm}
           className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700"
