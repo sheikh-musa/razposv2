@@ -56,7 +56,7 @@ export default function TransactionHistory() {
 
         return {
           name: orderDetails.name,
-          total: orderDetails.net_total,
+          net_total: orderDetails.net_total,
           date: date,
           time: time,
           custom_payment_mode: orderDetails.custom_payment_mode,
@@ -74,7 +74,7 @@ export default function TransactionHistory() {
 
       const uniquePayments = [...new Set(orders.map(o => o.custom_payment_mode).filter(Boolean))] as string[];
       const uniqueItems = [...new Set(orders.flatMap(o => o.items.map(i => i.item_name)))] as string[];
-      const max = Math.ceil(Math.max(...orders.map(o => o.total), 0));
+      const max = Math.ceil(Math.max(...orders.map(o => o.net_total), 0));
 
       setOrders(orders);
       setFilteredOrders(orders);
@@ -149,7 +149,7 @@ export default function TransactionHistory() {
     }
 
     // Advanced filters
-    newFilteredOrders = newFilteredOrders.filter(o => o.total >= advancedFilters.amount[0] && o.total <= advancedFilters.amount[1]);
+    newFilteredOrders = newFilteredOrders.filter(o => o.net_total >= advancedFilters.amount[0] && o.net_total <= advancedFilters.amount[1]);
 
     if (advancedFilters.paymentTypes.length > 0) {
       newFilteredOrders = newFilteredOrders.filter(o => advancedFilters.paymentTypes.includes(o.custom_payment_mode));
@@ -402,7 +402,7 @@ export default function TransactionHistory() {
                     <div className="font-sm text-black">Order #{order.name.slice(14)}</div>
                   </div>
                 </td>
-                <td className="p-3 text-gray-600">${order.total.toFixed(2)}</td>
+                <td className="p-3 text-gray-600">${order.net_total.toFixed(2)}</td>
                 <td className="p-2 text-gray-600">
                   <div>{order.date}</div>
                   <div className="text-sm text-gray-500">{order.time}</div>
