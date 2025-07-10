@@ -29,7 +29,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
         <div className="flex items-center gap-2 justify-between w-full">
           <span className="text-sm text-gray-500 p-2">• {order.total_qty} items
           </span>
-          <span className="text-lg font-semibold text-gray-700 p-2">${order.total.toFixed(2)}</span>
+          <span className="text-lg font-semibold text-gray-700 p-2">${order.net_total.toFixed(2)}</span>
         </div>
       </div>
 
