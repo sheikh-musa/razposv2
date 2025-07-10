@@ -16,7 +16,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'razpos.frappe.cloud',
+        hostname: 'razpos.razcraft.com',
         port: '',
         pathname: '/**',
       },
