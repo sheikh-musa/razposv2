@@ -1,8 +1,19 @@
 /** @type {import('next').NextConfig} */
-const withPWA = require('next-pwa')({
+const withPWA = require('@ducanh2912/next-pwa').default({
   dest: 'public',
   register: true,
   skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+  reloadOnOnline: true,
+  workboxOptions: {
+    disableDevLogs: true,
+  },
+  // Optionally, add a fallback for offline pages
+  fallbacks: {
+    document: '/offline', // page to serve if offline
+  }
 });
 
 const nextConfig = {

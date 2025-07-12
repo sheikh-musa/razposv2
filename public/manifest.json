@@ -1,16 +1,32 @@
 {
-  "name": "RazposV2",
+  "name": "Razpos V2",
   "short_name": "Razpos",
-  "description": "A Progressive Web App for managing inventory and orders.",
+  "description": "Point of Sale System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "categories": ["business", "productivity"],
   "icons": [
     {
       "src": "/favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "64x64",
       "type": "image/x-icon"
     }
   ],
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff"
+  "screenshots": [],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Home",
+      "url": "/home",
+      "description": "Go to Home"
+    },
+    {
+      "name": "Orders",
+      "url": "/orders",
+      "description": "View Orders"
+    }
+  ]
 }

@@ -19,6 +19,7 @@
     "workbox-webpack-plugin": "^7.3.0"
   },
   "devDependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@types/next-pwa": "^5.6.9",
     "@types/node": "^20",
     "@types/react": "^19",
