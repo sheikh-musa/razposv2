@@ -19,7 +19,6 @@ export default function RootLayout({
         <meta name="description" content="Point of Sale System" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" />
-        <script src="/register-sw.js" defer></script>
       </head>
       <body>
         <Toaster
