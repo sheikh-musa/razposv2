@@ -150,7 +150,7 @@ export type CompletedSalesOrder = {
     name: string;
     customer: string;
     date: string;
-    total: number
+    net_total: number
 }
 //* --------------------------- Sales Invoice Types ---------------------------- */
 
