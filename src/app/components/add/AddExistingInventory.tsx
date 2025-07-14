@@ -237,8 +237,8 @@ export default function AddExistingInventory() {
                                 className="w-full p-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 border-slate-400 text-black"
                             >
                                 <option value="">Select a template</option>
-                                {templates.map((template) => (
-                                    <option key={template.item_code} value={template.item_code}>
+                                {templates.map((template, index) => (
+                                    <option key={index} value={template.item_code}>
                                         {template.name}
                                     </option>
                                 ))}
