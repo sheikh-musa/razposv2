@@ -7,21 +7,12 @@ import { StockEntryItem } from "@/app/context/types/ERPNext";
 import { StockEntryPayload } from "@/app/context/types/ERPNext";
 import toast from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
-
-interface Template {
-    name: string;
-    item_code: string;
-    variants?: Array<{
-        name: string;
-        item_code: string;
-        item_name: string;
-    }>;
-}
+import { ItemTemplate } from "@/app/context/types/ERPNext";
 
 export default function AddExistingInventory() {
     const router = useRouter();
     const { createItemAttribute, createItemVariant, createItemPrice, createStockEntry, getCompanyName, fetchItems, fetchItemDetails } = useApi();
-    const [templates, setTemplates] = useState<Template[]>([]);
+    const [templates, setTemplates] = useState<ItemTemplate[]>([]);
     const [selectedTemplate, setSelectedTemplate] = useState<string>('');
     const [existingVariants, setExistingVariants] = useState<Array<{name: string, item_code: string, item_name: string}>>([]);
     const [variants, setVariants] = useState([{ name: '', inventory: 0, price: 0 }]);
@@ -122,7 +113,7 @@ export default function AddExistingInventory() {
             const companyNameString = companyName.charAt(0);
 
             // Get the selected template details
-            const template = templates.find(t => t.item_code === selectedTemplate);
+            const template = templates.find(t => t.item_name === selectedTemplate);
             if (!template) {
                 throw new Error('Selected template not found');
             }
@@ -237,8 +228,8 @@ export default function AddExistingInventory() {
                                 className="w-full p-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 border-slate-400 text-black"
                             >
                                 <option value="">Select a template</option>
-                                {templates.map((template) => (
-                                    <option key={template.item_code} value={template.item_code}>
+                                {templates.map((template, index) => (
+                                    <option key={index} value={template.item_name}>
                                         {template.name}
                                     </option>
                                 ))}
