@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useApi } from "@/app/context/ApiContext";
-import { StockEntryItem } from "@/app/context/types/ERPNext";
+import { ItemAttributeValue, StockEntryItem } from "@/app/context/types/ERPNext";
 import { StockEntryPayload } from "@/app/context/types/ERPNext";
 import toast from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
@@ -11,15 +11,15 @@ import { ItemTemplate } from "@/app/context/types/ERPNext";
 
 export default function AddExistingInventory() {
     const router = useRouter();
-    const { createItemAttribute, createItemVariant, createItemPrice, createStockEntry, getCompanyName, fetchItems, fetchItemDetails } = useApi();
+    const { getItemAttribute, updateItemAttribute, createItemVariant, createItemPrice, createStockEntry, getCompanyName, fetchItems, fetchItemDetails } = useApi();
     const [templates, setTemplates] = useState<ItemTemplate[]>([]);
     const [selectedTemplate, setSelectedTemplate] = useState<string>('');
     const [existingVariants, setExistingVariants] = useState<Array<{name: string, item_code: string, item_name: string}>>([]);
     const [variants, setVariants] = useState([{ name: '', inventory: 0, price: 0 }]);
     const [loading, setLoading] = useState(false);
     const [fetchingTemplates, setFetchingTemplates] = useState(true);
+    const [itemAttributeValues, setItemAttributeValues] = useState<ItemAttributeValue[]>([]);
     const stockItems: StockEntryItem[] = [];
-
     const capitalizeFirstLetter = (string: string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
@@ -29,7 +29,7 @@ export default function AddExistingInventory() {
             setFetchingTemplates(true);
             const items = await fetchItems(false, true);
             console.log('Templates fetched:', items);
-            
+
             if (items && Array.isArray(items)) {
                 setTemplates(items);
             }
@@ -53,7 +53,16 @@ export default function AddExistingInventory() {
             try {
                 // Fetch variants for the selected template
                 const templateVariants = await fetchItemDetails(templateCode, true);
-                console.log('Template variants:', templateVariants);
+
+                const attributeResponse = await getItemAttribute(templateCode);
+                //@ts-expect-error - attributeResponse is an array of ItemAttributeValue
+                const attributeValues = attributeResponse.map((item: ItemAttributeValue) => ({
+                    attribute_value: item.attribute_value,
+                    abbr: item.abbr
+                }));
+                
+                setItemAttributeValues(attributeValues);
+                console.log('Item attribute values:', attributeValues);
                 
                 if (templateVariants && Array.isArray(templateVariants)) {
                     setExistingVariants(templateVariants);
@@ -63,9 +72,11 @@ export default function AddExistingInventory() {
             } catch (error) {
                 console.error('Error fetching template variants:', error);
                 setExistingVariants([]);
+                setItemAttributeValues([]);
             }
         } else {
             setExistingVariants([]);
+            setItemAttributeValues([]);
         }
     };
 
@@ -118,21 +129,27 @@ export default function AddExistingInventory() {
                 throw new Error('Selected template not found');
             }
 
-            // * -----------------------  1. Create Item Attribute (if not exists) ---------------------- */
-            const attributePayload = {
-                attribute_name: `${template.name} - variant`,
-                numeric_values: 0,
-                item_attribute_values: variants
-                    .filter(variant => variant.name.trim() !== '')
-                    .map(variant => ({
-                        attribute_value: variant.name,
-                        abbr: variant.name
-                    }))
-            };
+            // * -----------------------  1. Update Item Attribute with new variants ---------------------- */
             
-            const attributeResponse = await createItemAttribute(attributePayload);
-            if (!attributeResponse.ok) {
-                throw new Error('Failed to create item attribute');
+            // Filter out empty variant names and create new attribute values
+            const newVariants = variants
+                .filter(variant => variant.name.trim() !== '')
+                .map(variant => ({
+                    attribute_value: variant.name,
+                    abbr: variant.name
+                }));
+
+            console.log('New variants:', newVariants);
+            console.log('Existing item attribute values:', itemAttributeValues);
+            
+            // Combine existing attribute values with new ones
+            const updatedAttributeValues = [...itemAttributeValues, ...newVariants];
+            
+            console.log('Updated item attribute values:', updatedAttributeValues);
+            
+            const itemAttributeResponse = await updateItemAttribute(updatedAttributeValues);
+            if (!itemAttributeResponse.ok) {
+                throw new Error('Failed to update item attribute');
             }
 
             // * -----------------------  2. Create Variants ---------------------- */  

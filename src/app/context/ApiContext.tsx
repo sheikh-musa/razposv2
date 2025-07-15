@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder } from './types/ERPNext';
+import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder, ItemAttributeValue } from './types/ERPNext';
 // import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
@@ -8,7 +8,9 @@ interface ApiContextType {
     fetchItemDetails: (itemName: string, fetchVariants?: boolean) => Promise<ItemDetailed[]>;
     disableItem: (itemName: string) => Promise<Response>;
     undoDisableItem: (itemName: string) => Promise<Response>;
+    getItemAttribute: (itemName: string) => Promise<Response>;
     createItemAttribute: (payload: ItemAttributePayload) => Promise<Response>;
+    updateItemAttribute: (payload: ItemAttributeValue[]) => Promise<Response>;
     createItemTemplate: (payload: ItemTemplatePayload) => Promise<Response>;
     createItemVariant: (payload: ItemVariantPayload) => Promise<Response>;
     createItemPrice: (payload: ItemPricePayload) => Promise<Response>;
@@ -263,6 +265,23 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //*                          API calls for creating Items                      */
     //* -------------------------------------------------------------------------- */
 
+    const getItemAttribute = async (itemName: string): Promise<Response> => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Attribute/${itemName} - variant`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch item attribute: ${JSON.stringify(errorData)}`);
+        }
+        const data = await response.json();
+        return data.data.item_attribute_values;
+    }
+
     const createItemAttribute = async (payload: ItemAttributePayload) => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Attribute`, {
@@ -287,6 +306,24 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     };
+
+    const updateItemAttribute = async (payload: ItemAttributeValue[]) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Attribute`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to update item attribute: ${JSON.stringify(errorData)}`);
+        }
+        return response;
+    }
 
     const createItemTemplate = async (payload: ItemTemplatePayload) => {
         try {
@@ -876,7 +913,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             fetchItemDetails,
             disableItem,
             undoDisableItem,
+            getItemAttribute,
             createItemAttribute,
+            updateItemAttribute,
             createItemTemplate,
             createItemVariant,
             createItemPrice,
