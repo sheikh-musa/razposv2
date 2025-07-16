@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder, ItemAttributeValue } from './types/ERPNext';
+import { ItemDetailed,ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder, ItemAttributeUpdatePayload } from './types/ERPNext';
 // import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
@@ -10,7 +10,7 @@ interface ApiContextType {
     undoDisableItem: (itemName: string) => Promise<Response>;
     getItemAttribute: (itemName: string) => Promise<Response>;
     createItemAttribute: (payload: ItemAttributePayload) => Promise<Response>;
-    updateItemAttribute: (payload: ItemAttributeValue[]) => Promise<Response>;
+    updateItemAttribute: (itemName: string, payload: ItemAttributeUpdatePayload) => Promise<Response>;
     createItemTemplate: (payload: ItemTemplatePayload) => Promise<Response>;
     createItemVariant: (payload: ItemVariantPayload) => Promise<Response>;
     createItemPrice: (payload: ItemPricePayload) => Promise<Response>;
@@ -307,8 +307,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const updateItemAttribute = async (payload: ItemAttributeValue[]) => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Attribute`, {
+    const updateItemAttribute = async (itemName: string, payload: ItemAttributeUpdatePayload) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Attribute/${itemName} - variant`, {
             method: 'PUT',
             headers: {
                 'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,

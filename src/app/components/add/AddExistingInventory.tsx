@@ -129,8 +129,7 @@ export default function AddExistingInventory() {
                 throw new Error('Selected template not found');
             }
 
-            // * -----------------------  1. Update Item Attribute with new variants ---------------------- */
-            
+            // * -----------------------  1. Update Item Attribute with new variants  ----------------------- */  
             // Filter out empty variant names and create new attribute values
             const newVariants = variants
                 .filter(variant => variant.name.trim() !== '')
@@ -143,11 +142,11 @@ export default function AddExistingInventory() {
             console.log('Existing item attribute values:', itemAttributeValues);
             
             // Combine existing attribute values with new ones
-            const updatedAttributeValues = [...itemAttributeValues, ...newVariants];
+            const updateAttributeValues = {"item_attribute_values": [...itemAttributeValues, ...newVariants]};
             
-            console.log('Updated item attribute values:', updatedAttributeValues);
+            console.log('Updated item attribute values:', updateAttributeValues);
             
-            const itemAttributeResponse = await updateItemAttribute(updatedAttributeValues);
+            const itemAttributeResponse = await updateItemAttribute(selectedTemplate, updateAttributeValues);
             if (!itemAttributeResponse.ok) {
                 throw new Error('Failed to update item attribute');
             }

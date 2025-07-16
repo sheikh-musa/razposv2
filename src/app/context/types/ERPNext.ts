@@ -4,6 +4,10 @@ export type ItemAttributeValue = {
     abbr: string;
 }
 
+export type ItemAttributeUpdatePayload = {
+    item_attribute_values: ItemAttributeValue[];
+}
+
 export type ItemAttributePayload = {
     attribute_name: string;
     numeric_values: number;
