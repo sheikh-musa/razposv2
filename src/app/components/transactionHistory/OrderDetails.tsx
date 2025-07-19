@@ -31,27 +31,41 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
       // Set font
       doc.setFont('helvetica');
       
-      // Header
+      // ! Company logo
       doc.setFontSize(20);
-      doc.setFont('helvetica', 'bold');
-      doc.text('RAZPOS', 105, 20, { align: 'center' });
+      doc.setFont('courier', 'bold');
+      doc.text('RAZPOS', 15, 15, { align: 'left' });
       
-      doc.setFontSize(12);
+      doc.setFontSize(15);
       doc.setFont('helvetica', 'normal');
-      doc.text('Receipt', 105, 30, { align: 'center' });
+      doc.text('Receipt', 15, 30, { align: 'left' });
       
       // Company info
       doc.setFontSize(10);
-      doc.text(`Company: ${companyName}`, 20, 45);
-      doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 55);
-      doc.text(`Time: ${new Date().toLocaleTimeString()}`, 20, 65);
-      doc.text(`Order ID: ${order.name}`, 20, 75);
+      doc.setTextColor(128, 128, 128);
+      doc.text('Order ID:', 15, 40);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`#${order.name}`, 50, 40);
+      doc.setTextColor(128, 128, 128);
+      doc.text('Receipt \nDate & Time', 15, 50);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`${new Date().toLocaleTimeString()},`, 50, 50);
+      doc.text(`${new Date().toLocaleDateString()}`, 67, 50);
       
+      doc.setDrawColor(128, 128, 128);
+      doc.line(15, 65, 200, 65);
+
       // Customer info
-      doc.text('Customer Details:', 20, 90);
-      doc.text(`Name: ${order.customer_name || 'N/A'}`, 20, 100);
-      doc.text(`Contact: ${order.contact_person || 'N/A'}`, 20, 110);
-      
+      doc.text("Billed To", 15, 80);
+      doc.text('Customer Details:', 15, 90);
+      doc.text(`${order.customer_name || 'Guest'}`, 15, 95);
+      doc.text(`${order.contact_person || ''}`, 15, 100);
+
+      // Company info
+      doc.text("From", 120, 80);
+      doc.text(`${companyName}`, 120, 90); // ! company name
+      doc.text(`${`200, Jurong West Street 61, #01-355\nSingapore 640200`}`, 120, 95); // ! company address
+
       // Items table
       const tableData = order.items?.map(item => [
         item.item_name || 'N/A',
@@ -63,26 +77,52 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
       // Add header row
       const tableHeaders = ['Item', 'Qty', 'Price', 'Total'];
       
-      // Create table
+      // Create table with full width
       autoTable(doc, {
         startY: 125,
         head: [tableHeaders],
         body: tableData,
-        theme: 'grid',
+        theme: 'plain', // Use plain theme for more control
         headStyles: {
-          fillColor: [128, 0, 128], // Purple color
-          textColor: 255,
-          fontStyle: 'bold'
+          fillColor: [255, 255, 255],  // white color
+          textColor: 0, // black text
+          fontStyle: 'bold',
+          fontSize: 10,
+          cellPadding: 2,
+          // lineColor: [220, 220, 220], // Gray line color
+          // lineWidth: 0.1
         },
         styles: {
           fontSize: 10,
-          cellPadding: 5
+          cellPadding: 5,
+          // lineColor: [220, 220, 220], // Gray line color for all cells
+          // lineWidth: 0.1
         },
         columnStyles: {
-          0: { cellWidth: 80 }, // Item name
-          1: { cellWidth: 20, halign: 'center' }, // Qty
-          2: { cellWidth: 30, halign: 'right' }, // Price
-          3: { cellWidth: 30, halign: 'right' } // Total
+          0: { cellWidth: 'auto', halign: 'left' }, // Item name - auto width
+          1: { cellWidth: 25, halign: 'center' }, // Qty
+          2: { cellWidth: 35, halign: 'right' }, // Price
+          3: { cellWidth: 35, halign: 'right' } // Total
+        },
+        margin: { left: 15, right: 15 }, // Full width margins
+        tableWidth: 'auto', // Auto width to fill available space
+        didDrawCell: function(data) {
+          // Add gray line under header row
+          if (data.row.index === 0) {
+            doc.setDrawColor(220, 220, 220);
+            doc.setLineWidth(0.5);
+            doc.line(data.cell.x, data.cell.y, 
+                     data.cell.x + data.cell.width, data.cell.y);
+                
+          }
+          
+          // Add gray line under each item row
+          if (data.row.index >= 1) {
+            doc.setDrawColor(220, 220, 220);
+            doc.setLineWidth(0.5);
+            doc.line(data.cell.x, data.cell.y + data.cell.height, 
+                     data.cell.x + data.cell.width, data.cell.y + data.cell.height);
+          }
         }
       });
       
@@ -109,8 +149,11 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
       // Payment info
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Payment Method: ${order.custom_payment_mode || 'Cash'}`, 20, finalY + 35);
-      doc.text(`Status: ${order.custom_payment_complete ? 'Paid' : 'Unpaid'}`, 20, finalY + 45);
+      doc.setTextColor(128, 128, 128);
+      doc.text('Powered by Razpos', 15, finalY + 35);
+      // doc.text(`Payment Method: ${order.custom_payment_mode || 'Cash'}`, 15, finalY + 35);
+
+      // doc.text(`Status: ${order.custom_payment_complete ? 'Paid' : 'Unpaid'}`, 15, finalY + 45);
       
       // Footer
       doc.setFontSize(8);
@@ -118,8 +161,9 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
       doc.text('For any queries, please contact us', 105, finalY + 70, { align: 'center' });
       
       // Save PDF
-      const fileName = `receipt_${order.name}_${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
+      const pdfBlob = doc.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
       
       toast.success('Receipt generated successfully!');
       
