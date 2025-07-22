@@ -1,0 +1,32 @@
+{
+  "name": "Razpos V2",
+  "short_name": "Razpos",
+  "description": "Point of Sale System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Home",
+      "url": "/home",
+      "description": "Go to Home"
+    },
+    {
+      "name": "Orders",
+      "url": "/orders",
+      "description": "View Orders"
+    }
+  ]
+}
