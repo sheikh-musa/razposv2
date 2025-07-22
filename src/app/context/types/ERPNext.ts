@@ -128,6 +128,7 @@ export type PaymentSchedule = {
 export type SalesOrderItem = {
     item_code: string;
     qty: number;
+    additional_notes?: string;
 }
 
 export type SalesOrderPayload = {

@@ -192,7 +192,10 @@ export default function KitchenOrderCard({
                                 />
                                 <div className={completedItems[item.item_code] ? 'line-through text-gray-400' : ''}>
                                     <p className='font-medium'>{item.item_code}</p>
-                                    <p className='text-slate-600'>Qty: {item.qty}</p>
+                                    {item.additional_notes && (
+                                            <p className='text-slate-600 text-xs'>note: {item.additional_notes}</p>
+                                        )}
+                                        <p className='text-slate-600'>Qty: {item.qty}</p>
                                 </div>
                             </div>
                         </div>
