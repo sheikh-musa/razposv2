@@ -35,6 +35,8 @@ interface ApiContextType {
     getCompanyName: () => Promise<Response>;
     updateItemPrice: (itemName: string, price: number) => Promise<Response>;
     initializeCustomFields: () => Promise<void>;
+    checkGuestCustomerExists: () => Promise<boolean>;
+    createGuestCustomer: () => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -906,7 +908,64 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     };
+    //* -------------------------------------------------------------------------- */
+    //*                             API calls for Customer                         */
+    //* -------------------------------------------------------------------------- */
+    const checkGuestCustomerExists = async () => {
+        try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Customer/Guest`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to check guest customer exists: ${JSON.stringify(errorData)}`);
+        }
+            const data = await response.json();
+            if (data.data.name === 'Guest') {
+                console.log('Guest customer exists');
+                return true;
+            } else {
+                console.log('Guest customer does not exist');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error checking guest customer exists:', error);
+            throw error;
+        }
+    }
 
+    const createGuestCustomer = async () => {
+        try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Customer`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                customer_name: "Guest",
+                customer_type: "Individual"
+            })
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to create guest customer: ${JSON.stringify(errorData)}`);
+        }
+        const data = await response.json();
+        console.log('Guest customer created:', data.data);
+        return data.data;
+        } catch (error) {
+            console.error('Error creating guest customer:', error);
+            throw error;
+        }
+    }
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
@@ -940,6 +999,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             getActivityLog,
             getCompanyName,
             initializeCustomFields,
+            checkGuestCustomerExists,
+            createGuestCustomer
         }}>
             {children}
         </ApiContext.Provider>

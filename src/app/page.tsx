@@ -6,17 +6,28 @@ import { useApi } from "./context/ApiContext";
 import { useEffect } from "react";
 
 function CustomFieldsInitializer() {
-  const { initializeCustomFields } = useApi();
+  const { initializeCustomFields, checkGuestCustomerExists, createGuestCustomer } = useApi();
 
   useEffect(() => {
     // Only run in production or when explicitly needed
     console.log('initializing custom fields');
     initializeCustomFields().catch(console.error);
-    
-  }, [initializeCustomFields]);
+    checkGuestCustomerExists().then(exists => {
+      if (!exists) {
+        createGuestCustomer().catch(console.error);
+      }
+    });
+  }, [initializeCustomFields, checkGuestCustomerExists, createGuestCustomer]);
 
   return null;
+
+  // async function checkGuest() {
+  //   const exists = await checkGuestCustomerExists();
+  //   console.log('Guest customer exists:', exists);
+  // }
 }
+
+
 
 export default function Main() {
   return (
