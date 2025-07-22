@@ -61,6 +61,7 @@ export default function TransactionHistory() {
           time: time,
           custom_payment_mode: orderDetails.custom_payment_mode,
           total_qty: orderDetails.total_qty,
+          customer_name: orderDetails.customer_name,
           items: orderDetails.items.map((item: TransactionHistoryItem) => ({
             item_code: item.item_code,
             item_name: item.item_name,

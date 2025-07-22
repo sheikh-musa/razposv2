@@ -1,14 +1,15 @@
 'use client'
-import { useEffect, useState } from 'react';
-// import { } from '@/app/context/types/ERPNext';
+import { useState } from 'react';
+import { SalesHistoryOrder, TransactionHistoryItem } from '@/app/context/types/ERPNext';
 import { useApi } from '@/app/context/ApiContext';
 import toast from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+
 type OrderDetailsProps = {
-  order: any;
+  order: SalesHistoryOrder;
   onClose: () => void;
 };
 
@@ -58,8 +59,8 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
       // Customer info
       doc.text("Billed To", 15, 80);
       doc.text('Customer Details:', 15, 90);
-      doc.text(`${order.customer_name || 'Guest'}`, 15, 95);
-      doc.text(`${order.contact_person || ''}`, 15, 100);
+      doc.text(`${order.customer_name}`, 15, 95);
+      // doc.text(`${order.contact_person || ''}`, 15, 100);
 
       // Company info
       doc.text("From", 120, 80);
@@ -127,13 +128,13 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
       });
       
       // Calculate totals
-      const subtotal = order.items?.reduce((sum: any, item: any) => 
+      const subtotal = order.items?.reduce((sum: number, item: TransactionHistoryItem) => 
         sum + ((item.qty || 0) * (item.rate || 0)), 0) || 0;
       const tax = subtotal * 0.07; // 7% GST
       const total = subtotal + tax;
       
       // Totals section
-      const finalY = (doc as any).lastAutoTable.finalY + 10;
+      const finalY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
       
       doc.setFont('helvetica', 'bold');
       doc.text('Subtotal:', 140, finalY);
@@ -174,10 +175,6 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log('Order Details', order);
-  }, [order]);
 
   return (
     <>
