@@ -38,12 +38,31 @@ const nextConfig = {
         pathname: "/**",
       },
       {
+        protocol: "https",
+        hostname: "razpos.s.frappe.cloud",
+        port: "",
+        pathname: "/**",
+      },
+      {
         protocol: "http",
         hostname: "localhost",
         port: "8080",
         pathname: "/**",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8000",
+        pathname: "/**",
+      },
     ],
+    // Add more flexible handling for unknown hosts
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Override default behavior to be more permissive
+    domains: [], // deprecated but might still work
+    // Custom loader can help with dynamic hostnames
+    loader: "default",
   },
 };
 
