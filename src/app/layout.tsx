@@ -14,13 +14,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="description" content="Point of Sale System" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta name="description" content="RAZPOS - Point of Sale System" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="RAZPOS" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body>
+      <body className="mobile-friendly" style={{ backgroundColor: "var(--color-bg-secondary)" }}>
         <Toaster
           position="top-center"
           toastOptions={{
@@ -33,9 +36,12 @@ export default function RootLayout({
         />
         <ApiProvider>
           <CartProvider>
-            <div className="flex h-screen bg-white">
+            <div className="min-h-screen">
               <Navbar />
-              <div className="flex-1 overflow-auto m-5">{children}</div>
+              {/* Main content that properly accounts for sidebar width */}
+              <main className="main-content-with-sidebar py-4 px-4 sm:px-6 lg:px-6 lg:py-6 safe-area-inset">
+                <div className="w-full">{children}</div>
+              </main>
             </div>
           </CartProvider>
         </ApiProvider>

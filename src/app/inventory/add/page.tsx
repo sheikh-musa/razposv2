@@ -24,6 +24,22 @@ export default function AddInventory() {
                 </div>
                 {isExistingTemplate === true ? <AddExistingInventory /> : isExistingTemplate === false ? <AddNewInventoryTemplate /> : <></>}
             </div>
-        </>
-    );
-} 
+          </div>
+          <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-300"></hr>
+          <div className="flex justify-end gap-4">
+            <button onClick={handleCancel} className="px-4 py-2 border border-black rounded-md hover:bg-gray-50 text-black text-sm">
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
+            >
+              {loading ? "Adding..." : "Add item"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
