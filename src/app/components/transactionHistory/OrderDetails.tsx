@@ -69,7 +69,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
 
       // Items table
       const tableData = order.items?.map(item => [
-        item.item_name || 'N/A',
+        item.item_code || 'N/A',
         item.qty || 0,
         `$${(item.rate || 0).toFixed(2)}`,
         `$${((item.qty || 0) * (item.rate || 0)).toFixed(2)}`
