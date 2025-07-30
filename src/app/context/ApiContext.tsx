@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed, ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder } from './types/ERPNext';
+import { ItemDetailed,ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder, ItemAttributeUpdatePayload } from './types/ERPNext';
 // import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
@@ -8,7 +8,9 @@ interface ApiContextType {
     fetchItemDetails: (itemName: string, fetchVariants?: boolean) => Promise<ItemDetailed[]>;
     disableItem: (itemName: string) => Promise<Response>;
     undoDisableItem: (itemName: string) => Promise<Response>;
+    getItemAttribute: (itemName: string) => Promise<Response>;
     createItemAttribute: (payload: ItemAttributePayload) => Promise<Response>;
+    updateItemAttribute: (itemName: string, payload: ItemAttributeUpdatePayload) => Promise<Response>;
     createItemTemplate: (payload: ItemTemplatePayload) => Promise<Response>;
     createItemVariant: (payload: ItemVariantPayload) => Promise<Response>;
     createItemPrice: (payload: ItemPricePayload) => Promise<Response>;
@@ -33,6 +35,8 @@ interface ApiContextType {
     getCompanyName: () => Promise<Response>;
     updateItemPrice: (itemName: string, price: number) => Promise<Response>;
     initializeCustomFields: () => Promise<void>;
+    checkGuestCustomerExists: () => Promise<boolean>;
+    createGuestCustomer: () => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -263,6 +267,23 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //*                          API calls for creating Items                      */
     //* -------------------------------------------------------------------------- */
 
+    const getItemAttribute = async (itemName: string): Promise<Response> => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Attribute/${itemName} - variant`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch item attribute: ${JSON.stringify(errorData)}`);
+        }
+        const data = await response.json();
+        return data.data.item_attribute_values;
+    }
+
     const createItemAttribute = async (payload: ItemAttributePayload) => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Attribute`, {
@@ -287,6 +308,24 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     };
+
+    const updateItemAttribute = async (itemName: string, payload: ItemAttributeUpdatePayload) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Attribute/${itemName} - variant`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to update item attribute: ${JSON.stringify(errorData)}`);
+        }
+        return response;
+    }
 
     const createItemTemplate = async (payload: ItemTemplatePayload) => {
         try {
@@ -869,14 +908,74 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     };
+    //* -------------------------------------------------------------------------- */
+    //*                             API calls for Customer                         */
+    //* -------------------------------------------------------------------------- */
+    const checkGuestCustomerExists = async () => {
+        try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Customer/Guest`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            return false;
+            throw new Error(`Failed to check guest customer exists: ${JSON.stringify(errorData)}`);
+        }
+            const data = await response.json();
+            if (data.data.name === 'Guest') {
+                console.log('Guest customer exists');
+                return true;
+            } else {
+                console.log('Guest customer does not exist');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error checking guest customer exists:', error);
+            throw error;
+        }
+    }
 
+    const createGuestCustomer = async () => {
+        try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Customer`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                customer_name: "Guest",
+                customer_type: "Individual"
+            })
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to create guest customer: ${JSON.stringify(errorData)}`);
+        }
+        const data = await response.json();
+        console.log('Guest customer created:', data.data);
+        return data.data;
+        } catch (error) {
+            console.error('Error creating guest customer:', error);
+            throw error;
+        }
+    }
     return (
         <ApiContext.Provider value={{ 
             fetchItems, 
             fetchItemDetails,
             disableItem,
             undoDisableItem,
+            getItemAttribute,
             createItemAttribute,
+            updateItemAttribute,
             createItemTemplate,
             createItemVariant,
             createItemPrice,
@@ -901,6 +1000,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             getActivityLog,
             getCompanyName,
             initializeCustomFields,
+            checkGuestCustomerExists,
+            createGuestCustomer
         }}>
             {children}
         </ApiContext.Provider>

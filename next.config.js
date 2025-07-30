@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const withPWA = require("@ducanh2912/next-pwa").default({
   dest: "public",
   register: true,
@@ -33,8 +34,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "razpos.razcraft.com",
-        port: "",
+        hostname: "razpos.s.frappe.cloud",
         pathname: "/**",
       },
       {

@@ -39,44 +39,43 @@ export default function TransactionHistory() {
 
   const fetchOrders = async () => {
     try {
-      const data = (await getCompletedSalesOrder()) as unknown as { name: string }[];
-      const orders = await Promise.all(
-        data.map(async (order) => {
-          const orderDetails = (await getCompletedSalesOrderItems(order.name)) as unknown as SalesHistoryOrder;
-          //@ts-expect-error creation is not a property of SalesHistoryOrder
-          const date = new Date(orderDetails.creation).toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          });
-          //@ts-expect-error creation is not a property of SalesHistoryOrder
-          const time = new Date(orderDetails.creation).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
+      const data = await getCompletedSalesOrder() as unknown as { name: string }[];
+      const orders = await Promise.all(data.map(async (order) => {
+        const orderDetails = await getCompletedSalesOrderItems(order.name) as unknown as SalesHistoryOrder;
+        //@ts-expect-error creation is not a property of SalesHistoryOrder
+        const date = new Date(orderDetails.creation).toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        });
+        //@ts-expect-error creation is not a property of SalesHistoryOrder
+        const time = new Date(orderDetails.creation).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
 
-          return {
-            name: orderDetails.name,
-            net_total: orderDetails.net_total,
-            date: date,
-            time: time,
-            custom_payment_mode: orderDetails.custom_payment_mode,
-            total_qty: orderDetails.total_qty,
-            items: orderDetails.items.map((item: TransactionHistoryItem) => ({
-              item_code: item.item_code,
-              item_name: item.item_name,
-              name: item.name,
-              qty: item.qty,
-              rate: item.rate,
-              amount: item.amount,
-            })),
-          } as SalesHistoryOrder;
-        })
-      );
+        return {
+          name: orderDetails.name,
+          net_total: orderDetails.net_total,
+          date: date,
+          time: time,
+          custom_payment_mode: orderDetails.custom_payment_mode,
+          total_qty: orderDetails.total_qty,
+          customer_name: orderDetails.customer_name,
+          items: orderDetails.items.map((item: TransactionHistoryItem) => ({
+            item_code: item.item_code,
+            item_name: item.item_name,
+            name: item.name,
+            qty: item.qty,
+            rate: item.rate,
+            amount: item.amount
+          }))
+        } as SalesHistoryOrder;
+      }));
 
-      const uniquePayments = [...new Set(orders.map((o) => o.custom_payment_mode).filter(Boolean))] as string[];
-      const uniqueItems = [...new Set(orders.flatMap((o) => o.items.map((i) => i.item_name)))] as string[];
-      const max = Math.ceil(Math.max(...orders.map((o) => o.net_total), 0));
+      const uniquePayments = [...new Set(orders.map(o => o.custom_payment_mode).filter(Boolean))] as string[];
+      const uniqueItems = [...new Set(orders.flatMap(o => o.items.map(i => i.item_name)))] as string[];
+      const max = Math.ceil(Math.max(...orders.map(o => o.net_total), 0));
 
       setOrders(orders);
       setFilteredOrders(orders);

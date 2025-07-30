@@ -4,6 +4,10 @@ export type ItemAttributeValue = {
     abbr: string;
 }
 
+export type ItemAttributeUpdatePayload = {
+    item_attribute_values: ItemAttributeValue[];
+}
+
 export type ItemAttributePayload = {
     attribute_name: string;
     numeric_values: number;
@@ -124,6 +128,7 @@ export type PaymentSchedule = {
 export type SalesOrderItem = {
     item_code: string;
     qty: number;
+    additional_notes?: string;
 }
 
 export type SalesOrderPayload = {
@@ -150,7 +155,7 @@ export type CompletedSalesOrder = {
     name: string;
     customer: string;
     date: string;
-    total: number
+    net_total: number
 }
 //* --------------------------- Sales Invoice Types ---------------------------- */
 
@@ -278,5 +283,6 @@ export type SalesHistoryOrder = {
     time: string;
     custom_payment_mode: string;
     total_qty: number;
+    customer_name: string;
     items: TransactionHistoryItem[];
 }

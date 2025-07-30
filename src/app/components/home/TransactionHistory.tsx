@@ -22,7 +22,7 @@ export default function TransactionHistory() {
                 name: order.name.substring(14),
                 customer: order.customer,
                 date: order.date,
-                total: order.total,
+                net_total: order.net_total,
             }));
             setLatestOrders(completedOrders);
         } catch (error) {
@@ -44,7 +44,7 @@ export default function TransactionHistory() {
                             </div>
                             <p className="text-xs text-gray-500">{order.customer}</p>
                         </div>
-                        <span className="text-gray-700 text-sm">- ${order.total.toFixed(2)}</span>
+                        <span className="text-gray-700 text-sm">- ${order.net_total.toFixed(2)}</span>
                     </div>
                 ))}
             </div>
