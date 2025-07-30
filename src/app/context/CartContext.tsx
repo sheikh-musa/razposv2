@@ -9,6 +9,7 @@ type CartItem = {
   price: number;
   quantity: number;
   type: string;
+  additional_notes?: string;
 };
 
 //  -------------------------------------------------------------------------- */
@@ -20,6 +21,7 @@ type CartContextType = {
   addItem: (item: CartItem) => void;
   removeItem: (itemVariant: string, name: string) => void;
   updateQuantity: (itemVariant: string, name: string, quantity: number) => void;
+  updateAdditionalNotes: (itemVariant: string, name: string, additionalNotes: string) => void;
   clearCart: () => void;
   total: number;
 };
@@ -65,6 +67,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const updateAdditionalNotes = (itemVariant: string, name: string, additionalNotes: string) => {
+
+    setItems(currentItems =>
+      currentItems.map(item =>
+        item.itemVariant === itemVariant && item.name === name
+          ? { ...item, additional_notes: additionalNotes }
+          : item
+      )
+    );
+  };
+
   const clearCart = () => {
     setItems([]);
   };
@@ -77,6 +90,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       addItem, 
       removeItem, 
       updateQuantity, 
+      updateAdditionalNotes,
       clearCart,
       total 
     }}>

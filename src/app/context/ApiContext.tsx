@@ -923,6 +923,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         if (!response.ok) {
             const errorData = await response.json();
             console.error('Error details:', errorData);
+            return false;
             throw new Error(`Failed to check guest customer exists: ${JSON.stringify(errorData)}`);
         }
             const data = await response.json();

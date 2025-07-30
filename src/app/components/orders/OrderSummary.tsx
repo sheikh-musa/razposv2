@@ -10,7 +10,7 @@ interface OrderSummaryProps {
 }
 
 export default function OrderSummary({ onClose }: OrderSummaryProps) {
-  const { items, removeItem, updateQuantity, total, clearCart } = useCart();
+  const { items, removeItem, updateQuantity, total, clearCart, updateAdditionalNotes } = useCart();
   const { createKitchenOrder } = useApi();
   const [dineIn, setDineIn] = useState(true);
   const [buzzerNumber, setBuzzerNumber] = useState('');
@@ -39,7 +39,11 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       customer: 'Guest',
       delivery_date: getCurrentDate(), // TODO: Change to actual delivery date past 12am
       custom_order_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: '2-digit' }).replace(' ', ''),
-      items: items.map((item) => ({ item_code: item.name, qty: item.quantity })),
+      items: items.map((item) => (
+        { item_code: item.name,
+          qty: item.quantity,
+          ...(item.additional_notes && { additional_notes: item.additional_notes })
+        })),
       status: 'To Deliver and Bill',
       custom_kitchen_status: 'preparing',
       custom_remarks: remark,
@@ -90,18 +94,6 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
                   <p className="font-sm">{item.name}</p>
                   <p className="text-xs text-gray-500">{item.type}</p>
                 </div>
-                <button
-                  onClick={() => removeItem(item.itemVariant, item.name)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
-                    />
-                  </svg>
-                </button>
-              </div>
-              <div className="flex justify-between items-center">
                 <div className="flex items-center border rounded-md">
                   {item.quantity > 1 ?
                   <button
@@ -127,6 +119,16 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
                   >
                     +
                   </button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center border rounded-md">
+                  <input type="text" value={item.additional_notes} 
+                  onChange={(e) => updateAdditionalNotes(item.itemVariant, item.name, e.target.value)} 
+                  className="w-full p-1 border rounded-md text-xs" 
+                  placeholder="Add special instructions" 
+                  onBlur={() => updateAdditionalNotes(item.itemVariant, item.name, item.additional_notes || '')}
+                  />
                 </div>
                 <div className="text-right">
                   <p className="text-sm">${item.price.toFixed(2)}ea</p>
