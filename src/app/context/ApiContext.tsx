@@ -932,7 +932,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                name: modeOfPayment
+                name: modeOfPayment,
+                mode_of_payment: modeOfPayment
             })
         });
         if (!response.ok) {
