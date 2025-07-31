@@ -37,6 +37,7 @@ interface ApiContextType {
     initializeCustomFields: () => Promise<void>;
     checkGuestCustomerExists: () => Promise<boolean>;
     createGuestCustomer: () => Promise<Response>;
+    initializeModeOfPayment: () => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -908,6 +909,52 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     };
+
+    const checkModeOfPaymentExists = async (modeOfPayment: string): Promise<boolean> => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Mode of Payment?filters=[["name","=","${modeOfPayment}"]]`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+            }
+        });
+        if (!response.ok) {
+            return false;
+        }
+        const data = await response.json();
+        return data.data && data.data.length > 0;
+    }
+
+    const createModeOfPayment = async (modeOfPayment: string) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Mode of Payment`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: modeOfPayment
+            })
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to create mode of payment: ${JSON.stringify(errorData)}`);
+        }
+        return response;
+    }
+    const initializeModeOfPayment = async () => {
+        const modeOfPayment = ["NETS", "Debit/Credit Card", "PayNow", "CDC"];
+        for (const payment of modeOfPayment) {
+            const exists = await checkModeOfPaymentExists(payment);
+            if (!exists) {
+                await createModeOfPayment(payment);
+            }
+            else {
+                console.log(`Mode of payment already exists: ${payment}`);
+            }
+        }
+        console.log('Mode of payment initialization completed');
+    }
     //* -------------------------------------------------------------------------- */
     //*                             API calls for Customer                         */
     //* -------------------------------------------------------------------------- */
@@ -1001,7 +1048,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             getCompanyName,
             initializeCustomFields,
             checkGuestCustomerExists,
-            createGuestCustomer
+            createGuestCustomer,
+            initializeModeOfPayment,
         }}>
             {children}
         </ApiContext.Provider>
