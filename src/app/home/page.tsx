@@ -69,21 +69,23 @@ export default function Home() {
     setActivityLog(activityLog);
   };
   return (
-    <div>
+    <div className="p-4 lg:p-0">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-4" style={{ color: "var(--color-fg-primary)" }}>
+        <h1 className="text-xl lg:text-2xl font-bold mb-4" style={{ color: "var(--color-fg-primary)" }}>
           Welcome back, User {companyName ? `(${companyName})` : ""}
         </h1>
         <div
-          className="flex rounded-lg border w-fit"
+          className="flex rounded-lg border w-full lg:w-fit overflow-x-auto"
           style={{ backgroundColor: "var(--color-bg-secondary)", borderColor: "var(--color-border-primary)" }}
         >
           {(["12 months", "30 days", "7 days"] as TimeRange[]).map((range) => (
             <button
               key={range}
               onClick={() => setSelectedRange(range)}
-              className={`px-4 py-2 rounded-lg text-xs ${selectedRange === range ? "shadow-sm" : "hover:bg-gray-200"}`}
+              className={`px-4 py-2 rounded-lg text-xs whitespace-nowrap flex-1 lg:flex-none ${
+                selectedRange === range ? "shadow-sm" : "hover:bg-gray-200"
+              }`}
               style={{
                 backgroundColor: selectedRange === range ? "var(--color-bg-primary)" : "transparent",
                 color: selectedRange === range ? "var(--color-fg-primary)" : "var(--color-fg-secondary)",
@@ -95,27 +97,25 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-row w-full gap-4 mb-8 border-b border-gray-300 pb-3">
-        {/* Left side - Graph */}
-        <div>
-          {/* Total Income */}
+      {/* Main Content - Responsive Layout */}
+      <div className="flex flex-col lg:flex-row w-full gap-4 mb-8 border-b border-gray-300 pb-3">
+        {/* Total Income - Mobile: Full width, Desktop: Left side */}
+        <div className="order-1 lg:order-1">
           <div className="mb-6">
             <h3 className="text-gray-600 text-sm mb-1">Total Income</h3>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-black">${totalRevenue.toFixed(2)}</span>
-              <span className={`text-sm ${percentageIncrease >= 0 ? "text-green-500" : "text-red-500"}`}>
-                {/* {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}% */}
-              </span>
+              <span className="text-xl lg:text-2xl font-bold text-black">${totalRevenue.toFixed(2)}</span>
             </div>
           </div>
         </div>
-        <div className="flex-1">
-          {/* Graph */}
-          <div className="bg-white text-gray-600 rounded-lg h-[240px] pt-10 text-xs">
+
+        {/* Graph - Mobile: Full width, Desktop: Center */}
+        <div className="flex-1 order-3 lg:order-2">
+          <div className="bg-white text-gray-600 rounded-lg h-[200px] lg:h-[240px] pt-4 lg:pt-10 text-xs">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={salesData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} dy={10} fontSize={12} tick={{ fill: "#666" }} />
-                <YAxis axisLine={false} tickLine={false} dx={-10} fontSize={12} tick={{ fill: "#666" }} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} dy={10} fontSize={10} tick={{ fill: "#666" }} />
+                <YAxis axisLine={false} tickLine={false} dx={-10} fontSize={10} tick={{ fill: "#666" }} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "white",
@@ -129,11 +129,11 @@ export default function Home() {
                     const value = payload[0].value as number;
                     return (
                       <div className="bg-white p-2 rounded-lg shadow-md">
-                        <p className="text-md text-black font-semibold">{label}</p>
-                        <p className="text-sm font-semibold text-purple-600">
+                        <p className="text-sm text-black font-semibold">{label}</p>
+                        <p className="text-xs font-semibold text-purple-600">
                           Revenue: ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
-                        <p className="text-sm font-semibold text-purple-600">Orders: {payload[0].payload.orderCount}</p>
+                        <p className="text-xs font-semibold text-purple-600">Orders: {payload[0].payload.orderCount}</p>
                       </div>
                     );
                   }}
@@ -143,49 +143,55 @@ export default function Home() {
             </ResponsiveContainer>
           </div>
         </div>
-        {/* Right side - Stats */}
-        <div className="w-64 flex flex-col pl-3 h-4/6">
-          <div className="space-y-6">
-            {/* Stats content */}
+
+        {/* Stats - Mobile: Grid 2 columns, Desktop: Right side */}
+        <div className="order-2 lg:order-3 w-full lg:w-64">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 lg:space-y-6 lg:gap-0 lg:flex lg:flex-col lg:pl-3">
+            {/* Current Revenue */}
             <div>
               <h3 className="text-gray-600 text-sm mb-1">Current Revenue</h3>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-black">${currentRevenue.toFixed(2)}</span>
-                <span className={`text-sm ${percentageIncrease >= 0 ? "text-green-500" : "text-red-500"}`}>
+                <span className="text-lg lg:text-2xl font-bold text-black">${currentRevenue.toFixed(2)}</span>
+                <span className={`text-xs lg:text-sm ${percentageIncrease >= 0 ? "text-green-500" : "text-red-500"}`}>
                   {percentageIncrease >= 0 ? "↑" : "↓"} {Math.abs(percentageIncrease).toFixed(1)}%
                 </span>
               </div>
             </div>
 
+            {/* Last Month Revenue */}
             <div>
               <h3 className="text-gray-600 text-sm mb-1">Last Month Revenue</h3>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-black">${lastRevenue.toFixed(2)}</span>
-                <span className={`text-sm ${percentageIncrease >= 0 ? "text-green-500" : "text-red-500"}`}>
+                <span className="text-lg lg:text-2xl font-bold text-black">${lastRevenue.toFixed(2)}</span>
+                <span className={`text-xs lg:text-sm ${percentageIncrease >= 0 ? "text-green-500" : "text-red-500"}`}>
                   {percentageIncrease >= 0 ? "↑" : "↓"} {Math.abs(percentageIncrease).toFixed(1)}%
                 </span>
               </div>
             </div>
 
-            <div>
+            {/* Percentage Change - Hidden on mobile in grid, shown as third item */}
+            <div className="sm:col-span-2 lg:col-span-1">
               <h3 className="text-gray-600 text-sm mb-1">Percentage {percentageIncrease >= 0 ? "increase" : "decrease"}</h3>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
-                <span className={`text-sm ${percentageIncrease >= 0 ? "text-green-500" : "text-red-500"}`}>
-                  {/* {percentageIncrease >= 0 ? '↑' : '↓'} {Math.abs(percentageIncrease).toFixed(1)}% */}
-                </span>
+                <span className="text-lg lg:text-2xl font-bold text-black">{percentageIncrease.toFixed(0)}%</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Transaction History and Recent Activity */}
-      <div className="grid grid-cols-3 -mt-6 h-[300px]">
-        <div className="h-2/3">
+      {/* Transaction History and Recent Activity - Mobile: Stack vertically, Desktop: Side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:-mt-6 lg:h-[300px]">
+        <div className="lg:h-2/3">
+          <h3 className="text-lg font-semibold mb-4 lg:hidden" style={{ color: "var(--color-fg-primary)" }}>
+            Transaction History
+          </h3>
           <TransactionHistory />
         </div>
-        <div className="col-span-2 h-2/3">
+        <div className="lg:col-span-2 lg:h-2/3">
+          <h3 className="text-lg font-semibold mb-4 lg:hidden" style={{ color: "var(--color-fg-primary)" }}>
+            Recent Activity
+          </h3>
           <RecentActivity activityLog={activityLog} />
         </div>
       </div>

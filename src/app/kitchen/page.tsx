@@ -79,42 +79,44 @@ export default function Kitchen() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="flex flex-col min-h-full text-black font-sans" style={{ backgroundColor: "var(--color-bg-primary)" }}>
-      <div>
-        <h1 className="text-2xl font-bold" style={{ color: "var(--color-fg-primary)" }}>
+    <div className="flex flex-col min-h-full text-black font-sans p-4 lg:p-0" style={{ backgroundColor: "var(--color-bg-primary)" }}>
+      <div className="mb-4 lg:mb-6">
+        <h1 className="text-xl lg:text-2xl font-bold" style={{ color: "var(--color-fg-primary)" }}>
           Kitchen
         </h1>
       </div>
 
-      {/* Summary Section */}
-      <div className="mt-2 pl-4 py-2 rounded-md shadow-lg" style={{ backgroundColor: "var(--color-bg-secondary)" }}>
-        <h3 className="font-semibold" style={{ color: "var(--color-fg-primary)" }}>
+      {/* Summary Section - Mobile: Vertical scroll, Desktop: Horizontal scroll */}
+      <div className="mt-2 p-3 lg:pl-4 lg:py-2 rounded-md shadow-lg mb-4" style={{ backgroundColor: "var(--color-bg-secondary)" }}>
+        <h3 className="font-semibold mb-3" style={{ color: "var(--color-fg-primary)" }}>
           Summary item count
         </h3>
-        <div className="flex overflow-x-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:overflow-x-auto gap-2 lg:gap-0">
           {Object.entries(itemSummary).map(([key, count]) => (
             <div
               key={key}
-              className="shadow-lg flex-shrink-0 flex flex-col m-2 rounded-md p-2 items-center min-w-[150px] w-[200px]"
+              className="shadow-lg flex-shrink-0 flex flex-col lg:m-2 rounded-md p-3 lg:p-2 items-center lg:min-w-[150px] lg:w-[200px]"
               style={{ backgroundColor: "var(--color-bg-tertiary)" }}
             >
-              <span className="font-semibold" style={{ color: "var(--color-fg-primary)" }}>
+              <span className="font-semibold text-sm lg:text-base" style={{ color: "var(--color-fg-primary)" }}>
                 {key}
               </span>
-              <span style={{ color: "var(--color-fg-secondary)" }}>{count}</span>
+              <span className="text-lg lg:text-base font-bold lg:font-normal" style={{ color: "var(--color-fg-secondary)" }}>
+                {count}
+              </span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Orders Section */}
-      <div className="mt-2 pl-4 py-2 rounded-md shadow-lg" style={{ backgroundColor: "var(--color-bg-secondary)" }}>
+      {/* Orders Section - Mobile: Vertical layout, Desktop: Horizontal scroll */}
+      <div className="mt-2 p-3 lg:pl-4 lg:py-2 rounded-md shadow-lg mb-4" style={{ backgroundColor: "var(--color-bg-secondary)" }}>
         <button
           onClick={() => setShowOrders(!showOrders)}
-          className="flex items-center gap-2 font-semibold"
+          className="flex items-center gap-2 font-semibold w-full justify-between lg:justify-start"
           style={{ color: "var(--color-fg-primary)" }}
         >
-          <h3>Pending Orders ({orders.length})</h3>
+          <h3 className="text-base lg:text-lg">Pending Orders ({orders.length})</h3>
           <svg
             className={`w-4 h-4 transition-transform ${showOrders ? "rotate-180" : ""}`}
             fill="none"
@@ -126,22 +128,28 @@ export default function Kitchen() {
         </button>
 
         {showOrders && (
-          <div className="flex overflow-x-auto mt-2 mb-2 h-[550px]">
-            {orders.map((order) => (
-              <KitchenOrderCard key={order.name} order={order} onItemComplete={handleItemComplete} onOrderComplete={loadOrders} />
-            ))}
+          <div className="mt-3 lg:mt-2">
+            {/* Mobile: Vertical stack, Desktop: Horizontal scroll */}
+            <div className="grid grid-cols-1 gap-4 lg:flex lg:overflow-x-auto lg:gap-0 lg:h-[550px]">
+              {orders.map((order) => (
+                <div key={order.name} className="lg:flex-shrink-0">
+                  <KitchenOrderCard order={order} onItemComplete={handleItemComplete} onOrderComplete={loadOrders} />
+                </div>
+              ))}
+            </div>
+            {orders.length === 0 && <div className="text-center py-8 text-gray-500">No pending orders</div>}
           </div>
         )}
       </div>
 
-      {/* Completed Orders Section */}
-      <div className="mt-2 pl-4 py-2 rounded-md shadow-lg" style={{ backgroundColor: "var(--color-bg-secondary)" }}>
+      {/* Completed Orders Section - Mobile: Vertical layout, Desktop: Horizontal scroll */}
+      <div className="mt-2 p-3 lg:pl-4 lg:py-2 rounded-md shadow-lg" style={{ backgroundColor: "var(--color-bg-secondary)" }}>
         <button
           onClick={() => setShowCompleted(!showCompleted)}
-          className="flex items-center gap-2 font-semibold"
+          className="flex items-center gap-2 font-semibold w-full justify-between lg:justify-start"
           style={{ color: "var(--color-fg-primary)" }}
         >
-          <h3>Completed Orders ({completedOrders.length})</h3>
+          <h3 className="text-base lg:text-lg">Completed Orders ({completedOrders.length})</h3>
           <svg
             className={`w-4 h-4 transition-transform ${showCompleted ? "rotate-180" : ""}`}
             fill="none"
@@ -153,10 +161,16 @@ export default function Kitchen() {
         </button>
 
         {showCompleted && (
-          <div className="flex overflow-x-auto mt-2">
-            {completedOrders.map((order) => (
-              <KitchenOrderCard key={order.name} order={order} onItemComplete={handleItemComplete} onOrderComplete={loadOrders} />
-            ))}
+          <div className="mt-3 lg:mt-2">
+            {/* Mobile: Vertical stack, Desktop: Horizontal scroll */}
+            <div className="grid grid-cols-1 gap-4 lg:flex lg:overflow-x-auto lg:gap-0">
+              {completedOrders.map((order) => (
+                <div key={order.name} className="lg:flex-shrink-0">
+                  <KitchenOrderCard order={order} onItemComplete={handleItemComplete} onOrderComplete={loadOrders} />
+                </div>
+              ))}
+            </div>
+            {completedOrders.length === 0 && <div className="text-center py-8 text-gray-500">No completed orders</div>}
           </div>
         )}
       </div>
