@@ -1,11 +1,8 @@
 'use client'
 import { useState } from 'react';
-import { SalesHistoryOrder, TransactionHistoryItem } from '@/app/context/types/ERPNext';
-import { useApi } from '@/app/context/ApiContext';
-import toast from 'react-hot-toast';
+import { SalesHistoryOrder } from '@/app/context/types/ERPNext';
 import { Toaster } from 'react-hot-toast';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { generateReceipt } from '@/app/utils/receiptUtils';
 
 
 type OrderDetailsProps = {
@@ -14,7 +11,6 @@ type OrderDetailsProps = {
 };
 
 export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
-  const { getCompanyName } = useApi();
   const [loading, setLoading] = useState(false);
   // const [paymentMethod, setPaymentMethod] = useState(order?.custom_payment_mode || 'Cash');
   // const [paymentStatus, setPaymentStatus] = useState(order?.custom_payment_complete ? 'Paid' : 'Unpaid');
@@ -24,153 +20,19 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
   const handleGenerateReceipt = async () => {
     try {
       setLoading(true);
-      const companyName = await getCompanyName();
       
-      // Create PDF document
-      const doc = new jsPDF();
-      
-      // Set font
-      doc.setFont('helvetica');
-      
-      // ! Company logo
-      doc.setFontSize(20);
-      doc.setFont('courier', 'bold');
-      doc.text('RAZPOS', 15, 15, { align: 'left' });
-      
-      doc.setFontSize(15);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Receipt', 15, 30, { align: 'left' });
-      
-      // Company info
-      doc.setFontSize(10);
-      doc.setTextColor(128, 128, 128);
-      doc.text('Order ID:', 15, 40);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`#${order.name}`, 50, 40);
-      doc.setTextColor(128, 128, 128);
-      doc.text('Receipt \nDate & Time', 15, 50);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`${new Date().toLocaleTimeString()},`, 50, 50);
-      doc.text(`${new Date().toLocaleDateString()}`, 67, 50);
-      
-      doc.setDrawColor(128, 128, 128);
-      doc.line(15, 65, 200, 65);
-
-      // Customer info
-      doc.text("Billed To", 15, 80);
-      doc.text('Customer Details:', 15, 90);
-      doc.text(`${order.customer_name}`, 15, 95);
-      // doc.text(`${order.contact_person || ''}`, 15, 100);
-
-      // Company info
-      doc.text("From", 120, 80);
-      doc.text(`${companyName}`, 120, 90); // ! company name
-      doc.text(`${`200, Jurong West Street 61, #01-355\nSingapore 640200`}`, 120, 95); // ! company address
-
-      // Items table
-      const tableData = order.items?.map(item => [
-        item.item_code || 'N/A',
-        item.qty || 0,
-        `$${(item.rate || 0).toFixed(2)}`,
-        `$${((item.qty || 0) * (item.rate || 0)).toFixed(2)}`
-      ]) || [];
-      
-      // Add header row
-      const tableHeaders = ['Item', 'Qty', 'Price', 'Total'];
-      
-      // Create table with full width
-      autoTable(doc, {
-        startY: 125,
-        head: [tableHeaders],
-        body: tableData,
-        theme: 'plain', // Use plain theme for more control
-        headStyles: {
-          fillColor: [255, 255, 255],  // white color
-          textColor: 0, // black text
-          fontStyle: 'bold',
-          fontSize: 10,
-          cellPadding: 2,
-          // lineColor: [220, 220, 220], // Gray line color
-          // lineWidth: 0.1
+      await generateReceipt({
+        order,
+        onSuccess: () => {
+          // Optional: Add any additional success handling
         },
-        styles: {
-          fontSize: 10,
-          cellPadding: 5,
-          // lineColor: [220, 220, 220], // Gray line color for all cells
-          // lineWidth: 0.1
-        },
-        columnStyles: {
-          0: { cellWidth: 'auto', halign: 'left' }, // Item name - auto width
-          1: { cellWidth: 25, halign: 'center' }, // Qty
-          2: { cellWidth: 35, halign: 'right' }, // Price
-          3: { cellWidth: 35, halign: 'right' } // Total
-        },
-        margin: { left: 15, right: 15 }, // Full width margins
-        tableWidth: 'auto', // Auto width to fill available space
-        didDrawCell: function(data) {
-          // Add gray line under header row
-          if (data.row.index === 0) {
-            doc.setDrawColor(220, 220, 220);
-            doc.setLineWidth(0.5);
-            doc.line(data.cell.x, data.cell.y, 
-                     data.cell.x + data.cell.width, data.cell.y);
-                
-          }
-          
-          // Add gray line under each item row
-          if (data.row.index >= 1) {
-            doc.setDrawColor(220, 220, 220);
-            doc.setLineWidth(0.5);
-            doc.line(data.cell.x, data.cell.y + data.cell.height, 
-                     data.cell.x + data.cell.width, data.cell.y + data.cell.height);
-          }
+        onError: (error) => {
+          console.error('Receipt generation failed:', error);
         }
       });
       
-      // Calculate totals
-      const subtotal = order.items?.reduce((sum: number, item: TransactionHistoryItem) => 
-        sum + ((item.qty || 0) * (item.rate || 0)), 0) || 0;
-      const tax = subtotal * 0.07; // 7% GST
-      const total = subtotal + tax;
-      
-      // Totals section
-      const finalY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
-      
-      doc.setFont('helvetica', 'bold');
-      doc.text('Subtotal:', 140, finalY);
-      doc.text(`$${subtotal.toFixed(2)}`, 170, finalY);
-      
-      doc.text('GST (7%):', 140, finalY + 10);
-      doc.text(`$${tax.toFixed(2)}`, 170, finalY + 10);
-      
-      doc.setFontSize(12);
-      doc.text('Total:', 140, finalY + 20);
-      doc.text(`$${total.toFixed(2)}`, 170, finalY + 20);
-      
-      // Payment info
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(128, 128, 128);
-      doc.text('Powered by Razpos', 15, finalY + 35);
-      // doc.text(`Payment Method: ${order.custom_payment_mode || 'Cash'}`, 15, finalY + 35);
-
-      // doc.text(`Status: ${order.custom_payment_complete ? 'Paid' : 'Unpaid'}`, 15, finalY + 45);
-      
-      // Footer
-      doc.setFontSize(8);
-      doc.text('Thank you for your business!', 105, finalY + 60, { align: 'center' });
-      doc.text('For any queries, please contact us', 105, finalY + 70, { align: 'center' });
-      
-      // Save PDF
-      const pdfBlob = doc.output('blob');
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-      
-      toast.success('Receipt generated successfully!');
-      
     } catch (error) {
-      console.error('Error generating receipt:', error);
-      toast.error('Failed to generate receipt');
+      console.error('Error in handleGenerateReceipt:', error);
     } finally {
       setLoading(false);
     }
