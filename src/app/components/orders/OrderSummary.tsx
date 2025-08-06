@@ -23,15 +23,15 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
   const [discountError, setDiscountError] = useState<string>('');
   const [receipt, setReceipt] = useState(true);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
-  const [createdOrder, setCreatedOrder] = useState<{
-    name: string;
-    customer_name: string;
-    items: Array<{
-      item_code: string;
-      qty: number;
-      rate: number;
-    }>;
-  } | null>(null);
+  // const [createdOrder, setCreatedOrder] = useState<{ // eslint-disable-line @typescript-eslint/no-unused-vars
+  //   name: string;
+  //   customer_name: string;
+  //   items: Array<{
+  //     item_code: string;
+  //     qty: number;
+  //     rate: number;
+  //   }>;
+  // } | null>(null);
 //   const shippingFee = 3.99;
 
   const getCurrentDate = () => {
@@ -72,18 +72,21 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       toast.success('Order created successfully');
       
       // Create order object for receipt
-      const orderForReceipt = {
-        name: `Order-${Date.now()}`, // Generate a unique order name
-        customer_name: 'Guest',
-        items: items.map((item) => ({
-          item_code: item.name,
-          qty: item.quantity,
-          rate: item.price
-        }))
-      };
+      // const orderForReceipt = {
+      //   name: `Order-${Date.now()}`, // Generate a unique order name
+      //   customer_name: 'Guest',
+      //   items: items.map((item) => ({
+      //     item_code: item.name,
+      //     qty: item.quantity,
+      //     rate: item.price
+      //   }))
+      // };
       
-      setCreatedOrder(orderForReceipt);
+      // setCreatedOrder(orderForReceipt);
       setShowReceiptModal(true);
+
+      clearCart();
+      // onClose();
     } else {
       toast.error('Failed to create order');
     }
@@ -91,7 +94,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
 
   const handleReceiptModalClose = () => {
     setShowReceiptModal(false);
-    clearCart();
+    // clearCart();
     onClose();
   };
 
@@ -315,14 +318,14 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
     </div>
 
 
-      {createdOrder && showReceiptModal && (
+      {showReceiptModal ? (
         <SendReceiptModal
           isOpen={showReceiptModal}
           onClose={handleReceiptModalClose}
-          order={createdOrder}
+          // order={createdOrder}
           onSkip={handleReceiptSkip}
         />
-      )}
+      ) : null}
     </>
   );
 }

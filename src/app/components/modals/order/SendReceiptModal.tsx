@@ -1,21 +1,21 @@
 'use client'
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { generateReceipt } from '../../../utils/receiptUtils';
-import { ReceiptOrder } from '../../../utils/receiptUtils';
+// import { ReceiptOrder } from '../../../utils/receiptUtils';
+import { useApi } from '../../../context/ApiContext';
 
 interface SendReceiptModalProps {
   isOpen: boolean;
   onClose: () => void;
-  order: ReceiptOrder;
+//   order: ReceiptOrder;
   onSkip?: () => void;
 }
 
-export default function SendReceiptModal({ isOpen, onClose, order, onSkip }: SendReceiptModalProps) {
+export default function SendReceiptModal({ isOpen, onClose, onSkip }: SendReceiptModalProps) {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
-
+  const { sendEmail } = useApi();
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -42,21 +42,17 @@ export default function SendReceiptModal({ isOpen, onClose, order, onSkip }: Sen
     try {
       // Here you would typically call your API to send the receipt via email
       // For now, we'll just generate the receipt and show a success message
-      await generateReceipt({
-        order,
-        onSuccess: () => {
-          toast.success(`Receipt sent to ${email}`);
-          onClose();
-        },
-        onError: (error) => {
-          toast.error('Failed to send receipt');
-          console.error('Error sending receipt:', error);
-        }
+      const response = await sendEmail({
+        recipients: email,
+        subject: 'Receipt',
+        content: 'This is a test receipt email',
+        doctype: 'Sales Order',
+        // name: order.name,
+        send_email: 1,
       });
-      
-      // TODO: Add actual email sending logic here
-      // await sendReceiptEmail({ email, order });
-      
+      console.log('response', response);
+      toast.success(`Receipt sent to ${email}`);
+      onClose();
     } catch (error) {
       console.error('Error sending receipt:', error);
       toast.error('Failed to send receipt');
