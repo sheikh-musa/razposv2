@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed,ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder, ItemAttributeUpdatePayload } from './types/ERPNext';
+import { ItemDetailed,ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder, ItemAttributeUpdatePayload, EmailPayload } from './types/ERPNext';
 // import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
@@ -38,6 +38,7 @@ interface ApiContextType {
     checkGuestCustomerExists: () => Promise<boolean>;
     createGuestCustomer: () => Promise<Response>;
     initializeModeOfPayment: () => Promise<void>;
+    sendEmail: (payload: EmailPayload) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -786,6 +787,28 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     //* -------------------------------------------------------------------------- */
+    //*                             API calls for send email                       */
+    //* -------------------------------------------------------------------------- */
+    
+    const sendEmail = async (payload: EmailPayload) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/method/frappe.core.doctype.communication.email.make`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to send email: ${JSON.stringify(errorData)}`);
+        }
+        return response;
+    }
+
+    //* -------------------------------------------------------------------------- */
     //*                             API calls for Custom Fields                     */
     //* -------------------------------------------------------------------------- */
 
@@ -1051,6 +1074,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             checkGuestCustomerExists,
             createGuestCustomer,
             initializeModeOfPayment,
+            sendEmail
         }}>
             {children}
         </ApiContext.Provider>

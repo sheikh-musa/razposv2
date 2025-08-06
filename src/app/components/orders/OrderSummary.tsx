@@ -4,6 +4,8 @@ import { useCart } from '../../context/CartContext';
 import { useApi } from '../../context/ApiContext';
 import { SalesOrderPayload } from '../../context/types/ERPNext';
 import toast from 'react-hot-toast';
+// import { generateReceipt } from '../../utils/receiptUtils';
+import SendReceiptModal from '../modals/order/SendReceiptModal';
 
 interface OrderSummaryProps {
   onClose: () => void;
@@ -20,6 +22,16 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
   const [discount, setDiscount] = useState<number>(0);
   const [discountError, setDiscountError] = useState<string>('');
   const [receipt, setReceipt] = useState(true);
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [createdOrder, setCreatedOrder] = useState<{
+    name: string;
+    customer_name: string;
+    items: Array<{
+      item_code: string;
+      qty: number;
+      rate: number;
+    }>;
+  } | null>(null);
 //   const shippingFee = 3.99;
 
   const getCurrentDate = () => {
@@ -58,15 +70,42 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
     const response = await createKitchenOrder(payload);
     if (response.ok) {
       toast.success('Order created successfully');
-      clearCart();
-      onClose();
+      
+      // Create order object for receipt
+      const orderForReceipt = {
+        name: `Order-${Date.now()}`, // Generate a unique order name
+        customer_name: 'Guest',
+        items: items.map((item) => ({
+          item_code: item.name,
+          qty: item.quantity,
+          rate: item.price
+        }))
+      };
+      
+      setCreatedOrder(orderForReceipt);
+      setShowReceiptModal(true);
     } else {
       toast.error('Failed to create order');
     }
   };
 
+  const handleReceiptModalClose = () => {
+    setShowReceiptModal(false);
+    clearCart();
+    onClose();
+  };
+
+  const handleReceiptSkip = () => {
+    // Generate receipt without email
+    // if (createdOrder) {
+    //   generateReceipt({ order: createdOrder });
+    // }
+    handleReceiptModalClose();
+  };
+
   return (
-    <div className="bg-white border-solid border p-4 rounded-lg shadow-md h-[calc(100vh-7rem)] sticky top-4 relative">
+    <>
+      <div className="bg-white border-solid border p-4 rounded-lg shadow-md h-[calc(100vh-7rem)] sticky top-4 relative">
       {/* Scrollable content */}
       <div className="overflow-y-auto h-[calc(100%-8rem)]">
         {/* Header */}
@@ -274,5 +313,16 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
         </button>
       </div>
     </div>
+
+
+      {createdOrder && showReceiptModal && (
+        <SendReceiptModal
+          isOpen={showReceiptModal}
+          onClose={handleReceiptModalClose}
+          order={createdOrder}
+          onSkip={handleReceiptSkip}
+        />
+      )}
+    </>
   );
 }

@@ -286,3 +286,14 @@ export type SalesHistoryOrder = {
     customer_name: string;
     items: TransactionHistoryItem[];
 }
+
+//* --------------------------- Email Types ---------------------------- */
+
+export type EmailPayload = {
+    recipients: string;
+    subject: string;
+    content: string;
+    doctype?: string;
+    name?: string;
+    send_email: number;
+}

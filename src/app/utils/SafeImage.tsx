@@ -78,9 +78,9 @@ export default function SafeImage({
     ...props,
   };
 
-  if (fill) {
+  if (fill) { // eslint-disable-next-line jsx-a11y/alt-text
     return <Image {...imageProps} fill />;
   }
-
+  // eslint-disable-next-line jsx-a11y/alt-text
   return <Image {...imageProps} width={width || 100} height={height || 100} />;
 }
