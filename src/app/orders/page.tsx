@@ -181,7 +181,7 @@ export default function Orders() {
       </div>
 
       {/* Main content wrapper */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 ">
         {/* Product Grid */}
         <div className={`grid grid-cols-1 ${showOrderSummary ? "md:grid-cols-2" : "md:grid-cols-3"} gap-3 flex-1`}>
           {filteredProducts.map((product) => (
@@ -191,7 +191,7 @@ export default function Orders() {
 
         {/* Order Summary Side Panel */}
         {showOrderSummary && (
-          <div className="w-80 flex-shrink-0 sticky top-4">
+          <div className="w-80 flex-shrink-0 ">
             <OrderSummary onClose={() => setShowOrderSummary(false)} />
           </div>
         )}

@@ -21,7 +21,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
   const [paymentComplete, setPaymentComplete] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
   const [discountError, setDiscountError] = useState<string>('');
-  const [receipt, setReceipt] = useState(true);
+  // const [receipt, setReceipt] = useState(true);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   // const [createdOrder, setCreatedOrder] = useState<{ // eslint-disable-line @typescript-eslint/no-unused-vars
   //   name: string;
@@ -282,13 +282,13 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
             {discountError && <p className="text-xs text-red-500">{discountError}</p>}
           </div>
 
-          <div className='text-black text-sm mb-4'>
+          {/* <div className='text-black text-sm mb-4'>
                     <span className='mr-2'>Receipt:</span>
                     <input type="radio" value="" checked={receipt} name="inline-radio-group" className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" onChange={() => setReceipt(true)} />
                     <label className="mx-2 text-sm font-medium text-black">Yes</label>
                     <input type="radio" value="" checked={!receipt} name="inline-radio-group" className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" onChange={() => setReceipt(false)} />
                     <label className="mx-2 text-sm font-medium text-black">No</label>
-                </div>
+                </div> */}
         </div>
       </div>
 
