@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Home01, Box, FileX01, BarChart01, Settings01 } from "@untitledui/icons";
+import { Home01, Box, FileX01, BarChart01, Settings01, Ticket01 } from "@untitledui/icons";
 import { SidebarNavigationSimple } from "@/components/application/app-navigation/sidebar-navigation/sidebar-simple";
 import type { NavItemType } from "@/components/application/app-navigation/config";
 
@@ -27,6 +27,11 @@ export default function Navbar() {
       label: "Kitchen",
       href: "/kitchen",
       icon: Box,
+    },
+    {
+      label: "Tickets",
+      href: "/tickets",
+      icon: Ticket01,
     },
     {
       label: "Inventory",

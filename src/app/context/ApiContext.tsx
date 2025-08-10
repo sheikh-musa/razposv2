@@ -22,6 +22,7 @@ interface ApiContextType {
     fetchKitchenOrderNames: () => Promise<SalesOrders[]>;
     fetchKitchenOrderDetails: (orderId: string) => Promise<SalesOrders[]>;
     updateKitchenOrder: (orderName: string, payload: SalesOrderUpdatePayload) => Promise<Response>;
+    fetchOpenTickets: () => Promise<SalesOrders[]>;
     createSalesInvoice: (payload: SalesInvoicePayload) => Promise<Response>;
     createPaymentEntry: (payload: PaymentEntryPayload) => Promise<Response>;
     getRevenue: () => Promise<RevenueEntry[]>;
@@ -590,6 +591,23 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return response;
     }
 
+    const fetchOpenTickets = async () => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order?filters=[["docstatus", "=", 0]]`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to fetch open tickets: ${JSON.stringify(errorData)}`);
+        }
+        const data = await response.json();
+        return data.data;
+    }
+
     //* -------------------------------------------------------------------------- */
     //*                             API calls for Payment                          */
     //* -------------------------------------------------------------------------- */
@@ -1059,6 +1077,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             fetchKitchenOrderNames,
             fetchKitchenOrderDetails,
             updateKitchenOrder,
+            fetchOpenTickets,
             createSalesInvoice,
             createPaymentEntry,
             getRevenue,
