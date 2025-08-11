@@ -15,7 +15,7 @@ export default function KitchenOrderCard({
     onItemComplete,
     onOrderComplete
 }: KitchenOrderCardProps) {
-    const { createSalesInvoice, createPaymentEntry, updateKitchenOrder, updateKitchenOrderPayment, getCompanyName } = useApi();
+    const { createSalesInvoice, createPaymentEntry, updateKitchenOrder, updateKitchenOrderPayment, getCompanyName, updateKitchenOrderItem } = useApi();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
     const [isCompleting, setIsCompleting] = useState(false);
@@ -31,11 +31,17 @@ export default function KitchenOrderCard({
         setCanComplete(paymentStatus === 1 && allItemsCompleted);
     }, [completedItems, paymentStatus, order.items]);
 
-    const handleCheckboxChange = (itemCode: string, checked: boolean) => {
+    const handleCheckboxChange = async (itemCode: string, checked: boolean) => {
         setCompletedItems(prev => ({
             ...prev,
             [itemCode]: checked
         }));
+        const item_name = order.items.find(item => item.item_code === itemCode)?.name;
+        if (item_name) {
+            const response = await updateKitchenOrderItem(item_name);
+            const data = await response.json();
+            console.log('data', data.data); // ! console log
+        }
         onItemComplete(order.name, itemCode, checked);
     };
 

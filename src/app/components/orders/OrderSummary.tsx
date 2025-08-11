@@ -62,7 +62,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
       custom_payment_mode: paymentMethod,
       custom_order_complete: 0,
       custom_payment_complete: paymentComplete,
-      docstatus: 1,
+      docstatus: 0,
       ...(discount > 0 && { additional_discount_percentage: discount }),
     };
   

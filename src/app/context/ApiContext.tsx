@@ -22,6 +22,7 @@ interface ApiContextType {
     fetchKitchenOrderNames: () => Promise<SalesOrders[]>;
     fetchKitchenOrderDetails: (orderId: string) => Promise<SalesOrders[]>;
     updateKitchenOrder: (orderName: string, payload: SalesOrderUpdatePayload) => Promise<Response>;
+    updateKitchenOrderItem: (SalesOrderItemName: string) => Promise<Response>;
     fetchOpenTickets: () => Promise<SalesOrders[]>;
     createSalesInvoice: (payload: SalesInvoicePayload) => Promise<Response>;
     createPaymentEntry: (payload: PaymentEntryPayload) => Promise<Response>;
@@ -573,6 +574,24 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return response;
     }
 
+    const updateKitchenOrderItem = async (SalesOrderItemName: string) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order Item/${SalesOrderItemName}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({custom_item_done: 1})
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to update kitchen order item: ${JSON.stringify(errorData)}`);
+        }
+        return response;
+    }
+
     const updateKitchenOrderPayment = async (orderName: string, payload: PaymentUpdatePayload) => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order/${orderName}`, {
             method: 'PUT',
@@ -1077,6 +1096,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             fetchKitchenOrderNames,
             fetchKitchenOrderDetails,
             updateKitchenOrder,
+            updateKitchenOrderItem,
             fetchOpenTickets,
             createSalesInvoice,
             createPaymentEntry,
