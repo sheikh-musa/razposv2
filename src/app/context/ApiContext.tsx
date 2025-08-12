@@ -22,7 +22,7 @@ interface ApiContextType {
     fetchKitchenOrderNames: () => Promise<SalesOrders[]>;
     fetchKitchenOrderDetails: (orderId: string) => Promise<SalesOrders[]>;
     updateKitchenOrder: (orderName: string, payload: SalesOrderUpdatePayload) => Promise<Response>;
-    updateKitchenOrderItem: (SalesOrderItemName: string) => Promise<Response>;
+    updateKitchenOrderItem: (SalesOrderItemName: string, customItemDone: number) => Promise<Response>;
     fetchOpenTickets: () => Promise<SalesOrders[]>;
     createSalesInvoice: (payload: SalesInvoicePayload) => Promise<Response>;
     createPaymentEntry: (payload: PaymentEntryPayload) => Promise<Response>;
@@ -574,7 +574,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return response;
     }
 
-    const updateKitchenOrderItem = async (SalesOrderItemName: string) => {
+    const updateKitchenOrderItem = async (SalesOrderItemName: string, customItemDone: number) => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order Item/${SalesOrderItemName}`, {
             method: 'PUT',
             headers: {
@@ -582,7 +582,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({custom_item_done: 1})
+            body: JSON.stringify({custom_item_done: customItemDone})
         });
         if (!response.ok) {
             const errorData = await response.json();

@@ -17,7 +17,14 @@ export default function KitchenOrderCard({
 }: KitchenOrderCardProps) {
     const { createSalesInvoice, createPaymentEntry, updateKitchenOrder, updateKitchenOrderPayment, getCompanyName, updateKitchenOrderItem } = useApi();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
+    // Initialize completedItems state based on API response
+    const [completedItems, setCompletedItems] = useState<Record<string, boolean>>(() => {
+        const initialCompletedItems: Record<string, boolean> = {};
+        order.items.forEach(item => {
+            initialCompletedItems[item.item_code] = item.custom_item_done === 1;
+        });
+        return initialCompletedItems;
+    });
     const [isCompleting, setIsCompleting] = useState(false);
     const [canComplete, setCanComplete] = useState(false);
     const [paymentStatus, setPaymentStatus] = useState(order.custom_payment_complete);
@@ -32,17 +39,38 @@ export default function KitchenOrderCard({
     }, [completedItems, paymentStatus, order.items]);
 
     const handleCheckboxChange = async (itemCode: string, checked: boolean) => {
-        setCompletedItems(prev => ({
-            ...prev,
-            [itemCode]: checked
-        }));
+        console.log('Checkbox changed:', itemCode, checked); // Debug log
+        
+        // Update state immediately
+        setCompletedItems(prev => {
+            const newState = {
+                ...prev,
+                [itemCode]: checked
+            };
+            console.log('New completedItems state:', newState); // Debug log
+            return newState;
+        });
+        
+        // Call the parent callback
+        onItemComplete(order.name, itemCode, checked);
+        
+        // Update API asynchronously
         const item_name = order.items.find(item => item.item_code === itemCode)?.name;
         if (item_name) {
-            const response = await updateKitchenOrderItem(item_name);
-            const data = await response.json();
-            console.log('data', data.data); // ! console log
+            try {
+                const customItemDone = checked ? 1 : 0;
+                const response = await updateKitchenOrderItem(item_name, customItemDone);
+                const data = await response.json();
+                console.log('API response:', data.data); // ! console log
+            } catch (error) {
+                console.error('Failed to update API:', error);
+                // Revert state if API call fails
+                setCompletedItems(prev => ({
+                    ...prev,
+                    [itemCode]: !checked
+                }));
+            }
         }
-        onItemComplete(order.name, itemCode, checked);
     };
 
     const handlePaymentToggle = () => {
@@ -187,7 +215,9 @@ export default function KitchenOrderCard({
                 </div>
                 <div className='py-3'>
                     <p className='font-bold mb-3'>Remaining order:</p>
-                    {order.items.map((item, idx) => (
+                    {order.items.map((item, idx) => {
+                        // console.log(`Rendering checkbox for ${item.item_code}:`, completedItems[item.item_code]); // Debug log
+                        return (
                         <div key={idx} className='flex items-center justify-between mb-2'>
                             <div className='flex items-center gap-3'>
                                 <input 
@@ -205,7 +235,8 @@ export default function KitchenOrderCard({
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    );
+                    })}
                 </div>
                 {order.custom_remarks && (
                     <div className='pt-3 border-t'>

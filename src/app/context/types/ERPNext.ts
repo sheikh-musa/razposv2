@@ -130,6 +130,7 @@ export type SalesOrderItem = {
     item_code: string;
     qty: number;
     additional_notes?: string;
+    custom_item_done?: number;
 }
 
 export type SalesOrderPayload = {
