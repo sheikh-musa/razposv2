@@ -871,10 +871,10 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     //*                             API calls for Custom Fields                     */
     //* -------------------------------------------------------------------------- */
 
-    const checkCustomFieldExists = async (fieldname: string): Promise<boolean> => {
+    const checkCustomFieldExists = async (fieldname: string, dt: string): Promise<boolean> => {
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/resource/Custom Field?filters=[["fieldname","=","${fieldname}"],["dt","=","Sales Order"]]`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/resource/Custom Field?filters=[["fieldname","=","${fieldname}"],["dt","=","${dt}"]]`,
                 {
                     headers: {
                         'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -983,7 +983,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             ];
 
             for (const field of customFields) {
-                const exists = await checkCustomFieldExists(field.fieldname);
+                const exists = await checkCustomFieldExists(field.fieldname, field.dt);
                 if (!exists) {
                     console.log(`Creating custom field: ${field.fieldname}`);
                     await createCustomField(field);
