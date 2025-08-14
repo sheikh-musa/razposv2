@@ -24,6 +24,7 @@ interface ApiContextType {
     updateKitchenOrder: (orderName: string, payload: SalesOrderUpdatePayload) => Promise<Response>;
     updateKitchenOrderItem: (SalesOrderItemName: string, customItemDone: number) => Promise<Response>;
     fetchOpenTickets: () => Promise<SalesOrders[]>;
+    completeOpenTicket: (orderName: string) => Promise<Response>;
     createSalesInvoice: (payload: SalesInvoicePayload) => Promise<Response>;
     createPaymentEntry: (payload: PaymentEntryPayload) => Promise<Response>;
     getRevenue: () => Promise<RevenueEntry[]>;
@@ -609,6 +610,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
         return response;
     }
+    //* -------------------------------------------------------------------------- */
+    //*                             API calls for Open Tickets                     */
+    //* -------------------------------------------------------------------------- */
 
     const fetchOpenTickets = async () => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order?filters=[["docstatus", "=", 0]]`, {
@@ -625,6 +629,24 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
         const data = await response.json();
         return data.data;
+    }
+
+    const completeOpenTicket = async (orderName: string) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order/${orderName}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({docstatus: 1})
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to complete open ticket: ${JSON.stringify(errorData)}`);
+        }
+        return response;
     }
 
     //* -------------------------------------------------------------------------- */
@@ -1098,6 +1120,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             updateKitchenOrder,
             updateKitchenOrderItem,
             fetchOpenTickets,
+            completeOpenTicket,
             createSalesInvoice,
             createPaymentEntry,
             getRevenue,

@@ -129,7 +129,7 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
         {/* Cart Items */}
         <div className="space-y-4 mb-6">
           {items.map((item) => (
-            console.log('item', item),
+            // console.log('item', item),
             <div key={`${item.itemVariant}-${item.name}`} className="flex flex-col">
               <div className="flex justify-between items-start mb-1">
                 <div>

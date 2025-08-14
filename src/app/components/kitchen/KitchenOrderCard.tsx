@@ -18,7 +18,7 @@ export default function KitchenOrderCard({
     const { createSalesInvoice, createPaymentEntry, updateKitchenOrder, updateKitchenOrderPayment, getCompanyName, updateKitchenOrderItem } = useApi();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     // Initialize completedItems state based on API response
-    const [completedItems, setCompletedItems] = useState<Record<string, boolean>>(() => {
+    const [completeOrderItems, setCompleteOrderItems] = useState<Record<string, boolean>>(() => {
         const initialCompletedItems: Record<string, boolean> = {};
         order.items.forEach(item => {
             initialCompletedItems[item.item_code] = item.custom_item_done === 1;
@@ -34,15 +34,15 @@ export default function KitchenOrderCard({
 
     // Check if all items are completed and payment is received
     useEffect(() => {
-        const allItemsCompleted = order.items.every(item => completedItems[item.item_code]);
+        const allItemsCompleted = order.items.every(item => completeOrderItems[item.item_code]);
         setCanComplete(paymentStatus === 1 && allItemsCompleted);
-    }, [completedItems, paymentStatus, order.items]);
+    }, [completeOrderItems, paymentStatus, order.items]);
 
     const handleCheckboxChange = async (itemCode: string, checked: boolean) => {
         console.log('Checkbox changed:', itemCode, checked); // Debug log
         
         // Update state immediately
-        setCompletedItems(prev => {
+        setCompleteOrderItems(prev => {
             const newState = {
                 ...prev,
                 [itemCode]: checked
@@ -65,7 +65,7 @@ export default function KitchenOrderCard({
             } catch (error) {
                 console.error('Failed to update API:', error);
                 // Revert state if API call fails
-                setCompletedItems(prev => ({
+                setCompleteOrderItems(prev => ({
                     ...prev,
                     [itemCode]: !checked
                 }));
@@ -223,10 +223,10 @@ export default function KitchenOrderCard({
                                 <input 
                                     type="checkbox" 
                                     className='w-4 h-4'
-                                    checked={completedItems[item.item_code] || false}
+                                    checked={completeOrderItems[item.item_code] || false}
                                     onChange={(e) => handleCheckboxChange(item.item_code, e.target.checked)}
                                 />
-                                <div className={completedItems[item.item_code] ? 'line-through text-gray-400' : ''}>
+                                <div className={completeOrderItems[item.item_code] ? 'line-through text-gray-400' : ''}>
                                     <p className='font-medium'>{item.item_code}</p>
                                     {item.additional_notes && (
                                             <p className='text-slate-600 text-xs'>note: {item.additional_notes}</p>
@@ -264,7 +264,7 @@ export default function KitchenOrderCard({
                         ? 'Completing...' 
                         : !paymentStatus
                             ? 'Payment Required'
-                            : !order.items.every(item => completedItems[item.item_code])
+                            : !order.items.every(item => completeOrderItems[item.item_code])
                                 ? 'Items Pending'
                                 : 'Complete Order'
                     }
@@ -273,7 +273,7 @@ export default function KitchenOrderCard({
                 {!canComplete && (
                     <div className='mt-2 text-xs text-gray-500'>
                         {!paymentStatus && '• Payment required'}
-                        {!order.items.every(item => completedItems[item.item_code]) && '• Complete all items'}
+                        {!order.items.every(item => completeOrderItems[item.item_code]) && '• Complete all items'}
                     </div>
                 )}
             </div>
