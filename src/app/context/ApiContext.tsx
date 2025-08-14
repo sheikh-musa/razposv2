@@ -972,6 +972,13 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                     insert_after: "custom_payment_mode",
                     fieldtype: "Check",
                     allow_on_submit: 1
+                },
+                {
+                    dt: "Sales Order Item",
+                    label: "item_done",
+                    fieldname: "custom_item_done",
+                    insert_after: "reserve_stock",
+                    fieldtype: "Check",
                 }
             ];
 
