@@ -5,16 +5,27 @@ import { SalesOrders } from '@/app/context/types/ERPNext'
 
 
 export default function Tickets() {
-  const { fetchOpenTickets } = useApi();
+  const { fetchOpenTickets, fetchKitchenOrderDetails } = useApi();
   const [tickets, setTickets] = useState<SalesOrders[]>([]);
   const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
   useEffect(() => {
-    fetchOpenTickets().then(setTickets);
+    loadPage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); 
+
+  const loadPage = async () => {
+    const response = await fetchOpenTickets();
+    const ticketsDetails = await Promise.all(response.map(async (ticket) => {
+      const details = await fetchKitchenOrderDetails(ticket.name);
+      return details;
+    }));
+    console.log('ticketsDetails', (ticketsDetails));
+    console.log('ticketsDetails.flat()', (ticketsDetails.flat()));
+    setTickets(ticketsDetails.flat());
+  }
 
   const handleCheckboxChange = (ticketId: string, checked: boolean) => {
     if (checked) {
