@@ -286,6 +286,7 @@ export type SalesHistoryOrder = {
     custom_payment_mode: string;
     total_qty: number;
     customer_name: string;
+    docstatus: number;
     items: TransactionHistoryItem[];
 }
 

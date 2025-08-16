@@ -139,10 +139,11 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                 <option>Unpaid</option>
               </select>
             </div> */}
-            
-            <button className="w-full py-3 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
-              Save
-            </button>
+            {order.docstatus === 0 ? (
+              <button className="w-full py-3 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
+                Edit
+              </button>
+            ) : null}
           </div>
         </div>
       </div>

@@ -2,9 +2,12 @@
 import { useApi } from '@/app/context/ApiContext'
 import { useEffect, useState } from 'react'
 import { SalesOrders } from '@/app/context/types/ERPNext'
+import OrderDetails from '../components/transactionHistory/OrderDetails'
 
 
 export default function Tickets() {
+  const [showOrderDetails, setShowOrderDetails] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<SalesOrders | null>(null);
   const { fetchOpenTickets, fetchKitchenOrderDetails } = useApi();
   const [tickets, setTickets] = useState<SalesOrders[]>([]);
   const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
@@ -22,8 +25,6 @@ export default function Tickets() {
       const details = await fetchKitchenOrderDetails(ticket.name);
       return details;
     }));
-    console.log('ticketsDetails', (ticketsDetails));
-    console.log('ticketsDetails.flat()', (ticketsDetails.flat()));
     setTickets(ticketsDetails.flat());
   }
 
@@ -48,9 +49,12 @@ export default function Tickets() {
     console.log('Delete ticket:', ticketId);
   };
 
-  const handleResume = (ticketId: string) => {
-    // TODO: Implement resume functionality
-    console.log('Resume ticket:', ticketId);
+  const handleOpen = (ticketId: string) => {
+    const ticket = tickets.find(ticket => ticket.name === ticketId);
+    if (ticket) {
+      setSelectedOrder(ticket);
+      setShowOrderDetails(true);
+    }
   };
 
   const formatTime = (creationDate: string) => {
@@ -66,6 +70,7 @@ export default function Tickets() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentTickets = tickets.slice(startIndex, endIndex);
+  console.log('currentTickets', currentTickets);
 
   const generatePageNumbers = () => {
     const pages = [];
@@ -174,10 +179,10 @@ export default function Tickets() {
                           Delete
                         </button>
                         <button
-                          onClick={() => handleResume(ticket.name)}
+                          onClick={() => handleOpen(ticket.name)}
                           className="text-purple-600 hover:text-purple-800 font-medium"
                         >
-                          Resume
+                          Open
                         </button>
                       </div>
                     </td>
@@ -259,6 +264,16 @@ export default function Tickets() {
           </div>
         </div>
       </div>
+      {showOrderDetails && selectedOrder && (
+        <OrderDetails
+          // @ts-expect-error - selectedOrder is guaranteed to be Order type
+          order={selectedOrder} // Now selectedOrder is guaranteed to be Order type
+          onClose={() => {
+            setShowOrderDetails(false);
+            setSelectedOrder(null);
+          }}
+        />
+      )}
     </div>
   );
 }
