@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { SalesHistoryOrder } from '@/app/context/types/ERPNext';
 import { Toaster } from 'react-hot-toast';
 import { generateReceipt } from '@/app/utils/receiptUtils';
+import { useRouter } from 'next/navigation';
 
 
 type OrderDetailsProps = {
@@ -12,6 +13,7 @@ type OrderDetailsProps = {
 
 export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
   // const [paymentMethod, setPaymentMethod] = useState(order?.custom_payment_mode || 'Cash');
   // const [paymentStatus, setPaymentStatus] = useState(order?.custom_payment_complete ? 'Paid' : 'Unpaid');
 
@@ -37,6 +39,10 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
       setLoading(false);
     }
   };
+
+  const handleEditOrder = async () => {
+    router.push(`/orders?order=${order.name}`);
+  }
 
   return (
     <>
@@ -140,7 +146,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
               </select>
             </div> */}
             {order.docstatus === 0 ? (
-              <button className="w-full py-3 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
+              <button className="w-full py-3 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700" onClick={handleEditOrder}>
                 Edit
               </button>
             ) : null}

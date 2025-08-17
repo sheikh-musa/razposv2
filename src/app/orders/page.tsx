@@ -6,9 +6,12 @@ import OrderConfirmationModal from "../components/modals/OrderConfirmationModal"
 import OrderCard from "../components/orders/OrderCard";
 import { useApi } from "../context/ApiContext";
 import { ItemTemplate, ItemWithPrice } from "../context/types/ERPNext";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 export default function Orders() {
-  const { fetchItems, fetchItemDetails, fetchItemPrice } = useApi();
+  const { fetchItems, fetchItemDetails, fetchItemPrice, fetchKitchenOrderDetails } = useApi();
   const [products, setProducts] = useState<ItemTemplate[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   // const [showFilters, setShowFilters] = useState(false);
@@ -21,50 +24,80 @@ export default function Orders() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const editOrder = searchParams.get("order");
+  const router = useRouter();
 
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoading(true);
-        // Fetch item templates (items with variants)
-        const templates = await fetchItems(false, true);
-        // For each template, fetch its variants
-        const productsWithVariants = await Promise.all(
-          templates.map(async (template) => {
-            const variants = await fetchItemDetails(template.name, true);
-            // Fetch prices for all variants
-            const variantsWithPrices = await Promise.all(
-              variants.map(async (variant) => {
-                const price = await fetchItemPrice(variant.name);
-                const itemPrice = price[0]; // Get first price from array
-                return {
-                  ...variant,
-                  price: itemPrice, // Use single ItemPrice object instead of array
-                  quantity: 1, // Default quantity for ordering
-                } as ItemWithPrice;
-              })
-            );
-
-            return {
-              name: template.name,
-              item_name: template.item_name,
-              variants: variantsWithPrices,
-            };
-          })
-        );
-        setProducts(productsWithVariants);
-        console.log("productsWithVariants", productsWithVariants); // ! console log
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load products");
-        console.error("Error loading products:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    
     loadProducts();
+    fetchOrderToUpdate();
     // eslint-disable-next-line
   }, []);
+
+  const fetchOrderToUpdate = async () => {
+    if (editOrder) {
+      const storedOrder = await fetchKitchenOrderDetails(editOrder);
+      // @ts-expect-error - docstatus is not defined in the type
+      if (storedOrder.docstatus === 0) {
+        const order = storedOrder;
+        // @ts-expect-error - items is not defined in the type
+        order.items.forEach((item) => {
+          addItem({
+            itemTemplate: item.item_code,
+            name: item.item_name,
+            itemVariant: item.item_name,
+            price: item.price?.price_list_rate || 0, // ! some of the old data use valuation_rate
+            quantity: item.quantity || 1,
+            type: item.item_name,
+          });
+        });
+        setShowOrderSummary(true);
+      } else {
+        router.push("/orders");
+        toast.error("Order is already completed");
+      }
+    }
+  };
+
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      // Fetch item templates (items with variants)
+      const templates = await fetchItems(false, true);
+      // For each template, fetch its variants
+      const productsWithVariants = await Promise.all(
+        templates.map(async (template) => {
+          const variants = await fetchItemDetails(template.name, true);
+          // Fetch prices for all variants
+          const variantsWithPrices = await Promise.all(
+            variants.map(async (variant) => {
+              const price = await fetchItemPrice(variant.name);
+              const itemPrice = price[0]; // Get first price from array
+              return {
+                ...variant,
+                price: itemPrice, // Use single ItemPrice object instead of array
+                quantity: 1, // Default quantity for ordering
+              } as ItemWithPrice;
+            })
+          );
+
+          return {
+            name: template.name,
+            item_name: template.item_name,
+            variants: variantsWithPrices,
+          };
+        })
+      );
+      setProducts(productsWithVariants);
+      console.log("productsWithVariants", productsWithVariants); // ! console log
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load products");
+      console.error("Error loading products:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleQuantityChange = (productName: string, variantName: string, change: number) => {
     setProducts((prevProducts) =>
