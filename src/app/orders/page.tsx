@@ -57,7 +57,7 @@ export default function Orders() {
         setShowOrderSummary(true);
       } else {
         router.push("/orders");
-        toast.error("Order is already completed");
+        toast.error("Invalid order. Order is already completed");
       }
     }
   };
