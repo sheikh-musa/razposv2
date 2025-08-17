@@ -47,8 +47,8 @@ export default function Orders() {
             itemTemplate: item.item_code,
             name: item.item_name,
             itemVariant: item.item_name,
-            price: item.price?.price_list_rate || 0, // ! some of the old data use valuation_rate
-            quantity: item.quantity || 1,
+            price: item.price_list_rate,
+            quantity: item.qty,
             type: item.item_name,
           });
         });
