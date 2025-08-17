@@ -1,17 +1,18 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useApi } from '../../context/ApiContext';
-import { SalesOrderPayload } from '../../context/types/ERPNext';
+import { SalesOrderPayload, SalesOrders } from '../../context/types/ERPNext';
 import toast from 'react-hot-toast';
 // import { generateReceipt } from '../../utils/receiptUtils';
 import SendReceiptModal from '../modals/order/SendReceiptModal';
 
 interface OrderSummaryProps {
   onClose: () => void;
+  orderToUpdate: SalesOrders | null;
 }
 
-export default function OrderSummary({ onClose }: OrderSummaryProps) {
+export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryProps) {
   const { items, removeItem, updateQuantity, total, clearCart, updateAdditionalNotes } = useCart();
   const { createKitchenOrder } = useApi();
   const [dineIn, setDineIn] = useState(true);
@@ -41,6 +42,11 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
 // TODO: Add logic to check if the items are in stock
 // TODO: Add logic to change outstanding amount to 0 if paid
 
+useEffect(() => {
+  if (orderToUpdate) {
+    console.log('orderToUpdate', orderToUpdate);
+  }
+}, [orderToUpdate]);
  // ! Current item naming convention is item_code
  // ! Not all items are based on Item Price
  // ! Status is always To Deliver and Bill will change to Overdue after 1 day
@@ -104,6 +110,10 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
     //   generateReceipt({ order: createdOrder });
     // }
     handleReceiptModalClose();
+  };
+
+  const handleUpdate = () => {
+    console.log('update');
   };
 
   return (
@@ -308,12 +318,21 @@ export default function OrderSummary({ onClose }: OrderSummaryProps) {
             <span>Less {discount}% discount</span>
             <span className="font-medium">${(total * (1 - discount / 100)).toFixed(2)}</span>
           </div>}
+          {orderToUpdate ? (
+            <button 
+              onClick={handleUpdate}
+              className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700"
+            >
+              Update
+            </button>
+          ) : (
         <button 
           onClick={handleConfirm}
           className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700"
         >
           Confirm
         </button>
+        )}
       </div>
     </div>
 

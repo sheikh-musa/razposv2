@@ -27,6 +27,8 @@ export default function Orders() {
   const searchParams = useSearchParams();
   const editOrder = searchParams.get("order");
   const router = useRouter();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [orderToUpdate, setOrderToUpdate] = useState<any>(null);
 
   useEffect(() => {
     
@@ -40,9 +42,9 @@ export default function Orders() {
       const storedOrder = await fetchKitchenOrderDetails(editOrder);
       // @ts-expect-error - docstatus is not defined in the type
       if (storedOrder.docstatus === 0) {
-        const order = storedOrder;
+        setOrderToUpdate(storedOrder);
         // @ts-expect-error - items is not defined in the type
-        order.items.forEach((item) => {
+        storedOrder.items.forEach((item) => {
           addItem({
             itemTemplate: item.item_code,
             name: item.item_name,
@@ -225,7 +227,10 @@ export default function Orders() {
         {/* Order Summary Side Panel */}
         {showOrderSummary && (
           <div className="w-80 flex-shrink-0 ">
-            <OrderSummary onClose={() => setShowOrderSummary(false)} />
+            <OrderSummary 
+            onClose={() => setShowOrderSummary(false)} 
+            orderToUpdate={orderToUpdate} 
+            />
           </div>
         )}
       </div>
