@@ -203,13 +203,13 @@ useEffect(() => {
 
           {/* Buzzer Number */}
           <div>
-            <label className="block text-sm mb-1">Buzzer</label>
+            <label className="block text-sm mb-1">Buzzer/table number</label>
             <input
               type="text"
               value={buzzerNumber}
               onChange={(e) => setBuzzerNumber(e.target.value)}
               className="w-full p-2 border rounded-md text-sm"
-              placeholder="Enter buzzer number"
+              placeholder="Enter buzzer/table number"
             />
           </div>
 
