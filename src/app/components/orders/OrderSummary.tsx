@@ -6,6 +6,7 @@ import { SalesOrderPayload, SalesOrders } from '../../context/types/ERPNext';
 import toast from 'react-hot-toast';
 // import { generateReceipt } from '../../utils/receiptUtils';
 import SendReceiptModal from '../modals/order/SendReceiptModal';
+import { useRouter } from 'next/navigation';
 
 interface OrderSummaryProps {
   onClose: () => void;
@@ -13,6 +14,7 @@ interface OrderSummaryProps {
 }
 
 export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryProps) {
+  const router = useRouter();
   const { items, removeItem, updateQuantity, total, clearCart, updateAdditionalNotes } = useCart();
   const { createKitchenOrder, updateKitchenOrder } = useApi();
   const [dineIn, setDineIn] = useState(true);
@@ -79,6 +81,7 @@ useEffect(() => {
       orderToUpdate ? toast.success('Order updated successfully') : toast.success('Order created successfully');
       setShowReceiptModal(true);
       clearCart();
+      router.push('/orders');
       // onClose();
     } else {
       toast.error('Failed to create order');
