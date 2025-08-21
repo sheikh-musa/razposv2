@@ -532,8 +532,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         });
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('Error details:', errorData);
-            throw new Error(`Failed to fetch kitchen order details: ${JSON.stringify(errorData)}`);
+            console.log('Error details:', errorData);
+            console.log(`Failed to fetch kitchen order details: ${JSON.stringify(errorData)}`);
+            return null;
         }
         const data = await response.json();
         return data.data;

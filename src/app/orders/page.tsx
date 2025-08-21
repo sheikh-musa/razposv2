@@ -40,6 +40,11 @@ export default function Orders() {
   const fetchOrderToUpdate = async () => {
     if (editOrder) {
       const storedOrder = await fetchKitchenOrderDetails(editOrder);
+      if (!storedOrder) {
+        router.push("/orders");
+        toast.error("Invalid order. Order is not found");
+        return;
+      }
       // @ts-expect-error - docstatus is not defined in the type
       if (storedOrder.docstatus === 0) {
         setOrderToUpdate(storedOrder);
