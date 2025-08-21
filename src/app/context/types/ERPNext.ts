@@ -116,6 +116,8 @@ export type SalesOrders = {
     custom_payment_complete: number;
     custom_order_complete: number;
     docstatus?: number;
+    custom_buzzer_number?: string;
+    additional_discount_percentage?: number;
     payment_schedule: PaymentSchedule[];
     items: SalesOrderItem[];
 }

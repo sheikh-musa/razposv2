@@ -16,11 +16,11 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
   const { items, removeItem, updateQuantity, total, clearCart, updateAdditionalNotes } = useCart();
   const { createKitchenOrder } = useApi();
   const [dineIn, setDineIn] = useState(true);
-  const [buzzerNumber, setBuzzerNumber] = useState('');
+  const [buzzerNumber, setBuzzerNumber] = useState(orderToUpdate?.custom_buzzer_number || '');
   const [remark, setRemark] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [paymentComplete, setPaymentComplete] = useState<number>(0);
-  const [discount, setDiscount] = useState<number>(0);
+  const [discount, setDiscount] = useState<number>(orderToUpdate?.additional_discount_percentage || 0);
   const [discountError, setDiscountError] = useState<string>('');
   // const [receipt, setReceipt] = useState(true);
   const [showReceiptModal, setShowReceiptModal] = useState(false);

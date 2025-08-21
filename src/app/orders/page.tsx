@@ -57,9 +57,10 @@ export default function Orders() {
             price: item.price_list_rate,
             quantity: item.qty,
             type: item.item_name,
-          });
+          }, item.additional_notes || ''); // Pass additional notes directly
         });
         setShowOrderSummary(true);
+        
       } else {
         router.push("/orders");
         toast.error("Invalid order. Order is already completed");

@@ -18,7 +18,7 @@ type CartItem = {
 
 type CartContextType = {
   items: CartItem[];
-  addItem: (item: CartItem) => void;
+  addItem: (item: CartItem, additionalNotes?: string) => void;
   removeItem: (itemVariant: string, name: string) => void;
   updateQuantity: (itemVariant: string, name: string, quantity: number) => void;
   updateAdditionalNotes: (itemVariant: string, name: string, additionalNotes: string) => void;
@@ -31,21 +31,23 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  const addItem = (newItem: CartItem) => {
-    setItems(currentItems => {
-      const existingItem = currentItems.find(
-          item => item.itemVariant === newItem.itemVariant && item.name === newItem.name
-      );
-
-      if (existingItem) {
-        return currentItems.map(item =>
-          item.itemVariant === newItem.itemVariant && item.name === newItem.name
-            ? { ...item, quantity: item.quantity + newItem.quantity }
-            : item
-        );
+  const addItem = (newItem: CartItem, additionalNotes?: string) => {
+    setItems(prevItems => {
+      const existingItemIndex = prevItems.findIndex(item => item.name === newItem.name);
+      
+      if (existingItemIndex !== -1) {
+        // Update existing item
+        const updatedItems = [...prevItems];
+        updatedItems[existingItemIndex] = {
+          ...updatedItems[existingItemIndex],
+          quantity: updatedItems[existingItemIndex].quantity + newItem.quantity,
+          additional_notes: additionalNotes || updatedItems[existingItemIndex].additional_notes
+        };
+        return updatedItems;
+      } else {
+        // Add new item with additional notes
+        return [...prevItems, { ...newItem, additional_notes: additionalNotes || '' }];
       }
-
-      return [...currentItems, newItem];
     });
   };
 
