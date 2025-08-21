@@ -52,7 +52,7 @@ export default function Orders() {
         storedOrder.items.forEach((item) => {
           addItem({
             itemTemplate: item.item_code,
-            name: item.item_name,
+            name: item.item_code,
             itemVariant: item.item_name,
             price: item.price_list_rate,
             quantity: item.qty,

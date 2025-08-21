@@ -14,7 +14,7 @@ interface OrderSummaryProps {
 
 export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryProps) {
   const { items, removeItem, updateQuantity, total, clearCart, updateAdditionalNotes } = useCart();
-  const { createKitchenOrder } = useApi();
+  const { createKitchenOrder, updateKitchenOrder } = useApi();
   const [dineIn, setDineIn] = useState(true);
   const [buzzerNumber, setBuzzerNumber] = useState(orderToUpdate?.custom_buzzer_number || '');
   const [remark, setRemark] = useState('');
@@ -73,24 +73,11 @@ useEffect(() => {
     };
   
     console.log('payload', JSON.stringify(payload, null, 2));
-    const response = await createKitchenOrder(payload);
+    const response = orderToUpdate ? await updateKitchenOrder(orderToUpdate.name, payload) : await createKitchenOrder(payload);
     if (response.ok) {
-      toast.success('Order created successfully');
-      
-      // Create order object for receipt
-      // const orderForReceipt = {
-      //   name: `Order-${Date.now()}`, // Generate a unique order name
-      //   customer_name: 'Guest',
-      //   items: items.map((item) => ({
-      //     item_code: item.name,
-      //     qty: item.quantity,
-      //     rate: item.price
-      //   }))
-      // };
-      
-      // setCreatedOrder(orderForReceipt);
+      // eslint-disable-next-line 
+      orderToUpdate ? toast.success('Order updated successfully') : toast.success('Order created successfully');
       setShowReceiptModal(true);
-
       clearCart();
       // onClose();
     } else {
@@ -110,10 +97,6 @@ useEffect(() => {
     //   generateReceipt({ order: createdOrder });
     // }
     handleReceiptModalClose();
-  };
-
-  const handleUpdate = () => {
-    console.log('update');
   };
 
   return (
@@ -320,7 +303,7 @@ useEffect(() => {
           </div>}
           {orderToUpdate ? (
             <button 
-              onClick={handleUpdate}
+              onClick={handleConfirm}
               className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700"
             >
               Update

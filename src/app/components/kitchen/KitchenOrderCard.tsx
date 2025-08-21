@@ -15,7 +15,7 @@ export default function KitchenOrderCard({
     onItemComplete,
     onOrderComplete
 }: KitchenOrderCardProps) {
-    const { createSalesInvoice, createPaymentEntry, updateKitchenOrder, updateKitchenOrderPayment, getCompanyName, updateKitchenOrderItem } = useApi();
+    const { createSalesInvoice, createPaymentEntry, completeKitchenOrder, updateKitchenOrderPayment, getCompanyName, updateKitchenOrderItem } = useApi();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     // Initialize completedItems state based on API response
     const [completeOrderItems, setCompleteOrderItems] = useState<Record<string, boolean>>(() => {
@@ -140,7 +140,7 @@ export default function KitchenOrderCard({
                 custom_order_complete: 1,
                 custom_payment_complete: 1,
             };
-            const updateResponse = await updateKitchenOrder(order.name, updatePayload);
+            const updateResponse = await completeKitchenOrder(order.name, updatePayload);
             const updateData = await updateResponse.json();
             console.log('updateData', updateData); // ! CONSOLE LOG
 

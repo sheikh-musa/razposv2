@@ -21,7 +21,8 @@ interface ApiContextType {
     createKitchenOrder: (payload: SalesOrderPayload) => Promise<Response>;
     fetchKitchenOrderNames: () => Promise<SalesOrders[]>;
     fetchKitchenOrderDetails: (orderId: string) => Promise<SalesOrders[]>;
-    updateKitchenOrder: (orderName: string, payload: SalesOrderUpdatePayload) => Promise<Response>;
+    updateKitchenOrder: (orderName: string, payload: SalesOrderPayload) => Promise<Response>;
+    completeKitchenOrder: (orderName: string, payload: SalesOrderUpdatePayload) => Promise<Response>;
     updateKitchenOrderItem: (SalesOrderItemName: string, customItemDone: number) => Promise<Response>;
     fetchOpenTickets: () => Promise<SalesOrders[]>;
     completeOpenTicket: (orderName: string) => Promise<Response>;
@@ -558,7 +559,25 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return response;
     }
 
-    const updateKitchenOrder = async (orderName: string, payload: SalesOrderUpdatePayload) => {
+    const updateKitchenOrder = async (orderName: string, payload: SalesOrderPayload) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order/${orderName}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to update kitchen order: ${JSON.stringify(errorData)}`);
+        }
+        return response;
+    }
+
+    const completeKitchenOrder = async (orderName: string, payload: SalesOrderUpdatePayload) => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order/${orderName}`, {
             method: 'PUT',
             headers: {
@@ -1126,6 +1145,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             fetchKitchenOrderNames,
             fetchKitchenOrderDetails,
             updateKitchenOrder,
+            completeKitchenOrder,
             updateKitchenOrderItem,
             fetchOpenTickets,
             completeOpenTicket,
