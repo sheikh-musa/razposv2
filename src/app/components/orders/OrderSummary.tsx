@@ -20,7 +20,7 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
   const [dineIn, setDineIn] = useState(true);
   const [buzzerNumber, setBuzzerNumber] = useState(orderToUpdate?.custom_buzzer_number || '');
   const [remark, setRemark] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const [paymentMethod, setPaymentMethod] = useState(orderToUpdate?.custom_payment_mode || 'Cash');
   const [paymentComplete, setPaymentComplete] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(orderToUpdate?.additional_discount_percentage || 0);
   const [discountError, setDiscountError] = useState<string>('');

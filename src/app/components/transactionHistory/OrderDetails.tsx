@@ -127,13 +127,19 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                 <option>CDC</option>
               </select>
             </div>
+            {order.docstatus === 0 ? 
+            <button
+            className="w-full py-1 bg-white border border-purple-600 text-purple-600 text-sm rounded-lg hover:bg-purple-100 disabled:bg-gray-100 disabled:text-gray-400"
+            onClick={() => router.push('/payment')}>
+              Proceed to payment
+            </button> :
             <button 
               className="w-full py-1 bg-white border border-purple-600 text-purple-600 text-sm rounded-lg hover:bg-purple-100 disabled:bg-gray-100 disabled:text-gray-400" 
               onClick={handleGenerateReceipt}
               disabled={loading}
             >
               {loading ? 'Generating...' : 'Generate Receipt'}
-            </button>
+            </button>}
             {/* <div>
               <label className="block text-xs text-gray-600 mb-1 font-semibold">Payment status</label>
               <select 
