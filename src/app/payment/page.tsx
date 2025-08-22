@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useApi} from "../context/ApiContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
+// import { SalesOrders } from "../context/types/ERPNext";
 
 
 export default function Payment() {
@@ -25,7 +26,18 @@ export default function Payment() {
 
     const fetchOrderDetails = async () => {
         const orderDetails = await fetchKitchenOrderDetails(order);
-        console.log(orderDetails);
+        if (!orderDetails) {
+            toast.error('Invalid order. Order is not found');
+            router.push('/');
+        }
+        // @ts-expect-error - docstatus is not defined in the type
+        if (orderDetails.docstatus != 0) {
+            toast.error('Invalid order. Order is already completed');
+            router.push('/');
+        }
+        else {
+            console.log(orderDetails);
+        }
     }
 
     return (
