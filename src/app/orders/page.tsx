@@ -25,7 +25,7 @@ export default function Orders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
-  const editOrder = searchParams.get("order");
+  const editOrder = searchParams?.get("order") || null;
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [orderToUpdate, setOrderToUpdate] = useState<any>(null);

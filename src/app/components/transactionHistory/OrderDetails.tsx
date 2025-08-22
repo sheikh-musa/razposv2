@@ -44,6 +44,10 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
     router.push(`/orders?order=${order.name}`);
   }
 
+  const handleProceedPayment = async () => {
+    router.push(`/payment?order=${order.name}`);
+  }
+
   return (
     <>
       <div className="z-50"><Toaster /></div>
@@ -130,7 +134,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
             {order.docstatus === 0 ? 
             <button
             className="w-full py-1 bg-white border border-purple-600 text-purple-600 text-sm rounded-lg hover:bg-purple-100 disabled:bg-gray-100 disabled:text-gray-400"
-            onClick={() => router.push('/payment')}>
+            onClick={handleProceedPayment}>
               Proceed to payment
             </button> :
             <button 
