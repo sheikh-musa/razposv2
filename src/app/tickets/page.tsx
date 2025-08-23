@@ -70,7 +70,7 @@ export default function Tickets() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentTickets = tickets.slice(startIndex, endIndex);
-  console.log('currentTickets', currentTickets);
+  // console.log('currentTickets', currentTickets);
 
   const generatePageNumbers = () => {
     const pages = [];

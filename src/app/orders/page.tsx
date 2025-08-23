@@ -16,7 +16,7 @@ export default function Orders() {
   const [searchQuery, setSearchQuery] = useState("");
   // const [showFilters, setShowFilters] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
-  const { addItem, items } = useCart();
+  const { addItem, items, clearCart } = useCart();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingOrder, setPendingOrder] = useState<{
     product: ItemTemplate;
@@ -31,7 +31,6 @@ export default function Orders() {
   const [orderToUpdate, setOrderToUpdate] = useState<any>(null);
 
   useEffect(() => {
-    
     loadProducts();
     fetchOrderToUpdate();
     // eslint-disable-next-line
@@ -48,6 +47,7 @@ export default function Orders() {
       // @ts-expect-error - docstatus is not defined in the type
       if (storedOrder.docstatus === 0) {
         setOrderToUpdate(storedOrder);
+        clearCart();
         // @ts-expect-error - items is not defined in the type
         storedOrder.items.forEach((item) => {
           addItem({

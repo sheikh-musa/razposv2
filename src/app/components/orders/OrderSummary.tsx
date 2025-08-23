@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useApi } from '../../context/ApiContext';
 import { SalesOrderPayload, SalesOrders } from '../../context/types/ERPNext';
@@ -44,11 +44,6 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
 // TODO: Add logic to check if the items are in stock
 // TODO: Add logic to change outstanding amount to 0 if paid
 
-useEffect(() => {
-  if (orderToUpdate) {
-    console.log('orderToUpdate', orderToUpdate);
-  }
-}, [orderToUpdate]);
  // ! Current item naming convention is item_code
  // ! Not all items are based on Item Price
  // ! Status is always To Deliver and Bill will change to Overdue after 1 day
