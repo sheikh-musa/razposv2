@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, PaymentUpdatePayload } from '@/app/context/types/ERPNext';
 import { useApi } from '@/app/context/ApiContext';
 import toast from 'react-hot-toast';
@@ -15,6 +16,7 @@ export default function KitchenOrderCard({
     onItemComplete,
     onOrderComplete
 }: KitchenOrderCardProps) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { createSalesInvoice, createPaymentEntry, completeKitchenOrder, updateKitchenOrderPayment, getCompanyName, updateKitchenOrderItem } = useApi();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     // Initialize completedItems state based on API response
@@ -91,61 +93,62 @@ export default function KitchenOrderCard({
         try {
             setIsCompleting(true);
             // const today = new Date().toISOString().split('T')[0];
-            const companyName = await getCompanyName();
-            // @ts-expect-error - companyName is a string
-            const companyNameString = companyName.charAt(0);
+            // TODO: Commented out. Payment logic will be changed to payment page
+            // const companyName = await getCompanyName();
+            // // @ts-expect-error - companyName is a string
+            // const companyNameString = companyName.charAt(0);
             
-            const invoicePayload: SalesInvoicePayload = {
-                customer: order.customer,
-                items: order.items.map(item => ({
-                    item_code: item.item_code,
-                    qty: item.qty,
-                    warehouse: `Stores - ${companyNameString}`,
-                    income_account: `Sales Income - ${companyNameString}`,
-                    sales_order: order.name,
-                })),
-                update_stock: 1,
-                disable_rounded_total: 1,
-                docstatus: 1
-            };
-            console.log('invoicePayload', invoicePayload);
-            const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
-            const salesInvoiceData = await salesInvoiceResponse.json();
+            // const invoicePayload: SalesInvoicePayload = {
+            //     customer: order.customer,
+            //     items: order.items.map(item => ({
+            //         item_code: item.item_code,
+            //         qty: item.qty,
+            //         warehouse: `Stores - ${companyNameString}`,
+            //         income_account: `Sales Income - ${companyNameString}`,
+            //         sales_order: order.name,
+            //     })),
+            //     update_stock: 1,
+            //     disable_rounded_total: 1,
+            //     docstatus: 1
+            // };
+            // console.log('invoicePayload', invoicePayload);
+            // const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
+            // const salesInvoiceData = await salesInvoiceResponse.json();
 
-            console.log('salesInvoiceData', salesInvoiceData); // ! CONSOLE LOG
+            // console.log('salesInvoiceData', salesInvoiceData); // ! CONSOLE LOG
 
-            const paymentPayload: PaymentEntryPayload = {
-                payment_type: "Receive",
-                party_type: "Customer",
-                party: order.customer,
-                paid_to: `Petty Cash - ${companyNameString}`, // ! if Bank Account - R, then reference no. needed regardless of mode of payment
-                received_amount: order.total,
-                paid_amount: order.total,
-                references: [{
-                    reference_doctype: "Sales Invoice",
-                    reference_name: salesInvoiceData.data.name,
-                    total_amount: order.total,
-                    outstanding_amount: order.total,
-                    allocated_amount: order.total,
-                }],
-                mode_of_payment: paymentMethod,
-                docstatus: 1
-            };
-            console.log('paymentPayload', paymentPayload); // ! console log
-            const paymentEntryResponse = await createPaymentEntry(paymentPayload);
-            const paymentEntryData = await paymentEntryResponse.json();
+            // const paymentPayload: PaymentEntryPayload = {
+            //     payment_type: "Receive",
+            //     party_type: "Customer",
+            //     party: order.customer,
+            //     paid_to: `Petty Cash - ${companyNameString}`, // ! if Bank Account - R, then reference no. needed regardless of mode of payment
+            //     received_amount: order.total,
+            //     paid_amount: order.total,
+            //     references: [{
+            //         reference_doctype: "Sales Invoice",
+            //         reference_name: salesInvoiceData.data.name,
+            //         total_amount: order.total,
+            //         outstanding_amount: order.total,
+            //         allocated_amount: order.total,
+            //     }],
+            //     mode_of_payment: paymentMethod,
+            //     docstatus: 1
+            // };
+            // console.log('paymentPayload', paymentPayload); // ! console log
+            // const paymentEntryResponse = await createPaymentEntry(paymentPayload);
+            // const paymentEntryData = await paymentEntryResponse.json();
 
-            console.log('paymentEntryData', paymentEntryData); // ! CONSOLE LOG
+            // console.log('paymentEntryData', paymentEntryData); // ! CONSOLE LOG
             const updatePayload: SalesOrderUpdatePayload = {
                 custom_order_complete: 1,
-                custom_payment_complete: 1,
+                custom_payment_complete: 0
             };
             const updateResponse = await completeKitchenOrder(order.name, updatePayload);
             const updateData = await updateResponse.json();
             console.log('updateData', updateData); // ! CONSOLE LOG
 
             onOrderComplete();
-            toast.success('Order completed and invoice created');
+            toast.success('Order completed');
         } catch (error) {
             console.error('Error completing order:', error);
             toast.error('Failed to complete order');
