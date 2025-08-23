@@ -5,6 +5,7 @@ import Navbar from "./components/navbar";
 import { CartProvider } from "./context/CartContext";
 import { ApiProvider } from "./context/ApiContext";
 import { Toaster } from "react-hot-toast";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -36,13 +37,15 @@ export default function RootLayout({
         />
         <ApiProvider>
           <CartProvider>
+            <Suspense fallback={<div>Loading...</div>}>
             <div className="min-h-screen">
               <Navbar />
               {/* Main content that properly accounts for sidebar width */}
               <main className="main-content-with-sidebar py-4 px-4 sm:px-6 lg:px-6 lg:py-6 safe-area-inset">
-                <div className="w-full">{children}</div>
-              </main>
-            </div>
+                  <div className="w-full">{children}</div>
+                </main>
+              </div>
+            </Suspense>
           </CartProvider>
         </ApiProvider>
       </body>
