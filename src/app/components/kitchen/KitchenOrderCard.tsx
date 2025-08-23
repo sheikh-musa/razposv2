@@ -18,7 +18,7 @@ export default function KitchenOrderCard({
 }: KitchenOrderCardProps) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { createSalesInvoice, createPaymentEntry, completeKitchenOrder, updateKitchenOrderPayment, getCompanyName, updateKitchenOrderItem } = useApi();
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     // Initialize completedItems state based on API response
     const [completeOrderItems, setCompleteOrderItems] = useState<Record<string, boolean>>(() => {
         const initialCompletedItems: Record<string, boolean> = {};
@@ -29,16 +29,17 @@ export default function KitchenOrderCard({
     });
     const [isCompleting, setIsCompleting] = useState(false);
     const [canComplete, setCanComplete] = useState(false);
-    const [paymentStatus, setPaymentStatus] = useState(order.custom_payment_complete);
-    const [paymentMethod, setPaymentMethod] = useState(order.custom_payment_mode);
+    // const [paymentStatus, setPaymentStatus] = useState(order.custom_payment_complete);
+    // const [paymentMethod, setPaymentMethod] = useState(order.custom_payment_mode);
 
-    const paymentOptions = ["Cash", "Paynow", "Debit/Credit Card", "NETS"];
+    // const paymentOptions = ["Cash", "Paynow", "Debit/Credit Card", "NETS"];
 
     // Check if all items are completed and payment is received
     useEffect(() => {
         const allItemsCompleted = order.items.every(item => completeOrderItems[item.item_code]);
-        setCanComplete(paymentStatus === 1 && allItemsCompleted);
-    }, [completeOrderItems, paymentStatus, order.items]);
+        // setCanComplete(paymentStatus === 1 && allItemsCompleted);
+        setCanComplete(allItemsCompleted);
+    }, [completeOrderItems, order.items]);
 
     const handleCheckboxChange = async (itemCode: string, checked: boolean) => {
         console.log('Checkbox changed:', itemCode, checked); // Debug log
@@ -75,19 +76,19 @@ export default function KitchenOrderCard({
         }
     };
 
-    const handlePaymentToggle = () => {
-        setPaymentStatus(prev => prev === 1 ? 0 : 1);
-    };
+    // const handlePaymentToggle = () => {
+    //     setPaymentStatus(prev => prev === 1 ? 0 : 1);
+    // };
 
-    const handlePaymentMethodChange = async (orderName: string, method: string) => {
-        const payload: PaymentUpdatePayload = {
-            custom_payment_mode: method
-        };
-        const response = await updateKitchenOrderPayment(orderName, payload);
-        const data = await response.json();
-        console.log('data', data.data); // ! console log
-        toast.success('Payment method updated');
-    };
+    // const handlePaymentMethodChange = async (orderName: string, method: string) => {
+    //     const payload: PaymentUpdatePayload = {
+    //         custom_payment_mode: method
+    //     };
+    //     const response = await updateKitchenOrderPayment(orderName, payload);
+    //     const data = await response.json();
+    //     console.log('data', data.data); // ! console log
+    //     toast.success('Payment method updated');
+    // };
 
     const handleCompleteOrder = async () => {
         try {
@@ -170,7 +171,8 @@ export default function KitchenOrderCard({
                         minute: '2-digit'
                     })}
                 </span></p>
-                <div className='flex gap-2 mt-4'>
+                {/* // TODO: Payment logic will be changed to payment page */}
+                {/* <div className='flex gap-2 mt-4'>
                     <button 
                         onClick={handlePaymentToggle}
                         className={`text-xs px-4 py-2 ${
@@ -209,12 +211,12 @@ export default function KitchenOrderCard({
                             </div>
                         )}
                     </div>
-                </div>
+                </div> */}
             </div>
             <div className='flex-1 overflow-y-auto'>
                 <div className='py-3 border-b text-sm'>
-                    <p className='font-medium'>Total: <span className='font-light'>${order.total.toFixed(2)}</span></p>
-                    <p className='font-medium'>Items: <span className='font-light'>{order.items.length}</span></p>
+                    {/* <p className='font-medium'>Total: <span className='font-light'>${order.total.toFixed(2)}</span></p> */}
+                    <p className='font-medium'>Total items: <span className='font-light'>{order.items.length}</span></p>
                 </div>
                 <div className='py-3'>
                     <p className='font-bold mb-3'>Remaining order:</p>
@@ -263,11 +265,17 @@ export default function KitchenOrderCard({
                                 : 'bg-blue-500 hover:bg-blue-600'
                         }`}
                 >
-                    {isCompleting 
+                    {/* {isCompleting 
                         ? 'Completing...' 
                         : !paymentStatus
                             ? 'Payment Required'
                             : !order.items.every(item => completeOrderItems[item.item_code])
+                                ? 'Items Pending'
+                                : 'Complete Order'
+                    } */}
+                    {isCompleting 
+                        ? 'Completing...' 
+                        : !order.items.every(item => completeOrderItems[item.item_code])
                                 ? 'Items Pending'
                                 : 'Complete Order'
                     }
@@ -275,7 +283,7 @@ export default function KitchenOrderCard({
                 )}
                 {!canComplete && (
                     <div className='mt-2 text-xs text-gray-500'>
-                        {!paymentStatus && '• Payment required'}
+                        {/* {!paymentStatus && '• Payment required'} */}
                         {!order.items.every(item => completeOrderItems[item.item_code]) && '• Complete all items'}
                     </div>
                 )}
