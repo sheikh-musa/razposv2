@@ -57,7 +57,8 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
       items: items.map((item) => (
         { item_code: item.name,
           qty: item.quantity,
-          ...(item.additional_notes && { additional_notes: item.additional_notes })
+          ...(item.additional_notes && { additional_notes: item.additional_notes }),
+          ...(item.custom_item_done && { custom_item_done: item.custom_item_done })
         })),
       status: 'To Deliver and Bill',
       custom_kitchen_status: 'preparing',

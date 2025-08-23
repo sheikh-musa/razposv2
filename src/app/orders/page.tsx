@@ -57,6 +57,7 @@ export default function Orders() {
             price: item.price_list_rate,
             quantity: item.qty,
             type: item.item_name,
+            custom_item_done: item.custom_item_done,
           }, item.additional_notes || ''); // Pass additional notes directly
         });
         setShowOrderSummary(true);

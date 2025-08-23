@@ -10,6 +10,7 @@ type CartItem = {
   quantity: number;
   type: string;
   additional_notes?: string;
+  custom_item_done?: number;
 };
 
 //  -------------------------------------------------------------------------- */
@@ -41,7 +42,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         updatedItems[existingItemIndex] = {
           ...updatedItems[existingItemIndex],
           quantity: updatedItems[existingItemIndex].quantity + newItem.quantity,
-          additional_notes: additionalNotes || updatedItems[existingItemIndex].additional_notes
+          additional_notes: additionalNotes || updatedItems[existingItemIndex].additional_notes,
+          custom_item_done: updatedItems[existingItemIndex].custom_item_done,
         };
         return updatedItems;
       } else {
