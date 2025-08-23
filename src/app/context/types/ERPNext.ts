@@ -149,6 +149,7 @@ export type SalesOrderPayload = {
     custom_payment_complete: number;
     docstatus: number;
     additional_discount_percentage?: number;
+    custom_buzzer_number?: string;
   }
 
 export type SalesOrderUpdatePayload = {
