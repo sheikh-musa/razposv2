@@ -3,12 +3,13 @@ import { useApi } from '@/app/context/ApiContext'
 import { useEffect, useState } from 'react'
 import { SalesOrders } from '@/app/context/types/ERPNext'
 import OrderDetails from '../components/transactionHistory/OrderDetails'
+import { toast } from 'react-hot-toast'
 
 
 export default function Tickets() {
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<SalesOrders | null>(null);
-  const { fetchOpenTickets, fetchKitchenOrderDetails } = useApi();
+  const { fetchOpenTickets, fetchKitchenOrderDetails, deleteOpenTicket } = useApi();
   const [tickets, setTickets] = useState<SalesOrders[]>([]);
   const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,9 +45,12 @@ export default function Tickets() {
     }
   };
 
-  const handleDelete = (ticketId: string) => {
-    // TODO: Implement delete functionality
-    console.log('Delete ticket:', ticketId);
+  const handleDelete = async (ticketId: string) => {
+    const response = await deleteOpenTicket(ticketId);
+    const data = await response.json();
+    console.log('data', data); // ! console log
+    toast.success(`Order ${ticketId} deleted`);
+    loadPage();
   };
 
   const handleOpen = (ticketId: string) => {

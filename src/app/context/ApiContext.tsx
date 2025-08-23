@@ -26,6 +26,7 @@ interface ApiContextType {
     updateKitchenOrderItem: (SalesOrderItemName: string, customItemDone: number) => Promise<Response>;
     fetchOpenTickets: () => Promise<SalesOrders[]>;
     completeOpenTicket: (orderName: string) => Promise<Response>;
+    deleteOpenTicket: (orderName: string) => Promise<Response>;
     createSalesInvoice: (payload: SalesInvoicePayload) => Promise<Response>;
     createPaymentEntry: (payload: PaymentEntryPayload) => Promise<Response>;
     getRevenue: () => Promise<RevenueEntry[]>;
@@ -669,6 +670,24 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return response;
     }
 
+    const deleteOpenTicket = async (orderName: string) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order/${orderName}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            // body: JSON.stringify({docstatus: 2})
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to delete open ticket: ${JSON.stringify(errorData)}`);
+        }
+        return response;
+    }
+
     //* -------------------------------------------------------------------------- */
     //*                             API calls for Payment                          */
     //* -------------------------------------------------------------------------- */
@@ -1149,6 +1168,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             updateKitchenOrderItem,
             fetchOpenTickets,
             completeOpenTicket,
+            deleteOpenTicket,
             createSalesInvoice,
             createPaymentEntry,
             getRevenue,
