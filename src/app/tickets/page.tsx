@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { SalesOrders } from '@/app/context/types/ERPNext'
 import OrderDetails from '../components/transactionHistory/OrderDetails'
 import { toast } from 'react-hot-toast'
+import DeleteTicketModal from '../components/modals/inventory/DeleteItemModal'
 
 
 export default function Tickets() {
@@ -14,6 +15,8 @@ export default function Tickets() {
   const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [showDeleteTicketModal, setShowDeleteTicketModal] = useState(false);
+  const [ticketToDelete, setTicketToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     loadPage();
@@ -183,7 +186,10 @@ export default function Tickets() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex space-x-3">
                         <button
-                          onClick={() => handleDelete(ticket.name)}
+                          onClick={() => {
+                            setTicketToDelete(ticket.name);
+                            setShowDeleteTicketModal(true);
+                          }}
                           className="text-gray-900 hover:text-red-600 font-medium"
                         >
                           Delete
@@ -282,6 +288,14 @@ export default function Tickets() {
             setShowOrderDetails(false);
             setSelectedOrder(null);
           }}
+        />
+      )}
+      {showDeleteTicketModal && ticketToDelete && (
+        <DeleteTicketModal
+          isOpen={showDeleteTicketModal}
+          onClose={() => setShowDeleteTicketModal(false)}
+          onConfirm={() => handleDelete(ticketToDelete)}
+          itemName={ticketToDelete}
         />
       )}
     </div>
