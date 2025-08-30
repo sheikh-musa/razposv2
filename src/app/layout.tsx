@@ -6,6 +6,7 @@ import { CartProvider } from "./context/CartContext";
 import { ApiProvider } from "./context/ApiContext";
 import { Toaster } from "react-hot-toast";
 import { Suspense } from "react";
+import ConnectionStatus from "./components/ConnectionStatus";
 
 export default function RootLayout({
   children,
@@ -25,6 +26,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="mobile-friendly" style={{ backgroundColor: "var(--color-bg-secondary)" }}>
+        <ConnectionStatus />
         <Toaster
           position="top-center"
           toastOptions={{
