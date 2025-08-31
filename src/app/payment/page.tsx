@@ -3,8 +3,9 @@ import { useEffect } from "react";
 import { useApi} from "../context/ApiContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-// import { SalesOrders } from "../context/types/ERPNext";
 
+// import { SalesOrders } from "../context/types/ERPNext";
+// import OrderSummary from "../../pages/orderSummary/OrderSummary";
 
 export default function Payment() {
     const searchParams = useSearchParams();

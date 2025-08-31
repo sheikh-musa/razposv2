@@ -45,7 +45,8 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
   }
 
   const handleProceedPayment = async () => {
-    router.push(`/payment?order=${order.name}`);
+    // router.push(`/payment?order=${order.name}`);
+    router.push(`/tickets/ordersummary?order=${order.name}`);
   }
 
   return (
