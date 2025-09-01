@@ -49,13 +49,16 @@ export default function OrderSummary() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen text-black">
-    <h1>Order Summary</h1>
+    <div className="flex flex-col min-h-full text-black font-sans p-4 lg:p-0" style={{ backgroundColor: "var(--color-bg-primary)" }}>
+      <div className="mb-4 lg:mb-6">
+        <h1 className="text-xl lg:text-2xl font-bold" style={{ color: "var(--color-fg-primary)" }}>
+          Order summary
+        </h1>
+      </div>
     {orderDetails && (
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-4">{orderDetails.customer}</h2>
         <p className="mb-4">{orderDetails.items.map((item) => item.item_code).join(', ')}</p>
-        
         {/* Payment Button */}
         <button
           onClick={() => setIsPaymentOpen(true)}
@@ -70,7 +73,7 @@ export default function OrderSummary() {
     <SlideoutMenu isOpen={isPaymentOpen} onOpenChange={setIsPaymentOpen}>
       <SlideoutMenu.Content>
         <SlideoutMenu.Header onClose={() => setIsPaymentOpen(false)}>
-          <h2 className="text-xl font-semibold">Payment Details</h2>
+          <h2 className="text-xl text-black font-semibold">Payment Details</h2>
         </SlideoutMenu.Header>
         
         <div className="flex-1 p-6 text-black">

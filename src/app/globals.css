@@ -346,4 +346,35 @@ body.mobile-friendly {
   .transition-untitled {
     transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out;
   }
+  /* Add these custom animations */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Custom animation classes */
+.slide-in-from-right {
+  animation: slideInFromRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-out-to-right {
+  animation: slideOutToRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
 }
