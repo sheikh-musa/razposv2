@@ -30,6 +30,7 @@ export default function OrderSummary() {
 
   const fetchOrderDetails = async () => {
     const orderDetails = await fetchKitchenOrderDetails(order);
+    console.log(orderDetails);
     
     if (!orderDetails) {
       toast.error('Invalid order. Order is not found');
@@ -56,9 +57,26 @@ export default function OrderSummary() {
         </h1>
       </div>
     {orderDetails && (
-      <div className="text-center">
-        <h2 className="text-xl font-semibold mb-4">{orderDetails.customer}</h2>
-        <p className="mb-4">{orderDetails.items.map((item) => item.item_code).join(', ')}</p>
+      <div>
+        <div className="flex items-center gap-2 justify-between w-full">
+        <h2 className="text-xl font-semibold">Order: {orderDetails.name}</h2>
+        <span className="text-md text-gray-500 p-2">• {orderDetails.total_qty} items</span>
+        </div>
+        <hr className="my-2" />
+        {orderDetails.items.map((item) => (
+          <div key={item.item_code} className="flex items-center gap-2 justify-between w-full mb-2 text-medium">
+            <p className="text-sm text-gray-500 font-medium">{item.item_code}</p>
+            <p className="text-sm text-gray-500">Qty: {item.qty}</p>
+            <div>
+            <p className="text-sm text-gray-500">{item.price_list_rate.toFixed(2)} ea</p>
+            <p className="text-sm text-gray-500">${(item.price_list_rate * item.qty).toFixed(2)}</p>
+            </div>
+            
+          </div>
+        ))}
+        <hr className="my-2" />
+        <p className="text-lg text-black flex items-center gap-2 w-full justify-end">Total: ${orderDetails.total.toFixed(2)}</p>
+        <div className="flex justify-end gap-2 w-full">
         {/* Payment Button */}
         <button
           onClick={() => setIsPaymentOpen(true)}
@@ -66,6 +84,7 @@ export default function OrderSummary() {
         >
           Process Payment
         </button>
+        </div>
       </div>
     )}
 
@@ -91,7 +110,7 @@ export default function OrderSummary() {
                 <hr className="my-2" />
                 <div className="flex justify-between font-medium">
                   <span>Total</span>
-                  <span>${orderDetails?.total || 0}</span>
+                  <span>${orderDetails?.total.toFixed(2) || 0}</span>
                 </div>
               </div>
             </div>
