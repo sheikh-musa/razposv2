@@ -116,11 +116,12 @@ export default function Tickets() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Open Ticket</h1>
-        </div>
+      <div className="flex flex-col min-h-full text-black font-sans p-4 lg:p-0" style={{ backgroundColor: "var(--color-bg-primary)" }}>
+      <div className="mb-4 lg:mb-6">
+        <h1 className="text-xl lg:text-2xl font-bold" style={{ color: "var(--color-fg-primary)" }}>
+          Open tickets
+        </h1>
+      </div>
 
         {/* Table */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
