@@ -4,8 +4,6 @@ import { useCart } from '../../context/CartContext';
 import { useApi } from '../../context/ApiContext';
 import { SalesOrderPayload, SalesOrders } from '../../context/types/ERPNext';
 import toast from 'react-hot-toast';
-// import { generateReceipt } from '../../utils/receiptUtils';
-import SendReceiptModal from '../modals/order/SendReceiptModal';
 import { useRouter } from 'next/navigation';
 
 interface OrderSummaryProps {
@@ -24,17 +22,7 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
   const [paymentComplete, setPaymentComplete] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(orderToUpdate?.additional_discount_percentage || 0);
   const [discountError, setDiscountError] = useState<string>('');
-  // const [receipt, setReceipt] = useState(true);
-  const [showReceiptModal, setShowReceiptModal] = useState(false);
-  // const [createdOrder, setCreatedOrder] = useState<{ // eslint-disable-line @typescript-eslint/no-unused-vars
-  //   name: string;
-  //   customer_name: string;
-  //   items: Array<{
-  //     item_code: string;
-  //     qty: number;
-  //     rate: number;
-  //   }>;
-  // } | null>(null);
+
 //   const shippingFee = 3.99;
 
   const getCurrentDate = () => {
@@ -76,27 +64,12 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
     if (response.ok) {
       // eslint-disable-next-line 
       orderToUpdate ? toast.success('Order updated successfully') : toast.success('Order created successfully');
-      setShowReceiptModal(true);
       clearCart();
       router.push('/orders');
       // onClose();
     } else {
       toast.error('Failed to create order');
     }
-  };
-
-  const handleReceiptModalClose = () => {
-    setShowReceiptModal(false);
-    // clearCart();
-    onClose();
-  };
-
-  const handleReceiptSkip = () => {
-    // Generate receipt without email
-    // if (createdOrder) {
-    //   generateReceipt({ order: createdOrder });
-    // }
-    handleReceiptModalClose();
   };
 
   return (
@@ -274,7 +247,7 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
             <p className="text-xs text-gray-400">Please enter percentage between 0 to 100</p>
             {discountError && <p className="text-xs text-red-500">{discountError}</p>}
           </div>
-
+         {/* //! to remove receipt portion */}
           {/* <div className='text-black text-sm mb-4'>
                     <span className='mr-2'>Receipt:</span>
                     <input type="radio" value="" checked={receipt} name="inline-radio-group" className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" onChange={() => setReceipt(true)} />
@@ -318,16 +291,6 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
         )}
       </div>
     </div>
-
-
-      {showReceiptModal ? (
-        <SendReceiptModal
-          isOpen={showReceiptModal}
-          onClose={handleReceiptModalClose}
-          // order={createdOrder}
-          onSkip={handleReceiptSkip}
-        />
-      ) : null}
     </>
   );
 }

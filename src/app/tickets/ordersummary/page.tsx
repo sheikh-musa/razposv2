@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { SalesOrders } from "../../context/types/ERPNext";
 import { SlideoutMenu } from "@/components/application/slideout-menus/slideout-menu";
+import SendReceiptModal from "@/app/components/modals/order/SendReceiptModal";
 
 export default function OrderSummary() {
   const searchParams = useSearchParams();
@@ -14,6 +15,7 @@ export default function OrderSummary() {
   const router = useRouter();
   const [orderDetails, setOrderDetails] = useState<SalesOrders | null>(null);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [showSendReceiptModal, setShowSendReceiptModal] = useState(false);
 
 
   useEffect(() => {
@@ -155,7 +157,10 @@ export default function OrderSummary() {
         <SlideoutMenu.Footer>
           <div className="flex gap-3">
             <button
-              onClick={() => setIsPaymentOpen(false)}
+              onClick={() => {
+                setIsPaymentOpen(false);
+                setShowSendReceiptModal(false);
+              }}
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel
@@ -164,6 +169,7 @@ export default function OrderSummary() {
               onClick={() => {
                 // Handle payment processing
                 toast.success('Payment processed successfully!');
+                setShowSendReceiptModal(true);
                 setIsPaymentOpen(false);
               }}
               className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
@@ -174,6 +180,15 @@ export default function OrderSummary() {
         </SlideoutMenu.Footer>
       </SlideoutMenu.Content>
     </SlideoutMenu>
+
+    {showSendReceiptModal && (
+      <SendReceiptModal 
+      isOpen={showSendReceiptModal} 
+      onClose={() => setShowSendReceiptModal(false)} 
+      order={orderDetails} 
+      onSkip={() => setShowSendReceiptModal(false)} 
+      />
+    )}
   </div>
   );
 }

@@ -3,19 +3,24 @@ import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 // import { ReceiptOrder } from '../../../utils/receiptUtils';
 import { useApi } from '../../../context/ApiContext';
+import QRCodeGenerator from '@/app/utils/QRCodeGenerator';
+import { generateReceipt } from '@/app/utils/receiptUtils';
 
 interface SendReceiptModalProps {
   isOpen: boolean;
   onClose: () => void;
-//   order: ReceiptOrder;
+  // eslint-disable-next-line
+  order: any; //! temporary fix
   onSkip?: () => void;
 }
 
-export default function SendReceiptModal({ isOpen, onClose, onSkip }: SendReceiptModalProps) {
+export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: SendReceiptModalProps) {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
   const { sendEmail } = useApi();
+  const [showQR, setShowQR] = useState(false);
+
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -50,6 +55,7 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip }: SendReceip
         // name: order.name,
         send_email: 1,
       });
+      await handleGenerateReceipt();
       console.log('response', response);
       toast.success(`Receipt sent to ${email}`);
       onClose();
@@ -58,6 +64,55 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip }: SendReceip
       toast.error('Failed to send receipt');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+   const handleGenerateReceipt = async () => {
+    try {
+      setIsLoading(true);
+      
+      await generateReceipt({
+        order,
+        onSuccess: () => {
+          // Optional: Add any additional success handling
+          toast.success('Receipt generated successfully!');
+        },
+        onError: (error) => {
+          console.error('Receipt generation failed:', error);
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error in handleGenerateReceipt:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Generate QR code data - this could be a URL to view the order
+  const generateQRData = () => {
+    if (!order) return '';
+    
+    // Option 1: Direct order URL
+    const orderUrl = `${window.location.origin}/ordersummary?order=${order.name}`;
+    
+    // Option 2: API endpoint to fetch order details
+    // const orderUrl = `${window.location.origin}/api/orders/${order.name}`;
+    
+    // Option 3: Custom document URL
+    // const orderUrl = `${window.location.origin}/receipt/${order.name}`;
+    
+    return orderUrl;
+  };
+
+
+  const handleDownloadQR = () => {
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      const link = document.createElement('a');
+      link.download = `receipt-${order.name}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
     }
   };
 
@@ -110,6 +165,38 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip }: SendReceip
               <p className="text-red-500 text-xs mt-1">{emailError}</p>
             )}
           </div>
+
+          {/* QR Code Section */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-sm font-medium">QR Code</label>
+            <button
+              onClick={() => setShowQR(!showQR)}
+              className="text-sm text-purple-600 hover:text-purple-800"
+            >
+              {showQR ? 'Hide' : 'Show'} QR Code
+            </button>
+          </div>
+          
+          {showQR && (
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <QRCodeGenerator 
+                value={generateQRData()} 
+                size={150}
+                className="mb-3"
+              />
+              <p className="text-xs text-gray-600 text-center mb-3">
+                Scan to view order details
+              </p>
+              <button
+                onClick={handleDownloadQR}
+                className="w-full px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+              >
+                Download QR Code
+              </button>
+            </div>
+          )}
+        </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
