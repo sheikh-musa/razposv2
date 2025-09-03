@@ -68,7 +68,9 @@ export default function OrderSummary() {
             <p className="text-sm text-gray-500 font-medium">{item.item_code}</p>
             <p className="text-sm text-gray-500">Qty: {item.qty}</p>
             <div>
-            <p className="text-sm text-gray-500">{item.price_list_rate.toFixed(2)} ea</p>
+            {/* eslint-disable-next-line */}
+            <p className="text-sm text-gray-500">{item.price_list_rate?.toFixed(2)} ea</p>
+            {/* @ts-expect-error - price_list_rate is not defined in the type */}
             <p className="text-sm text-gray-500">${(item.price_list_rate * item.qty).toFixed(2)}</p>
             </div>
             

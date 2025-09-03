@@ -134,7 +134,7 @@ export type SalesOrderItem = {
     qty: number;
     additional_notes?: string;
     custom_item_done?: number;
-    price_list_rate: number;
+    price_list_rate?: number;
 }
 
 export type SalesOrderPayload = {
