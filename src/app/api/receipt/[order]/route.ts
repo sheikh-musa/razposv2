@@ -1,12 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { generateReceipt } from "@/app/utils/receiptUtils";
 
-// Define the order parameter type
-interface RouteParams {
-  params: {
-    order: string;
-  };
-}
+// Note: Use inline param typing for Next.js route handlers
 
 // Function to fetch order data from ERPNext API
 async function fetchOrderData(orderId: string) {
@@ -36,7 +31,7 @@ async function fetchOrderData(orderId: string) {
   }
 }
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: Request, { params }: { params: { order: string } }) {
   try {
     const orderId = params.order;
 
@@ -135,7 +130,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 // Optional: Add a POST method if you want to generate receipts with custom data
-export async function POST(request: NextRequest, { params }: RouteParams) {
+export async function POST(request: Request, { params }: { params: { order: string } }) {
   try {
     const orderId = params.order;
     const body = await request.json();
