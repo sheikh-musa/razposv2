@@ -58,6 +58,9 @@ export const generateReceipt = async (options: GenerateReceiptOptions): Promise<
     onError
   } = options;
 
+  // Check if we're in a server environment
+  const isServer = typeof window === 'undefined';
+
   try {
     // Create PDF document
     const doc = new jsPDF();
@@ -188,14 +191,20 @@ export const generateReceipt = async (options: GenerateReceiptOptions): Promise<
     // Save PDF
     const pdfBlob = doc.output('blob');
     
-    toast.success('Receipt generated successfully!');
+    // Only show toast on client side
+    if (!isServer) {
+      toast.success('Receipt generated successfully!');
+    }
     onSuccess?.();
     
     return pdfBlob;
     
   } catch (error) {
     console.error('Error generating receipt:', error);
-    toast.error('Failed to generate receipt');
+    // Only show toast on client side
+    if (!isServer) {
+      toast.error('Failed to generate receipt');
+    }
     onError?.(error as Error);
     return null;
   }

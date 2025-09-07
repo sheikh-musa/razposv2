@@ -116,28 +116,55 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
       toast.error('Failed to download receipt');
     }
   };
+
+  // const handleDownloadReceipt = async () => {
+  //   try {
+  //     const receipt = await generateReceiptData();
+  //     if (receipt) {
+  //       // Create blob and download
+  //       const blob = new Blob([receipt], { type: 'application/pdf' });
+  //       const url = window.URL.createObjectURL(blob);
+  //       const link = document.createElement('a');
+  //       link.href = url;
+  //       link.download = `receipt-${order.name}.pdf`;
+  //       link.click();
+  //       window.URL.revokeObjectURL(url);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error downloading receipt:', error);
+  //     toast.error('Failed to download receipt');
+  //   }
+  // };
   
   // Generate QR code data for receipt download
 const generateQRData = async () => {
   if (!order) return '';
   
-  try {
-    const receipt = await generateReceiptData();
-    if (receipt) {
-      // Create URL from the blob directly
-      const url = window.URL.createObjectURL(receipt);
-      console.log('Generated blob URL for QR:', url);
-      return url;
-    }
-  } catch (error) {
-    console.error('Error generating QR data:', error);
-  }
-  
-  // Fallback to API endpoint if blob generation fails
+  // Use API endpoint for cross-device compatibility
   const receiptUrl = `${window.location.origin}/api/receipt/${order.name}`;
+  console.log('Generated API URL for QR:', receiptUrl);
   return receiptUrl;
 };
-
+//! old code generate blob
+// const generateQRData = async () => {
+//   if (!order) return '';
+  
+//   try {
+//     const receipt = await generateReceiptData();
+//     if (receipt) {
+//       // Create URL from the blob directly
+//       const url = window.URL.createObjectURL(receipt);
+//       console.log('Generated blob URL for QR:', url);
+//       return url;
+//     }
+//   } catch (error) {
+//     console.error('Error generating QR data:', error);
+//   }
+  
+//   // Fallback to API endpoint if blob generation fails
+//   const receiptUrl = `${window.location.origin}/api/receipt/${order.name}`;
+//   return receiptUrl;
+// };
 
 
   const handleSkip = () => {
