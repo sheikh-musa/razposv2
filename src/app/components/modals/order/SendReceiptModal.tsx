@@ -20,6 +20,33 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
   const [emailError, setEmailError] = useState('');
   const { sendEmail } = useApi();
   const [showQR, setShowQR] = useState(false);
+  const [qrData, setQrData] = useState<string>('');
+
+
+  // Generate receipt data (PDF or HTML)
+  const generateReceiptData = async () => {
+    try {
+      setIsLoading(true);
+      
+      const receipt = await generateReceipt({
+        order,
+        onSuccess: () => {
+          // Optional: Add any additional success handling
+        },
+        onError: (error) => {
+          console.error('Receipt generation failed:', error);
+        }
+      });
+      if (receipt) {
+        return receipt;
+      }
+    } catch (error) {
+      console.error('Error generating receipt:', error);
+    } finally {
+      setIsLoading(false);
+    }
+    return null;
+  };
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,20 +72,25 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
 
     setIsLoading(true);
     try {
-      // Here you would typically call your API to send the receipt via email
-      // For now, we'll just generate the receipt and show a success message
+      // Generate receipt for email attachment
+      await generateReceiptData();
+
+      // Send email with receipt
       const response = await sendEmail({
         recipients: email,
-        subject: 'Receipt',
-        content: 'This is a test receipt email',
+        subject: `Receipt for Order ${order.name}`,
+        content: 'Please find your receipt attached.',
         doctype: 'Sales Order',
-        // name: order.name,
-        send_email: 1,
+        name: order.name,
+        send_email: 1
       });
-      await handleGenerateReceipt();
-      console.log('response', response);
-      toast.success(`Receipt sent to ${email}`);
-      onClose();
+      
+      if (response.ok) {
+        toast.success('Receipt sent successfully!');
+        onClose();
+      } else {
+        toast.error('Failed to send receipt');
+      }
     } catch (error) {
       console.error('Error sending receipt:', error);
       toast.error('Failed to send receipt');
@@ -67,58 +99,59 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
     }
   };
 
-   const handleGenerateReceipt = async () => {
+  const handleDownloadReceipt = async () => {
     try {
-      setIsLoading(true);
-      
-      await generateReceipt({
-        order,
-        onSuccess: () => {
-          // Optional: Add any additional success handling
-          toast.success('Receipt generated successfully!');
-        },
-        onError: (error) => {
-          console.error('Receipt generation failed:', error);
-        }
-      });
-      
+      const receipt = await generateReceiptData();
+      if (receipt) {
+        // Create URL and download
+        const url = window.URL.createObjectURL(receipt);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `receipt-${order.name}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      }
     } catch (error) {
-      console.error('Error in handleGenerateReceipt:', error);
-    } finally {
-      setIsLoading(false);
+      console.error('Error downloading receipt:', error);
+      toast.error('Failed to download receipt');
     }
   };
-
-  // Generate QR code data - this could be a URL to view the order
-  const generateQRData = () => {
-    if (!order) return '';
-    
-    // Option 1: Direct order URL
-    const orderUrl = `${window.location.origin}/ordersummary?order=${order.name}`;
-    
-    // Option 2: API endpoint to fetch order details
-    // const orderUrl = `${window.location.origin}/api/orders/${order.name}`;
-    
-    // Option 3: Custom document URL
-    // const orderUrl = `${window.location.origin}/receipt/${order.name}`;
-    
-    return orderUrl;
-  };
-
-
-  const handleDownloadQR = () => {
-    const canvas = document.querySelector('canvas');
-    if (canvas) {
-      const link = document.createElement('a');
-      link.download = `receipt-${order.name}.png`;
-      link.href = canvas.toDataURL();
-      link.click();
+  
+  // Generate QR code data for receipt download
+const generateQRData = async () => {
+  if (!order) return '';
+  
+  try {
+    const receipt = await generateReceiptData();
+    if (receipt) {
+      // Create URL from the blob directly
+      const url = window.URL.createObjectURL(receipt);
+      console.log('Generated blob URL for QR:', url);
+      return url;
     }
-  };
+  } catch (error) {
+    console.error('Error generating QR data:', error);
+  }
+  
+  // Fallback to API endpoint if blob generation fails
+  const receiptUrl = `${window.location.origin}/api/receipt/${order.name}`;
+  return receiptUrl;
+};
+
+
 
   const handleSkip = () => {
     onSkip?.();
     onClose();
+  };
+
+  // Generate QR data when QR section is shown
+  const handleShowQR = async () => {
+    if (!showQR) {
+      const data = await generateQRData();
+      setQrData(data || '');
+    }
+    setShowQR(!showQR);
   };
 
   if (!isOpen) return null;
@@ -171,7 +204,7 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
           <div className="flex items-center justify-between mb-2">
             <label className="text-sm font-medium">QR Code</label>
             <button
-              onClick={() => setShowQR(!showQR)}
+              onClick={handleShowQR}
               className="text-sm text-purple-600 hover:text-purple-800"
             >
               {showQR ? 'Hide' : 'Show'} QR Code
@@ -181,18 +214,18 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
           {showQR && (
             <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
               <QRCodeGenerator 
-                value={generateQRData()} 
+                value={qrData} 
                 size={150}
                 className="mb-3"
               />
-              <p className="text-xs text-gray-600 text-center mb-3">
-                Scan to view order details
+               <p className="text-xs text-gray-600 text-center mb-3">
+                Scan to download receipt
               </p>
               <button
-                onClick={handleDownloadQR}
+                onClick={handleDownloadReceipt}
                 className="w-full px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
               >
-                Download QR Code
+                Download Receipt
               </button>
             </div>
           )}

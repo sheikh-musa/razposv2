@@ -48,7 +48,7 @@ export interface GenerateReceiptOptions {
  *   onError: (error) => console.error('Failed:', error)
  * });
  */
-export const generateReceipt = async (options: GenerateReceiptOptions): Promise<void> => {
+export const generateReceipt = async (options: GenerateReceiptOptions): Promise<Blob | null> => {
   const {
     order,
     companyName = 'RAZPOS',
@@ -187,16 +187,17 @@ export const generateReceipt = async (options: GenerateReceiptOptions): Promise<
     
     // Save PDF
     const pdfBlob = doc.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    window.open(pdfUrl, '_blank');
     
     toast.success('Receipt generated successfully!');
     onSuccess?.();
+    
+    return pdfBlob;
     
   } catch (error) {
     console.error('Error generating receipt:', error);
     toast.error('Failed to generate receipt');
     onError?.(error as Error);
+    return null;
   }
 };
 
