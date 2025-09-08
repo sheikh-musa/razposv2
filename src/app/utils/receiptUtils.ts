@@ -10,7 +10,7 @@ export interface ReceiptItem {
 
 export interface ReceiptOrder {
   name: string;
-  customer_name: string;
+  customer_name?: string;
   items?: ReceiptItem[];
   custom_payment_mode?: string;
   custom_payment_complete?: boolean;
