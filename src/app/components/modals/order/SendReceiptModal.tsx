@@ -141,7 +141,7 @@ const generateQRData = async () => {
   if (!order) return '';
   
   // Use API endpoint for cross-device compatibility
-  const receiptUrl = `http://localhost:3000/tickets/receipt?order=${order.name}`;
+  const receiptUrl = `${window.location.origin}/tickets/receipt?order=${order.name}`;
   console.log('Generated API URL for QR:', receiptUrl);
   return receiptUrl;
 };
