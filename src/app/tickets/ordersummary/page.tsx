@@ -17,7 +17,37 @@ export default function OrderSummary() {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [showSendReceiptModal, setShowSendReceiptModal] = useState(false);
   const [multiplePaymentMode, setMultiplePaymentMode] = useState(1);
+  const [paymentMethods, setPaymentMethods] = useState<Array<{
+    method: string;
+    amount: number;
+  }>>([{ method: 'cash', amount: 0 }]);
 
+  // Update payment methods when multiplePaymentMode changes
+  useEffect(() => {
+    const newPaymentMethods = Array.from({ length: multiplePaymentMode }, (_, index) => 
+      paymentMethods[index] || { method: 'cash', amount: 0 }
+    );
+    setPaymentMethods(newPaymentMethods);
+  }, [multiplePaymentMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const updatePaymentMethod = (index: number, field: 'method' | 'amount', value: string | number) => {
+    setPaymentMethods(prev => 
+      prev.map((payment, i) => 
+        i === index 
+          ? { ...payment, [field]: value }
+          : payment
+      )
+    );
+  };
+
+  const calculateTotalReceived = () => {
+    return paymentMethods.reduce((total, payment) => total + payment.amount, 0);
+  };
+
+  const calculateChange = () => {
+    if (!orderDetails) return 0;
+    return calculateTotalReceived() - orderDetails.total;
+  };
 
   useEffect(() => {
     if (order) {
@@ -137,21 +167,50 @@ export default function OrderSummary() {
                 <button className="p-3 border border-gray-300 rounded-lg" onClick={() => setMultiplePaymentMode(multiplePaymentMode + 1)}>+</button>
                 )}
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Payment Method</label>
-                <select className="w-full p-3 border border-gray-300 rounded-lg">
-                  <option value="cash">Cash</option>
-                  <option value="card">Card</option>
-                  <option value="mobile">Mobile Payment</option>
-                </select>
-              </div>
+              
+              {/* Render payment method components based on multiplePaymentMode */}
+              {paymentMethods.map((payment, index) => (
+                <div key={index} className="flex flex-row gap-2 w-full text-sm">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Payment Method {multiplePaymentMode > 1 ? `#${index + 1}` : ''}
+                    </label>
+                    <select 
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      value={payment.method}
+                      onChange={(e) => updatePaymentMethod(index, 'method', e.target.value)}
+                    >
+                      <option value="cash">Cash</option>
+                      <option value="card">Card</option>
+                      <option value="mobile">Mobile Payment</option>
+                      <option value="nets">NETS</option>
+                      <option value="paynow">PayNow</option>
+                      <option value="cdc">CDC</option>
+                    </select>
+                  </div>
+                    
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Amount Received {multiplePaymentMode > 1 ? `#${index + 1}` : ''}
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="0.00"
+                      value={payment.amount || ''}
+                      onChange={(e) => updatePaymentMethod(index, 'amount', parseFloat(e.target.value) || 0)}
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+              ))}
 
               <div>
-                <label className="block text-sm font-medium mb-2">Amount Received</label>
+                <label className="block text-sm font-medium mb-2">Total Received</label>
                 <input
                   type="number"
-                  placeholder="0.00"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  value={calculateTotalReceived()}
+                  className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50"
+                  readOnly
                 />
               </div>
 
@@ -159,7 +218,7 @@ export default function OrderSummary() {
                 <label className="block text-sm font-medium mb-2">Change</label>
                 <input
                   type="number"
-                  placeholder="0.00"
+                  value={calculateChange()}
                   className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50"
                   readOnly
                 />
