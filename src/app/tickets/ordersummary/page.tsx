@@ -24,6 +24,13 @@ export default function OrderSummary() {
 
   // Update payment methods when multiplePaymentMode changes
   useEffect(() => {
+    if (order) {
+      fetchOrderDetails();
+    }
+    else {
+      toast.error('No order found');
+      router.push('/');
+    }
     const newPaymentMethods = Array.from({ length: multiplePaymentMode }, (_, index) => 
       paymentMethods[index] || { method: 'cash', amount: 0 }
     );
@@ -49,18 +56,6 @@ export default function OrderSummary() {
     return calculateTotalReceived() - orderDetails.total;
   };
 
-  useEffect(() => {
-    if (order) {
-      fetchOrderDetails();
-    }
-    else {
-      toast.error('No order found');
-      router.push('/');
-    }
-    
-    // eslint-disable-next-line
-  }, [order]);
-
   const fetchOrderDetails = async () => {
     const orderDetails = await fetchKitchenOrderDetails(order);
     console.log(orderDetails);
@@ -81,6 +76,56 @@ export default function OrderSummary() {
       }
     }
   }
+
+  // const companyName = await getCompanyName();
+            // // @ts-expect-error - companyName is a string
+            // const companyNameString = companyName.charAt(0);
+            
+            // const invoicePayload: SalesInvoicePayload = {
+            //     customer: order.customer,
+            //     items: order.items.map(item => ({
+            //         item_code: item.item_code,
+            //         qty: item.qty,
+            //         warehouse: `Stores - ${companyNameString}`,
+            //         income_account: `Sales Income - ${companyNameString}`,
+            //         sales_order: order.name,
+            //     })),
+            //     update_stock: 1,
+            //     disable_rounded_total: 1,
+            //     docstatus: 1
+            // };
+            // console.log('invoicePayload', invoicePayload);
+            // const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
+            // const salesInvoiceData = await salesInvoiceResponse.json();
+
+            // console.log('salesInvoiceData', salesInvoiceData); // ! CONSOLE LOG
+
+            // const paymentPayload: PaymentEntryPayload = {
+            //     payment_type: "Receive",
+            //     party_type: "Customer",
+            //     party: order.customer,
+            //     paid_to: `Petty Cash - ${companyNameString}`, // ! if Bank Account - R, then reference no. needed regardless of mode of payment
+            //     received_amount: order.total,
+            //     paid_amount: order.total,
+            //     references: [{
+            //         reference_doctype: "Sales Invoice",
+            //         reference_name: salesInvoiceData.data.name,
+            //         total_amount: order.total,
+            //         outstanding_amount: order.total,
+            //         allocated_amount: order.total,
+            //     }],
+            //     mode_of_payment: paymentMethod,
+            //     docstatus: 1
+            // };
+            // console.log('paymentPayload', paymentPayload); // ! console log
+            // const paymentEntryResponse = await createPaymentEntry(paymentPayload);
+            // const paymentEntryData = await paymentEntryResponse.json();
+
+            // console.log('paymentEntryData', paymentEntryData); // ! CONSOLE LOG
+          //   const updatePayload: SalesOrderUpdatePayload = {
+          //     custom_order_complete: 1,
+          //     custom_payment_complete: 0
+          // };
 
   return (
     <div className="flex flex-col min-h-full text-black font-sans p-4 lg:p-0" style={{ backgroundColor: "var(--color-bg-primary)" }}>
@@ -234,7 +279,7 @@ export default function OrderSummary() {
                 setIsPaymentOpen(false);
                 setShowSendReceiptModal(false);
               }}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-black"
             >
               Cancel
             </button>
