@@ -16,6 +16,7 @@ export default function OrderSummary() {
   const [orderDetails, setOrderDetails] = useState<SalesOrders | null>(null);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [showSendReceiptModal, setShowSendReceiptModal] = useState(false);
+  const [multiplePaymentMode, setMultiplePaymentMode] = useState(1);
 
 
   useEffect(() => {
@@ -122,7 +123,20 @@ export default function OrderSummary() {
             {/* Payment Form */}
             <div className="space-y-4">
               <h3 className="font-medium">Payment Information</h3>
-              
+                <label className="block text-sm font-medium mb-2">Split payment</label>
+              <div className="flex items-center gap-2 w-1/6 text-sm">
+              {multiplePaymentMode === 1 ? (
+                <button disabled className="p-3 border border-gray-300 rounded-lg cursor-not-allowed disabled:opacity-50">-</button>
+                ) : (
+                <button className="p-3 border border-gray-300 rounded-lg" onClick={() => setMultiplePaymentMode(multiplePaymentMode - 1)}>-</button>
+                )}
+                <span className="text-sm font-medium border border-gray-300 rounded-lg p-3">{multiplePaymentMode}</span>
+                {multiplePaymentMode === 3 ? (
+                <button disabled className="p-3 border border-gray-300 rounded-lg cursor-not-allowed disabled:opacity-50">+</button>
+                ) : (
+                <button className="p-3 border border-gray-300 rounded-lg" onClick={() => setMultiplePaymentMode(multiplePaymentMode + 1)}>+</button>
+                )}
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Payment Method</label>
                 <select className="w-full p-3 border border-gray-300 rounded-lg">
