@@ -33,7 +33,7 @@ export default function OrderCard({ product, onQuantityChange, onAddToOrder }: O
               />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">{variant.item_name}</h3>
+              <h3 className={`${variant.actual_qty > 0 ? '' : 'line-through'} font-semibold`}>{variant.item_name}</h3>
               <p className="text-sm text-gray-600">${variant.price?.price_list_rate.toFixed(2)}</p>
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex items-center border rounded-md">
@@ -53,7 +53,8 @@ export default function OrderCard({ product, onQuantityChange, onAddToOrder }: O
                 </div>
                 <button
                   onClick={() => onAddToOrder(product, variant)}
-                  className="px-4 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600"
+                  className={`px-4 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600 ${variant.actual_qty > 0 ? '' : 'disabled:opacity-50 disabled:cursor-not-allowed'}`}
+                  disabled={variant.actual_qty <= 0}
                 >
                   Add
                 </button>

@@ -4,14 +4,14 @@ import { useApi } from "@/app/context/ApiContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { SalesOrders } from "../../context/types/ERPNext";
+import { SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload } from "../../context/types/ERPNext";
 import { SlideoutMenu } from "@/components/application/slideout-menus/slideout-menu";
 import SendReceiptModal from "@/app/components/modals/order/SendReceiptModal";
 
 export default function OrderSummary() {
   const searchParams = useSearchParams();
   const order = searchParams?.get('order') || '';
-  const { fetchKitchenOrderDetails } = useApi();
+  const { fetchKitchenOrderDetails, createSalesInvoice, createPaymentEntry, getCompanyName, completeOpenTicket } = useApi();
   const router = useRouter();
   const [orderDetails, setOrderDetails] = useState<SalesOrders | null>(null);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -76,56 +76,59 @@ export default function OrderSummary() {
       }
     }
   }
-
-  // const companyName = await getCompanyName();
-            // // @ts-expect-error - companyName is a string
-            // const companyNameString = companyName.charAt(0);
+  const handleCompletePayment = async () => {
+    console.log('handleCompletePayment'); // ! console log
+            await completeOpenTicket(orderDetails?.name || '');
+            const companyName = await getCompanyName();
+            // @ts-expect-error - companyName is a string
+            const companyNameString = companyName.charAt(0);
             
-            // const invoicePayload: SalesInvoicePayload = {
-            //     customer: order.customer,
-            //     items: order.items.map(item => ({
-            //         item_code: item.item_code,
-            //         qty: item.qty,
-            //         warehouse: `Stores - ${companyNameString}`,
-            //         income_account: `Sales Income - ${companyNameString}`,
-            //         sales_order: order.name,
-            //     })),
-            //     update_stock: 1,
-            //     disable_rounded_total: 1,
-            //     docstatus: 1
-            // };
-            // console.log('invoicePayload', invoicePayload);
-            // const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
-            // const salesInvoiceData = await salesInvoiceResponse.json();
+            const invoicePayload: SalesInvoicePayload = {
+                customer: orderDetails.customer,
+                items: orderDetails.items.map(item => ({
+                    item_code: item.item_code,
+                    qty: item.qty,
+                    warehouse: `Stores - ${companyNameString}`,
+                    income_account: `Sales Income - ${companyNameString}`,
+                    sales_order: orderDetails.name,
+                })),
+                update_stock: 1,
+                disable_rounded_total: 1,
+                docstatus: 1
+            };
+            console.log('invoicePayload', invoicePayload);
+            const salesInvoiceResponse = await createSalesInvoice(invoicePayload);
+            const salesInvoiceData = await salesInvoiceResponse.json();
 
-            // console.log('salesInvoiceData', salesInvoiceData); // ! CONSOLE LOG
-
-            // const paymentPayload: PaymentEntryPayload = {
-            //     payment_type: "Receive",
-            //     party_type: "Customer",
-            //     party: order.customer,
-            //     paid_to: `Petty Cash - ${companyNameString}`, // ! if Bank Account - R, then reference no. needed regardless of mode of payment
-            //     received_amount: order.total,
-            //     paid_amount: order.total,
-            //     references: [{
-            //         reference_doctype: "Sales Invoice",
-            //         reference_name: salesInvoiceData.data.name,
-            //         total_amount: order.total,
-            //         outstanding_amount: order.total,
-            //         allocated_amount: order.total,
-            //     }],
-            //     mode_of_payment: paymentMethod,
-            //     docstatus: 1
-            // };
-            // console.log('paymentPayload', paymentPayload); // ! console log
-            // const paymentEntryResponse = await createPaymentEntry(paymentPayload);
-            // const paymentEntryData = await paymentEntryResponse.json();
-
-            // console.log('paymentEntryData', paymentEntryData); // ! CONSOLE LOG
+            console.log('salesInvoiceData', salesInvoiceData); // ! CONSOLE LOG
+            for (const payment of paymentMethods) {
+            const paymentPayload: PaymentEntryPayload = {
+                payment_type: "Receive",
+                party_type: "Customer", // @ts-expect-error - customer is not defined in the type
+                party: orderDetails.customer,
+                paid_to: `Petty Cash - ${companyNameString}`, // ! if Bank Account - R, then reference no. needed regardless of mode of payment
+                received_amount: payment.amount,
+                paid_amount: payment.amount,
+                references: [{
+                    reference_doctype: "Sales Invoice",
+                    reference_name: salesInvoiceData.data.name, // @ts-expect-error - name is not defined in the type
+                    total_amount: orderDetails.total, // @ts-expect-error - total is not defined in the type
+                    outstanding_amount: orderDetails.total - payment.amount,
+                    allocated_amount: payment.amount,
+                }],
+                mode_of_payment: payment.method,
+                docstatus: 1
+            };
+            console.log('paymentPayload', paymentPayload); // ! console log
+            const paymentEntryResponse = await createPaymentEntry(paymentPayload);
+            const paymentEntryData = await paymentEntryResponse.json();
+            console.log('paymentEntryData', paymentEntryData); // ! CONSOLE LOG
+            }
           //   const updatePayload: SalesOrderUpdatePayload = {
           //     custom_order_complete: 1,
           //     custom_payment_complete: 0
           // };
+  }
 
   return (
     <div className="flex flex-col min-h-full text-black font-sans p-4 lg:p-0" style={{ backgroundColor: "var(--color-bg-primary)" }}>
@@ -225,12 +228,11 @@ export default function OrderSummary() {
                       value={payment.method}
                       onChange={(e) => updatePaymentMethod(index, 'method', e.target.value)}
                     >
-                      <option value="cash">Cash</option>
-                      <option value="card">Card</option>
-                      <option value="mobile">Mobile Payment</option>
-                      <option value="nets">NETS</option>
-                      <option value="paynow">PayNow</option>
-                      <option value="cdc">CDC</option>
+                      <option value="Cash">Cash</option>
+                      <option value="Debit/Credit Card">Debit/Credit Card</option>
+                      <option value="NETS">NETS</option>
+                      <option value="Paynow">PayNow</option>
+                      <option value="CDC">CDC</option>
                     </select>
                   </div>
                     
@@ -287,6 +289,7 @@ export default function OrderSummary() {
               onClick={() => {
                 // Handle payment processing
                 toast.success('Payment processed successfully!');
+                handleCompletePayment();
                 setShowSendReceiptModal(true);
                 setIsPaymentOpen(false);
               }}
