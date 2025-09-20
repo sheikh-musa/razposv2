@@ -3,8 +3,8 @@
 import { useApi } from "@/app/context/ApiContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload } from "../../context/types/ERPNext";
+import toast from "react-hot-toast"; 
+import { SalesOrders, SalesInvoicePayload, PaymentEntryPayload } from "../../context/types/ERPNext";
 import { SlideoutMenu } from "@/components/application/slideout-menus/slideout-menu";
 import SendReceiptModal from "@/app/components/modals/order/SendReceiptModal";
 
@@ -77,13 +77,20 @@ export default function OrderSummary() {
     }
   }
   const handleCompletePayment = async () => {
-    console.log('handleCompletePayment'); // ! console log
-            await completeOpenTicket(orderDetails?.name || '');
-            const companyName = await getCompanyName();
-            // @ts-expect-error - companyName is a string
-            const companyNameString = companyName.charAt(0);
+    if (!orderDetails) {
+      toast.error('No order details available');
+      return;
+    }
+
+    try {
+      console.log('handleCompletePayment'); // ! console log
+      await completeOpenTicket(orderDetails.name);
+      const companyName = await getCompanyName();
+      //@ts-expect-error company name is a string
+      const companyNameString = companyName.charAt(0);
             
-            const invoicePayload: SalesInvoicePayload = {
+      const invoicePayload: SalesInvoicePayload = {
+              
                 customer: orderDetails.customer,
                 items: orderDetails.items.map(item => ({
                     item_code: item.item_code,
@@ -101,18 +108,27 @@ export default function OrderSummary() {
             const salesInvoiceData = await salesInvoiceResponse.json();
 
             console.log('salesInvoiceData', salesInvoiceData); // ! CONSOLE LOG
+            
+            // Get the invoice name from the response
+            const invoiceName = salesInvoiceData.data?.name;
+            
+            if (!invoiceName) {
+              toast.error('Failed to create sales invoice');
+              return;
+            }
+            
             for (const payment of paymentMethods) {
             const paymentPayload: PaymentEntryPayload = {
                 payment_type: "Receive",
-                party_type: "Customer", // @ts-expect-error - customer is not defined in the type
+                party_type: "Customer",
                 party: orderDetails.customer,
                 paid_to: `Petty Cash - ${companyNameString}`, // ! if Bank Account - R, then reference no. needed regardless of mode of payment
                 received_amount: payment.amount,
                 paid_amount: payment.amount,
                 references: [{
                     reference_doctype: "Sales Invoice",
-                    reference_name: salesInvoiceData.data.name, // @ts-expect-error - name is not defined in the type
-                    total_amount: orderDetails.total, // @ts-expect-error - total is not defined in the type
+                    reference_name: invoiceName,
+                    total_amount: orderDetails.total,
                     outstanding_amount: orderDetails.total - payment.amount,
                     allocated_amount: payment.amount,
                 }],
@@ -124,10 +140,15 @@ export default function OrderSummary() {
             const paymentEntryData = await paymentEntryResponse.json();
             console.log('paymentEntryData', paymentEntryData); // ! CONSOLE LOG
             }
+            //! not necessary as Sales Order will automatically update
           //   const updatePayload: SalesOrderUpdatePayload = {
           //     custom_order_complete: 1,
           //     custom_payment_complete: 0
           // };
+    } catch (error) {
+      console.error('Error completing payment:', error);
+      toast.error('Failed to complete payment. Please try again.');
+    }
   }
 
   return (

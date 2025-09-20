@@ -33,7 +33,8 @@ export default function OrderCard({ product, onQuantityChange, onAddToOrder }: O
               />
             </div>
             <div className="flex-1">
-              <h3 className={`${variant.actual_qty > 0 ? '' : 'line-through'} font-semibold`}>{variant.item_name}</h3>
+              <h3 className={`${variant.actual_qty > 0 ? '' : 'line-through'} font-semibold`}>{variant.item_name} </h3>
+              {variant.actual_qty > 0 ? '': <p className="text-xs text-gray-400">out of stock</p>}
               <p className="text-sm text-gray-600">${variant.price?.price_list_rate.toFixed(2)}</p>
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex items-center border rounded-md">
