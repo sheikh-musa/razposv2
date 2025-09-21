@@ -110,6 +110,8 @@ export type SalesOrders = {
     creation: string;
     total_qty: number;
     total: number
+    net_total: number;
+    discount_amount: number;
     custom_kitchen_status: string;
     custom_remarks: string;
     custom_payment_mode: string;

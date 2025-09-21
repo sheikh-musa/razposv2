@@ -53,7 +53,7 @@ export default function OrderSummary() {
 
   const calculateChange = () => {
     if (!orderDetails) return 0;
-    return calculateTotalReceived() - orderDetails.total;
+    return calculateTotalReceived() - orderDetails.net_total;
   };
 
   const fetchOrderDetails = async () => {
@@ -182,9 +182,7 @@ export default function OrderSummary() {
         <p className="text-lg text-black flex items-center gap-2 w-full justify-end">{orderDetails.additional_discount_percentage ? '' : 'Total:'} ${orderDetails.total.toFixed(2)}</p>
         {orderDetails.additional_discount_percentage ? 
         <div className="text-lg text-black flex flex-col items-end w-full justify-end">
-          {/* @ts-expect-error - discount_amount is not defined in the type */}
           <p className="align">Less {orderDetails.additional_discount_percentage}% discount: {orderDetails.discount_amount}</p>
-          {/* @ts-expect-error - net_total is not defined in the type */}
           <p>Total: ${orderDetails.net_total}</p>
           </div> : <></>}
         <div className="flex justify-end gap-2 w-full">
@@ -221,7 +219,7 @@ export default function OrderSummary() {
                 <hr className="my-2" />
                 <div className="flex justify-between font-medium">
                   <span>Total</span>
-                  <span>${orderDetails?.total.toFixed(2) || 0}</span>
+                  <span>${orderDetails?.net_total.toFixed(2) || 0}</span>
                 </div>
               </div>
             </div>
