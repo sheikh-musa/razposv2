@@ -99,6 +99,7 @@ export default function OrderSummary() {
                     income_account: `Sales Income - ${companyNameString}`,
                     sales_order: orderDetails.name,
                 })),
+                additional_discount_percentage: orderDetails.additional_discount_percentage,
                 update_stock: 1,
                 disable_rounded_total: 1,
                 docstatus: 1
@@ -128,8 +129,8 @@ export default function OrderSummary() {
                 references: [{
                     reference_doctype: "Sales Invoice",
                     reference_name: invoiceName,
-                    total_amount: orderDetails.total,
-                    outstanding_amount: orderDetails.total - payment.amount,
+                    total_amount: orderDetails.net_total,
+                    outstanding_amount: orderDetails.net_total - payment.amount,
                     allocated_amount: payment.amount,
                 }],
                 mode_of_payment: payment.method,

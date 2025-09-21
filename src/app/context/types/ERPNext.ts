@@ -185,6 +185,7 @@ export type SalesInvoicePayload = {
     update_stock: number;
     disable_rounded_total: number;
     docstatus: number;
+    additional_discount_percentage?: number;
 }
 
 export type PaymentEntryPayload = {
