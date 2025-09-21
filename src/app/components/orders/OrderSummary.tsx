@@ -38,6 +38,10 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
  // ! stock will be deducted when Sales Order converted to Sales Invoice
 // console.log('items', items); // ! console log
   const handleConfirm = async () => {
+    if (items.length == 0){
+      toast.error('Order unsuccessful. No items in cart');
+      return;
+    }
     const payload: SalesOrderPayload = {
       customer: 'Guest',
       delivery_date: getCurrentDate(), // TODO: Change to actual delivery date past 12am
@@ -66,7 +70,7 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
       orderToUpdate ? toast.success('Order updated successfully') : toast.success('Order created successfully');
       clearCart();
       router.push('/orders');
-      // onClose();
+      onClose();
     } else {
       toast.error('Failed to create order');
     }
