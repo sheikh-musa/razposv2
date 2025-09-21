@@ -179,7 +179,14 @@ export default function OrderSummary() {
           </div>
         ))}
         <hr className="my-2" />
-        <p className="text-lg text-black flex items-center gap-2 w-full justify-end">Total: ${orderDetails.total.toFixed(2)}</p>
+        <p className="text-lg text-black flex items-center gap-2 w-full justify-end">{orderDetails.additional_discount_percentage ? '' : 'Total:'} ${orderDetails.total.toFixed(2)}</p>
+        {orderDetails.additional_discount_percentage ? 
+        <div className="text-lg text-black flex flex-col items-end w-full justify-end">
+          {/* @ts-expect-error - discount_amount is not defined in the type */}
+          <p className="align">Less {orderDetails.additional_discount_percentage}% discount: {orderDetails.discount_amount}</p>
+          {/* @ts-expect-error - net_total is not defined in the type */}
+          <p>Total: ${orderDetails.net_total}</p>
+          </div> : <></>}
         <div className="flex justify-end gap-2 w-full">
         {/* Payment Button */}
         <button
