@@ -76,7 +76,7 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
         <div className="w-full h-48 relative rounded-lg overflow-hidden hover:scale-105 transition-all duration-300"
         style={{
           cursor: 'pointer',
-          backgroundImage: `url(${item.image ? `${process.env.NEXT_PUBLIC_API_URL}/${item.image}` : ""})`,
+          backgroundImage: `url(${item.image ? `${process.env.NEXT_PUBLIC_API_URL}/${item.image}` : "https://thumb.ac-illust.com/b1/b170870007dfa419295d949814474ab2_t.jpeg"})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
