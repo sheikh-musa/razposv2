@@ -81,6 +81,10 @@ export default function OrderSummary() {
       toast.error('No order details available');
       return;
     }
+    if (calculateChange() < 0) {
+      toast.error('Payment not completed. Please check payment amount');
+      return;
+    }
 
     try {
       console.log('handleCompletePayment'); // ! console log
@@ -146,6 +150,9 @@ export default function OrderSummary() {
           //     custom_order_complete: 1,
           //     custom_payment_complete: 0
           // };
+          toast.success('Payment processed successfully!');
+          setShowSendReceiptModal(true);
+          setIsPaymentOpen(false);
     } catch (error) {
       console.error('Error completing payment:', error);
       toast.error('Failed to complete payment. Please try again.');
@@ -315,10 +322,7 @@ export default function OrderSummary() {
             <button
               onClick={() => {
                 // Handle payment processing
-                toast.success('Payment processed successfully!');
                 handleCompletePayment();
-                setShowSendReceiptModal(true);
-                setIsPaymentOpen(false);
               }}
               className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
             >
