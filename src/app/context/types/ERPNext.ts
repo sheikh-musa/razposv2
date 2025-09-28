@@ -307,4 +307,6 @@ export type EmailPayload = {
     doctype?: string;
     name?: string;
     send_email: number;
+    docstatus: number;
+    now: number;
 }

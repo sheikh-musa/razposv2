@@ -82,7 +82,9 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
         content: 'Please find your receipt attached.',
         doctype: 'Sales Order',
         name: order.name,
-        send_email: 1
+        send_email: 1,
+        docstatus: 1,
+        now: 1
       });
       
       if (response.ok) {
