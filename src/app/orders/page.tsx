@@ -41,7 +41,7 @@ export default function Orders() {
 
   const fetchItemCategories = async () => {
     const categories = await getItemCategories();
-    setItemCategories(categories);
+    setItemCategories([{name: "All"}, ...categories]);
   };
 
   const fetchOrderToUpdate = async () => {
@@ -235,7 +235,9 @@ export default function Orders() {
             <button
               key={category.name}
               className={`px-4 py-2 rounded-lg text-sm ${selectedCategory === category.name ? "bg-purple-100 text-purple-600" : "text-gray-600"}`}
-              onClick={() => setSelectedCategory(category.name)}
+              onClick={() => {setSelectedCategory(category.name)
+                setProducts(products.filter((product) => product.item_group === category.name))
+              }}
             >
               {category.name}
             </button>
