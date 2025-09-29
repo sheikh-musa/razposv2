@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, ReactNode } from 'react';
-import { ItemDetailed,ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder, ItemAttributeUpdatePayload, EmailPayload } from './types/ERPNext';
+import { ItemDetailed,ItemTemplate, ItemAttributePayload, ItemTemplatePayload, ItemVariantPayload, ItemPricePayload, ItemPrice, StockReconciliationPayload, StockEntryPayload, SalesOrderPayload, SalesOrders, SalesInvoicePayload, PaymentEntryPayload, SalesOrderUpdatePayload, RevenueEntry, PaymentUpdatePayload, SalesInvoice, RecentActivity, SalesHistoryOrder, CompletedSalesOrder, ItemAttributeUpdatePayload, EmailPayload, ItemCategory } from './types/ERPNext';
 // import { mockRevenueData } from './MockData';
 
 interface ApiContextType {
@@ -13,6 +13,7 @@ interface ApiContextType {
     updateItemAttribute: (itemName: string, payload: ItemAttributeUpdatePayload) => Promise<Response>;
     createItemTemplate: (payload: ItemTemplatePayload) => Promise<Response>;
     createItemVariant: (payload: ItemVariantPayload) => Promise<Response>;
+    getItemCategories: () => Promise<ItemCategory[]>;
     createItemPrice: (payload: ItemPricePayload) => Promise<Response>;
     fetchItemPrice: (itemName: string) => Promise<ItemPrice[]>;
     createStockEntry: (payload: StockEntryPayload) => Promise<Response>;
@@ -58,7 +59,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     const fetchItems = async (includeDeleted: boolean = false, templatesOnly: boolean = false) => {
         try {
             const filters = templatesOnly 
-                ? '[["has_variants","=",1]]&fields=["name","item_name"]'
+                ? '[["has_variants","=",1]]&fields=["name","item_name","item_group"]'
                 : includeDeleted 
                     ? '[["has_variants","=",0],["is_purchase_item","=",1],["disabled","=",1]]'
                 : '[["has_variants","=",0],["is_purchase_item","=",1],["disabled","=",0]]';
@@ -383,6 +384,29 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     };
+
+    const getItemCategories = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Group?filters=[["parent_item_group", "=", "Food"]]`, {
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`Failed to fetch item category: ${JSON.stringify(errorData)}`);
+            }
+            const data = await response.json();
+            return data.data;
+        } catch (error) {
+            console.error('Error fetching item category:', error);
+            throw error;
+        }
+        }
+    
 
     //* -------------------------------------------------------------------------- */
     //*                             API calls for Item Price                       */
@@ -1154,6 +1178,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             updateItemAttribute,
             createItemTemplate,
             createItemVariant,
+            getItemCategories,
             createItemPrice,
             fetchItemPrice,
             updateItemPrice,

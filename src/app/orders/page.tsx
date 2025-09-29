@@ -5,13 +5,13 @@ import { useCart } from "../context/CartContext";
 import OrderConfirmationModal from "../components/modals/OrderConfirmationModal";
 import OrderCard from "../components/orders/OrderCard";
 import { useApi } from "../context/ApiContext";
-import { ItemTemplate, ItemWithPrice } from "../context/types/ERPNext";
+import { ItemTemplate, ItemWithPrice, ItemCategory } from "../context/types/ERPNext";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 export default function Orders() {
-  const { fetchItems, fetchItemDetails, fetchItemPrice, fetchKitchenOrderDetails } = useApi();
+  const { fetchItems, fetchItemDetails, fetchItemPrice, fetchKitchenOrderDetails, getItemCategories } = useApi();
   const [products, setProducts] = useState<ItemTemplate[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   // const [showFilters, setShowFilters] = useState(false);
@@ -29,12 +29,20 @@ export default function Orders() {
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [orderToUpdate, setOrderToUpdate] = useState<any>(null);
+  const [itemCategories, setItemCategories] = useState<ItemCategory[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
+    fetchItemCategories();
     loadProducts();
     fetchOrderToUpdate();
     // eslint-disable-next-line
   }, []);
+
+  const fetchItemCategories = async () => {
+    const categories = await getItemCategories();
+    setItemCategories(categories);
+  };
 
   const fetchOrderToUpdate = async () => {
     if (editOrder) {
@@ -94,6 +102,7 @@ export default function Orders() {
           return {
             name: template.name,
             item_name: template.item_name,
+            item_group: template.item_group,
             variants: variantsWithPrices,
           };
         })
@@ -221,7 +230,18 @@ export default function Orders() {
           </button>
         </div>
       </div>
-
+      <div className="flex gap-2">
+          {itemCategories.map((category) => (
+            <button
+              key={category.name}
+              className={`px-4 py-2 rounded-lg text-sm ${selectedCategory === category.name ? "bg-purple-100 text-purple-600" : "text-gray-600"}`}
+              onClick={() => setSelectedCategory(category.name)}
+            >
+              {category.name}
+            </button>
+          ))}
+      </div>
+      <hr className="my-4" />
       {/* Main content wrapper */}
       <div className="flex gap-4 ">
         {/* Product Grid */}

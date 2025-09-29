@@ -225,8 +225,13 @@ export type ItemDetailed = {
 export type ItemTemplate = {
     name: string;
     item_name: string;
+    item_group?: string;
     variants: ItemDetailed[];
 } 
+
+export type ItemCategory = {
+    name: string;
+}
 
 export type ItemBasic = {
     name: string;
