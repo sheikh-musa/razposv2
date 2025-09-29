@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import OrderSummary from "../components/orders/OrderSummary";
 import { useCart } from "../context/CartContext";
 import OrderConfirmationModal from "../components/modals/OrderConfirmationModal";
@@ -12,6 +12,7 @@ import { toast } from "react-hot-toast";
 
 export default function Orders() {
   const { fetchItems, fetchItemDetails, fetchItemPrice, fetchKitchenOrderDetails, getItemCategories } = useApi();
+  const [allProducts, setAllProducts] = useState<ItemTemplate[]>([]);
   const [products, setProducts] = useState<ItemTemplate[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   // const [showFilters, setShowFilters] = useState(false);
@@ -30,7 +31,7 @@ export default function Orders() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [orderToUpdate, setOrderToUpdate] = useState<any>(null);
   const [itemCategories, setItemCategories] = useState<ItemCategory[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>("All");
 
   useEffect(() => {
     fetchItemCategories();
@@ -38,6 +39,16 @@ export default function Orders() {
     fetchOrderToUpdate();
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    if (selectedCategory === "All") {
+      setProducts(products);
+    } else {
+      setProducts(products.filter((product) => product.item_group === selectedCategory));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory]);
+
 
   const fetchItemCategories = async () => {
     const categories = await getItemCategories();
@@ -107,6 +118,7 @@ export default function Orders() {
           };
         })
       );
+      setAllProducts(productsWithVariants);
       setProducts(productsWithVariants);
       console.log("productsWithVariants", productsWithVariants); // ! console log
     } catch (err) {
@@ -176,8 +188,14 @@ export default function Orders() {
     }
   };
 
+  const filteredProductsByCategory = useMemo(() => {
+    return selectedCategory === 'All'
+      ? allProducts
+      : allProducts.filter(p => p.item_group === selectedCategory);
+  }, [selectedCategory, allProducts]);
+
   // Filter products based on search query
-  const filteredProducts = products
+  const filteredProducts = filteredProductsByCategory
     .map((product) => ({
       ...product,
       variants: product.variants.filter(
