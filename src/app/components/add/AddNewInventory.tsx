@@ -1,29 +1,48 @@
 "use client"
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApi } from "@/app/context/ApiContext";
-import { StockEntryItem } from "@/app/context/types/ERPNext";
+import { ItemCategory, StockEntryItem } from "@/app/context/types/ERPNext";
 import { StockEntryPayload } from "@/app/context/types/ERPNext";
 import toast from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
+import NewCategoryModal from "./NewCategoryModal";
+// import { Select } from "@/components/base/select/select";
 
 
 export default function AddNewInventoryTemplate() {
     const router = useRouter();
-    const { createItemAttribute, createItemTemplate, createItemVariant, createItemPrice, createStockEntry, getCompanyName } = useApi();
+    const { createItemAttribute, createItemTemplate, createItemVariant, createItemPrice, createStockEntry, getCompanyName, getItemCategories } = useApi();
     const [itemName, setItemName] = useState('');
     const [variants, setVariants] = useState([{ name: '', inventory: 0, price: 0 }]);
     const [loading, setLoading] = useState(false);
     const stockItems: StockEntryItem[] = [];
-const capitalizeFirstLetter = (string: string) => {
+    const [itemCategory, setItemCategory] = useState('');
+    const [itemCategories, setItemCategories] = useState<ItemCategory[]>([]);
+    const [newCategoryModal, setNewCategoryModal] = useState(false);
+    const capitalizeFirstLetter = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
-};
+    };
 
-const handleAddVariant = () => {
-    const lastVariant = variants[variants.length - 1];
-    if (!lastVariant.name.trim()) {
-        toast.error('Please fill in the previous variant name before adding a new one', {
+    useEffect(() => {
+        fetchItemCategories();
+        console.log('itemCategory :', itemCategory);
+        if (itemCategory === "Add new category...") {
+            setNewCategoryModal(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [itemCategory]);
+
+    const fetchItemCategories = async () => {
+        const categories = await getItemCategories();
+        setItemCategories(categories);
+    };
+
+    const handleAddVariant = () => {
+        const lastVariant = variants[variants.length - 1];
+        if (!lastVariant.name.trim()) {
+            toast.error('Please fill in the previous variant name before adding a new one', {
             duration: 3000,
             position: 'top-center',
             style: {
@@ -34,20 +53,25 @@ const handleAddVariant = () => {
         return;
     }
     setVariants([...variants, { name: '', inventory: 0, price: 0 }]);
-};
+    };
 
-const handleRemoveVariant = (index: number) => {
-    setVariants(variants.filter((_, i) => i !== index));
-};
+    const handleRemoveVariant = (index: number) => {
+        setVariants(variants.filter((_, i) => i !== index));
+    };
 
-const handleCancel = () => {
-    router.back();
-};
+    const handleCancel = () => {
+        router.back();
+    };
 
-const handleSubmit = async () => {
+    const handleSubmit = async () => {
     // Validation checks
     if (!itemName.trim()) {
         toast.error('Please enter an item name');
+        return;
+    }
+
+    if (!itemCategory.trim()) {
+        toast.error('Please select an item category');
         return;
     }
 
@@ -175,8 +199,12 @@ return (
     <>
         <div className="z-50"><Toaster /></div>
         <div className="p-6 bg-white min-h-screen">
-
-            <div className="max-w-2xl">
+            {newCategoryModal && 
+            <NewCategoryModal isOpen={newCategoryModal} onClose={() => setNewCategoryModal(false)} onCreate={(categoryName) => {
+                setItemCategory(categoryName);
+                setNewCategoryModal(false);
+            }} />}
+            <div className="max-w-2xl text-sm">
                 <div className="mb-6">
                     <label className="block text-sm text-gray-700 mb-2 ">
                         Item name <span className="text-red-500">*</span>
@@ -189,9 +217,22 @@ return (
                         placeholder="Enter item name"
                     />
                 </div>
+                <div className="mb-6 text-sm">
+                    <label className="block text-sm text-gray-700 mb-2 ">
+                        Item category <span className="text-red-500">*</span>
+                    </label>
+                    <select
 
-                <div className="mb-6">
-                    
+                        value={itemCategory}
+                        onChange={(e) => setItemCategory(e.target.value)}
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 border-slate-400 text-black"
+                    >
+                        {[...itemCategories,{"name": "Add new category..."} ].map((category) => (
+                            <option key={category.name} value={category.name}>{category.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="mb-6">   
                     <div className="space-y-4 mt-4 text-black">
                         {variants.map((variant, index) => (
                             <div key={index} className="flex gap-4 items-start">
