@@ -385,6 +385,33 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const createCategoryHead = async() => {
+        try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Group`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: "Food",
+                item_group_name: "Food",
+                parent_item_group: "All Item Groups",
+                is_group: 1
+            })
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.log('Error details:', errorData);
+        }
+            return response;
+        } catch (error) {
+            console.error('Error creating item category:', error);
+            throw error;
+        }
+    }
+
     const getItemCategories = async () => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Group?filters=[["parent_item_group", "=", "Food"]]`, {
@@ -1053,6 +1080,15 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 } else {
                     console.log(`Custom field already exists: ${field.fieldname}`);
                 }
+            }
+
+            const categoryHeader = await createCategoryHead();
+            console.log('Category header: ', categoryHeader);
+            if (categoryHeader.statusText === "CONFLICT") {
+                console.log('Category header "Food" already exists');
+            }
+            else {
+                console.log('Category header created: "Food"');
             }
 
             console.log('Custom fields initialization completed');
