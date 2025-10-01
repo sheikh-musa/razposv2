@@ -1,17 +1,46 @@
 "use client";
-import { Modal } from "@/components/application/modals/modal";
+// import { Modal } from "@/components/application/modals/modal";
+import { useState } from "react";
 
 ;
 
-export default function NewCategoryModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+export default function NewCategoryModal({ 
+    isOpen,
+    onClose,
+    onCreate
+ }: {
+    isOpen: boolean, onClose: () => void, onCreate: (categoryName: string) => void }) {
+    const [categoryName, setCategoryName] = useState('');
+    const capitalizeFirstLetter = (string: string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-                <h1 className="text-black text-lg font-medium text-center mb-2">New Category</h1>
-                <input type="text" className="w-full p-2 border rounded-md text-sm" placeholder="Category name" />
-                <button className="w-full p-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm" onClick={onClose}>Create</button>
+                <h1 className="text-black text-lg font-medium text-center mb-2">Create new category</h1>
+                <input type="text" className="w-full p-2 border rounded-md text-sm text-black" 
+                placeholder="Please enter new category name" 
+                onChange={(e) => setCategoryName(capitalizeFirstLetter(e.target.value))} 
+                value={categoryName}
+                />
+                <div className="flex gap-4 my-2 justify-end">
+                    <button
+                        onClick={onClose}
+                        className="text-black w-1/2 text-sm flex-1 px-4 py-2 border border-slate-500 rounded-md hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={() => {
+                            onCreate(categoryName);
+                            onClose();
+                        }}
+                        className="w-1/2 p-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
+                    >Create</button>
+                </div>
             </div>
         </div>
         // <Modal isOpen={isOpen} onClose={onClose} className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">

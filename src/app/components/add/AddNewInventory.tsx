@@ -30,6 +30,7 @@ export default function AddNewInventoryTemplate() {
         console.log('itemCategory :', itemCategory);
         if (itemCategory === "Add new category...") {
             setNewCategoryModal(true);
+            setItemCategory('');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [itemCategory]);
@@ -200,10 +201,14 @@ return (
         <div className="z-50"><Toaster /></div>
         <div className="p-6 bg-white min-h-screen">
             {newCategoryModal && 
-            <NewCategoryModal isOpen={newCategoryModal} onClose={() => setNewCategoryModal(false)} onCreate={(categoryName) => {
+            <NewCategoryModal 
+            isOpen={newCategoryModal} 
+            onClose={() => setNewCategoryModal(false)} 
+            onCreate={(categoryName) => {
                 setItemCategory(categoryName);
                 setNewCategoryModal(false);
-            }} />}
+            }}
+            />}
             <div className="max-w-2xl text-sm">
                 <div className="mb-6">
                     <label className="block text-sm text-gray-700 mb-2 ">
