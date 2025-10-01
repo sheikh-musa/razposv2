@@ -13,6 +13,7 @@ interface ApiContextType {
     updateItemAttribute: (itemName: string, payload: ItemAttributeUpdatePayload) => Promise<Response>;
     createItemTemplate: (payload: ItemTemplatePayload) => Promise<Response>;
     createItemVariant: (payload: ItemVariantPayload) => Promise<Response>;
+    createItemCategory: (categoryName: string) => Promise<Response>;
     getItemCategories: () => Promise<ItemCategory[]>;
     createItemPrice: (payload: ItemPricePayload) => Promise<Response>;
     fetchItemPrice: (itemName: string) => Promise<ItemPrice[]>;
@@ -433,6 +434,34 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
         }
+
+    const createItemCategory = async (categoryName: string) => {
+        try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item Group`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: categoryName,
+                item_group_name: categoryName,
+                parent_item_group: "Food",
+                is_group: 0
+            })
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.log('Error details:', errorData);
+            // throw new Error(`Failed to create item category: ${JSON.stringify(errorData)}`);
+        }
+        return response;
+        } catch (error) {
+            console.error('Error creating item category:', error);
+            throw error;
+        }
+    }
     
 
     //* -------------------------------------------------------------------------- */
@@ -1215,6 +1244,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             createItemTemplate,
             createItemVariant,
             getItemCategories,
+            createItemCategory,
             createItemPrice,
             fetchItemPrice,
             updateItemPrice,
