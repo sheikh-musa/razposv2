@@ -1,6 +1,6 @@
 /* eslint-disable */
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import DeleteItemModal from "@/app/components/modals/inventory/DeleteItemModal";
 import DeleteMultipleItemsModal from "@/app/components/modals/inventory/DeleteMultipleItemsModal";
@@ -8,12 +8,13 @@ import RestoreItemModal from "@/app/components/modals/inventory/RestoreItemModal
 import RestoreMultipleItemsModal from "@/app/components/modals/inventory/RestoreMultipleItemsModal";
 import { useApi } from "../context/ApiContext";
 import InventoryTable from "@/app/components/inventory/InventoryTable";
-import { ItemWithPrice } from "../context/types/ERPNext";
+import { ItemCategory, ItemWithPrice } from "../context/types/ERPNext";
 import InventoryEdit from "@/app/components/inventory/InventoryEdit";
 
 export default function Inventory() {
   const router = useRouter();
-  const { fetchItems, fetchItemDetails, disableItem, undoDisableItem, fetchItemPrice } = useApi();
+  const { fetchItems, fetchItemDetails, disableItem, undoDisableItem, fetchItemPrice, getItemCategories } = useApi();
+  const [allItems, setAllItems] = useState<ItemWithPrice[]>([]);
   const [items, setItems] = useState<ItemWithPrice[]>([]);
   const [showOptions, setShowOptions] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,12 +42,16 @@ export default function Inventory() {
   const [showMultiRestoreModal, setShowMultiRestoreModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ItemWithPrice | null>(null);
   // const [itemPrice, setItemPrice] = useState<ItemPrice[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>("All");
+  const [categories, setCategories] = useState<ItemCategory[]>([]);
 
   useEffect(() => {
+    fetchItemCategories();
     const loadItems = async () => {
       try {
         setLoading(true);
         const itemsWithDetails = await fetchItemWithDetails();
+        setAllItems(itemsWithDetails);
         setItems(itemsWithDetails);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -57,6 +62,16 @@ export default function Inventory() {
 
     loadItems();
   }, [showDeletedItems]);
+
+  const fetchItemCategories = async () => {
+    const categories = await getItemCategories();
+    setCategories([{name: "All"}, ...categories]);
+  };
+
+  const filterItemsByCategory = useMemo(() => {
+    return selectedCategory === "All" ? items 
+    : items.filter((item) => item.item_group === selectedCategory);
+  }, [selectedCategory, items]);
 
   const fetchItemWithDetails = async () => {
     const basicItems = await fetchItems(showDeletedItems);
@@ -102,7 +117,7 @@ export default function Inventory() {
   };
 
   // Filter items based on search query
-  const filteredItems = items.filter(
+  const filteredItems = filterItemsByCategory.filter(
     (item) =>
       item.item_name.toLowerCase().includes(searchQuery.toLowerCase()) || item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -423,6 +438,18 @@ export default function Inventory() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        {categories.map((category) => (
+          <button key={category.name}
+          className={`px-4 py-2 rounded-lg text-sm ${selectedCategory === category.name ? "bg-purple-100 text-purple-600" : "text-gray-600"}`} 
+          onClick={() => {setSelectedCategory(category.name)
+            setItems(allItems.filter((item) => item.item_group === category.name))
+            console.log("items :", items)
+          }}
+          >{category.name}</button>
+        ))}
       </div>
 
       {/* Table - Now handles its own responsiveness */}

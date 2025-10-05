@@ -1,6 +1,6 @@
 'use client'
-import { useState } from 'react';
-import { ItemWithPrice, StockReconciliationPayload } from '@/app/context/types/ERPNext';
+import { useEffect, useState } from 'react';
+import { ItemCategory, ItemWithPrice, StockReconciliationPayload } from '@/app/context/types/ERPNext';
 import { useApi } from '@/app/context/ApiContext';
 import toast from 'react-hot-toast';
 
@@ -11,11 +11,23 @@ type InventoryDetailsProps = {
 };
 
 export default function InventoryDetails({ item, onClose, onUpdate }: InventoryDetailsProps) {
-  const { stockReconciliation, updateItemPrice, getCompanyName } = useApi();
+  const { stockReconciliation, updateItemPrice, getCompanyName, getItemCategories } = useApi();
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(item?.price?.price_list_rate || 0);
   const [loading, setLoading] = useState(false);
   // const [showEditModal, setShowEditModal] = useState(false);
+  const [itemCategories, setItemCategories] = useState<ItemCategory[]>([]);
+  const [newItemCategory, setNewItemCategory] = useState(item?.item_group);
+
+  useEffect(() => {
+    fetchItemCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchItemCategories = async () => {
+    const categories = await getItemCategories();
+    setItemCategories(categories);
+  };
 
   if (!item) return null;
 
@@ -139,8 +151,16 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
             <h3 className="font-semibold text-sm text-black">Basic Information</h3>
             <div className="grid grid-cols-2 gap-2">
               <div className="text-xs">
-                <p className="text-gray-500">Item Group</p>
-                <p className="text-black">{item.item_group}</p>
+                <p className="text-gray-500">Category</p>
+                {/* <p className="text-black">{item.item_group}</p> */}
+                <select className="p-1 border rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 border-slate-400 text-black"
+                value={newItemCategory}
+                onChange={(e) => {setNewItemCategory(e.target.value); console.log('newItemCategory :', newItemCategory)}}
+                >
+                  {itemCategories.map((category) => (
+                    <option key={category.name} value={category.name}>{category.name}</option>
+                  ))}
+                </select>
               </div>
               <div className="text-xs">
                 <p className="text-gray-500">Stock UOM</p>
@@ -214,7 +234,15 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
       {/* Action Buttons */}
       <div className="border-t bg-white p-3">
         <div className="space-y-3">
-          <button 
+          {quantity === 0 || price === item.price?.price_list_rate || newItemCategory === item.item_group ? (
+            <button 
+            className="w-full py-2 bg-purple-600 text-white text-gray-700 text-sm rounded-lg hover:cursor-not-allowed opacity-50"
+            onClick={() => toast.error('No changes to save')}
+          >
+            Save Changes
+          </button>
+          ) : (
+            <button 
             className={`w-full py-2 bg-purple-600 text-white text-sm rounded-lg 
               ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-700'}`}
             onClick={handleSave}
@@ -222,6 +250,7 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
           >
             {loading ? 'Saving...' : 'Save Changes'}
           </button>
+          )}
           <button 
             className="w-full py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50"
             onClick={onClose}
