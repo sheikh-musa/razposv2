@@ -15,6 +15,7 @@ interface ApiContextType {
     createItemVariant: (payload: ItemVariantPayload) => Promise<Response>;
     createItemCategory: (categoryName: string) => Promise<Response>;
     getItemCategories: () => Promise<ItemCategory[]>;
+    updateItemCategory: (itemName: string, categoryName: string) => Promise<Response>;
     createItemPrice: (payload: ItemPricePayload) => Promise<Response>;
     fetchItemPrice: (itemName: string) => Promise<ItemPrice[]>;
     createStockEntry: (payload: StockEntryPayload) => Promise<Response>;
@@ -462,7 +463,31 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             throw error;
         }
     }
-    
+
+    const updateItemCategory = async (itemName: string, categoryName: string) => {
+        try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Item/${itemName}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                item_group: categoryName
+            })
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to update item category: ${JSON.stringify(errorData)}`);
+        }
+        return response;
+        } catch (error) {
+            console.error('Error updating item category:', error);
+            throw error;
+        }
+    }
 
     //* -------------------------------------------------------------------------- */
     //*                             API calls for Item Price                       */
@@ -1245,6 +1270,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             createItemVariant,
             getItemCategories,
             createItemCategory,
+            updateItemCategory,
             createItemPrice,
             fetchItemPrice,
             updateItemPrice,

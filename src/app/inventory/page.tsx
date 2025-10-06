@@ -69,7 +69,7 @@ export default function Inventory() {
   };
 
   const filterItemsByCategory = useMemo(() => {
-    return selectedCategory === "All" ? items 
+    return selectedCategory === "All" ? allItems
     : items.filter((item) => item.item_group === selectedCategory);
   }, [selectedCategory, items]);
 

@@ -12,13 +12,13 @@ type InventoryDetailsProps = {
 };
 
 export default function InventoryDetails({ item, onClose, onUpdate }: InventoryDetailsProps) {
-  const { stockReconciliation, updateItemPrice, getCompanyName, getItemCategories } = useApi();
+  const { stockReconciliation, updateItemPrice, getCompanyName, getItemCategories, updateItemCategory } = useApi();
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(item?.price?.price_list_rate || 0);
   const [loading, setLoading] = useState(false);
   // const [showEditModal, setShowEditModal] = useState(false);
   const [itemCategories, setItemCategories] = useState<ItemCategory[]>([]);
-  const [newItemCategory, setNewItemCategory] = useState(item?.item_group);
+  const [newItemCategory, setNewItemCategory] = useState(item?.item_group || '');
   const [newCategoryModal, setNewCategoryModal] = useState(false);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
   if (!item) return null;
 
   const handleSave = async () => {
-    if (quantity === 0 && price === item.price?.price_list_rate || newItemCategory === item.item_group) {
+    if (quantity === 0 && price === item.price?.price_list_rate && newItemCategory === item.item_group) {
       toast.error('No changes to save');
       return;
     }
@@ -69,7 +69,16 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
       if (price !== item.price?.price_list_rate) {
           await updateItemPrice(item.price?.name || '', price);
       }
-      toast.success('Inventory updated successfully');
+      if (newItemCategory !== item.item_group) {
+        const response = await updateItemCategory(item.name, newItemCategory);
+        if (response.ok) {
+          toast.success('Item category updated successfully');
+        }
+        else {
+          toast.error('Failed to update item category');
+        }
+      }
+      toast.success('Item updated successfully');
 
 
       if (onUpdate) {
@@ -223,10 +232,6 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
                   value={newItemCategory}
                   onChange={(e) => {
                     setNewItemCategory(e.target.value);
-                    // console.log("newItemCategory :", newItemCategory);
-                    // if (newItemCategory === "Add new category...") {
-                    //   setNewCategoryModal(true);
-                    // }
                   }}
                 >
                   {itemCategories.map((category) => (
