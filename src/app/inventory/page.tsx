@@ -68,10 +68,21 @@ export default function Inventory() {
     setCategories([{name: "All"}, ...categories]);
   };
 
+  const visibleCategories = useMemo(
+    () => [
+      { name: "All" },
+      ...categories.filter(
+        (c) => c.name !== "All" && allItems.some((i) => i.item_group === c.name)
+      ),
+    ],
+    [categories, allItems]
+  );
+
   const filterItemsByCategory = useMemo(() => {
-    return selectedCategory === "All" ? allItems
-    : items.filter((item) => item.item_group === selectedCategory);
-  }, [selectedCategory, items]);
+    return selectedCategory === "All"
+      ? allItems
+      : allItems.filter((item) => item.item_group === selectedCategory);
+  }, [selectedCategory, allItems]);
 
   const fetchItemWithDetails = async () => {
     const basicItems = await fetchItems(showDeletedItems);
@@ -271,11 +282,24 @@ export default function Inventory() {
   }
 
   return (
-    <div className="p-4 lg:p-0" style={{ backgroundColor: "var(--color-bg-primary)", color: "var(--color-fg-primary)" }}>
+    <div
+      className="p-4 lg:p-0"
+      style={{
+        backgroundColor: "var(--color-bg-primary)",
+        color: "var(--color-fg-primary)",
+      }}
+    >
       {/* Header Section - Mobile: Stack vertically, Desktop: Side by side */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 gap-4">
         <h1 className="text-xl lg:text-2xl font-bold">
-          Inventory {showDeletedItems ? <span style={{ color: "var(--color-fg-error-primary)" }}>(Deleted)</span> : ""}
+          Inventory{" "}
+          {showDeletedItems ? (
+            <span style={{ color: "var(--color-fg-error-primary)" }}>
+              (Deleted)
+            </span>
+          ) : (
+            ""
+          )}
         </h1>
 
         {/* Controls - Mobile: Stack, Desktop: Horizontal */}
@@ -290,8 +314,18 @@ export default function Inventory() {
               className="w-full sm:w-auto pl-10 pr-4 py-2 border text-black rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
             />
             <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </div>
           </div>
@@ -304,7 +338,12 @@ export default function Inventory() {
                 className="w-full sm:w-auto flex items-center justify-center gap-2 px-3 lg:px-4 py-2 border rounded-md hover:bg-gray-50 text-xs lg:text-sm"
                 onClick={() => setFilterOptions(!filterOptions)}
               >
-                <svg className="w-4 lg:w-5 h-4 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-4 lg:w-5 h-4 lg:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -325,7 +364,10 @@ export default function Inventory() {
                       onChange={(e) => setShowDeletedItems(e.target.checked)}
                       className="rounded"
                     />
-                    <label htmlFor="showDeleted" className="text-sm text-gray-700">
+                    <label
+                      htmlFor="showDeleted"
+                      className="text-sm text-gray-700"
+                    >
                       Show deleted items
                     </label>
                   </div>
@@ -338,8 +380,18 @@ export default function Inventory() {
               onClick={() => router.push("/inventory/add")}
               className="w-full sm:w-auto flex items-center justify-center gap-2 bg-purple-500 text-white px-3 lg:px-4 py-2 rounded-md hover:bg-purple-600 text-xs lg:text-sm"
             >
-              <svg className="w-4 lg:w-5 h-4 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              <svg
+                className="w-4 lg:w-5 h-4 lg:h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               <span className="hidden sm:inline">Add</span>
               <span className="sm:hidden">Add Inventory</span>
@@ -347,7 +399,12 @@ export default function Inventory() {
 
             {/* Export Button */}
             <button className="w-full sm:w-auto flex items-center justify-center gap-2 border border-gray-300 px-3 lg:px-4 py-2 rounded-md hover:bg-gray-50 text-xs lg:text-sm">
-              <svg className="w-4 lg:w-5 h-4 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-4 lg:w-5 h-4 lg:h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -364,7 +421,12 @@ export default function Inventory() {
                 onClick={() => setShowOptions(!showOptions)}
                 className="w-full sm:w-auto p-2 hover:bg-gray-100 rounded-md flex items-center justify-center"
               >
-                <svg className="w-4 lg:w-5 h-4 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-4 lg:w-5 h-4 lg:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -384,7 +446,12 @@ export default function Inventory() {
                       setShowOptions(false);
                     }}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -403,7 +470,12 @@ export default function Inventory() {
                         setShowOptions(false);
                       }}
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -422,7 +494,12 @@ export default function Inventory() {
                         setShowOptions(false);
                       }}
                     >
-                      <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="w-4 h-4 text-purple-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -441,13 +518,18 @@ export default function Inventory() {
       </div>
 
       <div className="flex gap-2 mb-4">
-        {categories.map((category) => (
-          <button key={category.name}
-          className={`px-4 py-2 rounded-lg text-sm ${selectedCategory === category.name ? "bg-purple-100 text-purple-600" : "text-gray-600"}`} 
-          onClick={() => {setSelectedCategory(category.name)
-            setItems(allItems.filter((item) => item.item_group === category.name))
-          }}
-          >{category.name}</button>
+        {visibleCategories.map((category) => (
+          <button
+            key={category.name}
+            className={`px-4 py-2 rounded-lg text-sm ${
+              selectedCategory === category.name
+                ? "bg-purple-100 text-purple-600"
+                : "text-gray-600"
+            }`}
+            onClick={() => setSelectedCategory(category.name)}
+          >
+            {category.name}
+          </button>
         ))}
       </div>
 
@@ -472,8 +554,18 @@ export default function Inventory() {
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
           Previous
         </button>
@@ -483,7 +575,11 @@ export default function Inventory() {
           {getPageNumbers().map((page, index) => (
             <button
               key={index}
-              className={`flex-shrink-0 w-8 h-8 rounded-lg ${page === currentPage ? "bg-purple-600 text-white" : "text-gray-600"}`}
+              className={`flex-shrink-0 w-8 h-8 rounded-lg ${
+                page === currentPage
+                  ? "bg-purple-600 text-white"
+                  : "text-gray-600"
+              }`}
               onClick={() => typeof page === "number" && setCurrentPage(page)}
             >
               {page}
@@ -493,12 +589,24 @@ export default function Inventory() {
 
         <button
           className="flex items-center justify-center gap-2 text-gray-600 w-full sm:w-auto py-2 px-4 border rounded-md sm:border-0"
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
         >
           Next
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </button>
       </div>
@@ -535,7 +643,13 @@ export default function Inventory() {
         itemCount={selectedItems.length}
       />
 
-      {selectedItem && <InventoryEdit item={selectedItem} onClose={() => setSelectedItem(null)} onUpdate={handleInventoryUpdate} />}
+      {selectedItem && (
+        <InventoryEdit
+          item={selectedItem}
+          onClose={() => setSelectedItem(null)}
+          onUpdate={handleInventoryUpdate}
+        />
+      )}
     </div>
   );
 }
