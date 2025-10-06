@@ -446,7 +446,6 @@ export default function Inventory() {
           className={`px-4 py-2 rounded-lg text-sm ${selectedCategory === category.name ? "bg-purple-100 text-purple-600" : "text-gray-600"}`} 
           onClick={() => {setSelectedCategory(category.name)
             setItems(allItems.filter((item) => item.item_group === category.name))
-            console.log("items :", items)
           }}
           >{category.name}</button>
         ))}
