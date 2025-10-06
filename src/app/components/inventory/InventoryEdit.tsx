@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ItemCategory, ItemWithPrice, StockReconciliationPayload } from '@/app/context/types/ERPNext';
 import { useApi } from '@/app/context/ApiContext';
 import toast from 'react-hot-toast';
+import NewCategoryModal from '../add/NewCategoryModal';
 
 type InventoryDetailsProps = {
   item?: ItemWithPrice;
@@ -18,6 +19,7 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
   // const [showEditModal, setShowEditModal] = useState(false);
   const [itemCategories, setItemCategories] = useState<ItemCategory[]>([]);
   const [newItemCategory, setNewItemCategory] = useState(item?.item_group);
+  const [newCategoryModal, setNewCategoryModal] = useState(false);
 
   useEffect(() => {
     fetchItemCategories();
@@ -26,8 +28,17 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
 
   const fetchItemCategories = async () => {
     const categories = await getItemCategories();
-    setItemCategories(categories);
+    setItemCategories([...categories,{name: "Add new category..."} ]);
   };
+  // Add useEffect to handle the logic
+  useEffect(() => {
+    console.log("newItemCategory :", newItemCategory);
+    if (newItemCategory === "Add new category...") {
+      setNewCategoryModal(true);
+    }
+    fetchItemCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newItemCategory, newCategoryModal]);
 
   if (!item) return null;
 
@@ -80,7 +91,18 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
   }
 
   return (
+    <>
+    <div className="z-50">
+      {newCategoryModal && (
+        <NewCategoryModal
+          isOpen={newCategoryModal}
+          onClose={() => setNewCategoryModal(false)}
+          onCreate={(categoryName) => setNewItemCategory(categoryName)}
+        />
+      )}
+      </div>
     <div className="fixed inset-y-0 right-0 w-[315px] bg-white shadow-xl transform transition-transform duration-300 ease-in-out flex flex-col">
+      
       {/* Header */}
       <div className="flex flex-col justify-between items-center p-2 border-b">
         <div className="flex justify-between w-full">
@@ -201,7 +223,10 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
                   value={newItemCategory}
                   onChange={(e) => {
                     setNewItemCategory(e.target.value);
-                    console.log("newItemCategory :", newItemCategory);
+                    // console.log("newItemCategory :", newItemCategory);
+                    // if (newItemCategory === "Add new category...") {
+                    //   setNewCategoryModal(true);
+                    // }
                   }}
                 >
                   {itemCategories.map((category) => (
@@ -317,9 +342,15 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
       {/* Action Buttons */}
       <div className="border-t bg-white p-3">
         <div className="space-y-3">
-          {quantity != 0 || price != item.price?.price_list_rate || newItemCategory != item.item_group ? (
+          {quantity != 0 ||
+          price != item.price?.price_list_rate ||
+          newItemCategory != item.item_group ? (
             <button
-              className={`w-full py-2 bg-purple-600 text-white text-sm rounded-lg ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-purple-700"}`}
+              className={`w-full py-2 bg-purple-600 text-white text-sm rounded-lg ${
+                loading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-purple-700"
+              }`}
               onClick={handleSave}
               disabled={loading}
             >
@@ -343,5 +374,6 @@ export default function InventoryDetails({ item, onClose, onUpdate }: InventoryD
         </div>
       </div>
     </div>
+    </>
   );
 } 
