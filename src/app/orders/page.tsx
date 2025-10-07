@@ -9,6 +9,8 @@ import { ItemTemplate, ItemWithPrice, ItemCategory } from "../context/types/ERPN
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { Input } from "@/components/base/input/input";
+import { useBreakpoint } from "@/hooks/use-breakpoint";
 
 export default function Orders() {
   const { fetchItems, fetchItemDetails, fetchItemPrice, fetchKitchenOrderDetails, getItemCategories } = useApi();
@@ -28,6 +30,7 @@ export default function Orders() {
   const searchParams = useSearchParams();
   const editOrder = searchParams?.get("order") || null;
   const router = useRouter();
+  const width = useBreakpoint("md");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [orderToUpdate, setOrderToUpdate] = useState<any>(null);
   const [itemCategories, setItemCategories] = useState<ItemCategory[]>([]);
@@ -227,7 +230,7 @@ export default function Orders() {
         <div className="flex items-center gap-4">
           {/* Search Bar */}
           <div className="relative">
-            <input
+            <Input
               type="text"
               placeholder="Search"
               value={searchQuery}
@@ -235,8 +238,18 @@ export default function Orders() {
               className="pl-10 pr-4 py-2 border rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-black text-sm"
             />
             <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </div>
           </div>
@@ -246,47 +259,77 @@ export default function Orders() {
             className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white text-sm rounded-md hover:bg-purple-600"
             onClick={() => setShowOrderSummary(!showOrderSummary)}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            Order Summary
+            <div className="relative inline-flex">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              {items.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-black text-xs rounded-full h-4 w-4 flex items-center justify-center min-w-[16px]">
+                  {items.length}
+                </span>
+              )}
+            </div>
+            {width ? "Order Summary" : ""}
           </button>
         </div>
       </div>
       <div className="flex gap-2">
-          {visibleCategories.map((category) => (
-            <button
-              key={category.name}
-              className={`px-4 py-2 rounded-lg text-sm ${selectedCategory === category.name ? "bg-purple-100 text-purple-600" : "text-gray-600"}`}
-              onClick={() => {setSelectedCategory(category.name)
-                setProducts(products.filter((product) => product.item_group === category.name))
-              }}
-            >
-              {category.name}
-            </button>
-          ))}
+        {visibleCategories.map((category) => (
+          <button
+            key={category.name}
+            className={`px-4 py-2 rounded-lg text-sm ${
+              selectedCategory === category.name
+                ? "bg-purple-100 text-purple-600"
+                : "text-gray-600"
+            }`}
+            onClick={() => {
+              setSelectedCategory(category.name);
+              setProducts(
+                products.filter(
+                  (product) => product.item_group === category.name
+                )
+              );
+            }}
+          >
+            {category.name}
+          </button>
+        ))}
       </div>
       <hr className="my-4" />
       {/* Main content wrapper */}
       <div className="flex gap-4 ">
         {/* Product Grid */}
-        <div className={`grid grid-cols-1 ${showOrderSummary ? "md:grid-cols-2" : "md:grid-cols-3"} gap-3 flex-1`}>
+        <div
+          className={`grid grid-cols-1 ${
+            showOrderSummary ? "md:grid-cols-2" : "md:grid-cols-3"
+          } gap-3 flex-1`}
+        >
           {filteredProducts.map((product) => (
-            <OrderCard key={product.name} product={product} onQuantityChange={handleQuantityChange} onAddToOrder={handleAddToOrder} />
+            <OrderCard
+              key={product.name}
+              product={product}
+              onQuantityChange={handleQuantityChange}
+              onAddToOrder={handleAddToOrder}
+            />
           ))}
         </div>
 
         {/* Order Summary Side Panel */}
         {showOrderSummary && (
           <div className="w-80 flex-shrink-0 ">
-            <OrderSummary 
-            onClose={() => setShowOrderSummary(false)} 
-            orderToUpdate={orderToUpdate} 
+            <OrderSummary
+              onClose={() => setShowOrderSummary(false)}
+              orderToUpdate={orderToUpdate}
             />
           </div>
         )}
