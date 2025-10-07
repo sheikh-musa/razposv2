@@ -170,6 +170,7 @@ export default function Orders() {
         type: product.item_name,
       });
       console.log("variant", variant); // ! console log
+      toast.success('Item added to cart', {position: 'bottom-center'});
       setShowOrderSummary(true);
     }
   };
@@ -185,6 +186,7 @@ export default function Orders() {
         quantity: variant.quantity || 1,
         type: product.item_name,
       });
+      toast.success('Item added to cart', {position: 'bottom-center'});
       setShowOrderSummary(true);
       setPendingOrder(null);
       setShowConfirmModal(false);
@@ -307,7 +309,7 @@ export default function Orders() {
       </div>
       <hr className="my-4" />
       {/* Main content wrapper */}
-      <div className="flex gap-4 ">
+      <div className="flex gap-4 sm:relative">
         {/* Product Grid */}
         <div
           className={`grid grid-cols-1 ${
@@ -326,7 +328,7 @@ export default function Orders() {
 
         {/* Order Summary Side Panel */}
         {showOrderSummary && (
-          <div className="w-80 flex-shrink-0 ">
+          <div className="w-80 flex-shrink-0 sm:fixed sm:absolute sm:z-50 sm:top-0 sm:right-0">
             <OrderSummary
               onClose={() => setShowOrderSummary(false)}
               orderToUpdate={orderToUpdate}

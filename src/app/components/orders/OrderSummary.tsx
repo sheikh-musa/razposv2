@@ -78,7 +78,7 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
 
   return (
     <>
-      <div className="bg-white border-solid border p-4 rounded-lg shadow-md h-[calc(100vh-7rem)] sticky top-4 relative">
+      <div className="bg-white border-solid border p-4 rounded-lg shadow-md h-[calc(100vh-7rem)] sticky top-0 relative">
       {/* Scrollable content */}
       <div className="overflow-y-auto h-[calc(100%-8rem)]">
         {/* Header */}
