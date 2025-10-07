@@ -188,6 +188,16 @@ export default function Orders() {
     }
   };
 
+  const visibleCategories = useMemo(
+    () => [
+      { name: "All" },
+      ...itemCategories.filter(
+        (c) => c.name !== "All" && allProducts.some((p) => p.item_group === c.name)
+      ),
+    ],
+    [itemCategories, allProducts]
+  );
+
   const filteredProductsByCategory = useMemo(() => {
     return selectedCategory === 'All'
       ? allProducts
@@ -249,7 +259,7 @@ export default function Orders() {
         </div>
       </div>
       <div className="flex gap-2">
-          {itemCategories.map((category) => (
+          {visibleCategories.map((category) => (
             <button
               key={category.name}
               className={`px-4 py-2 rounded-lg text-sm ${selectedCategory === category.name ? "bg-purple-100 text-purple-600" : "text-gray-600"}`}
