@@ -283,11 +283,11 @@ export default function Orders() {
           </button>
         </div>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 overflow-x-auto sm:flex-wrap">
         {visibleCategories.map((category) => (
           <button
             key={category.name}
-            className={`px-4 py-2 rounded-lg text-sm ${
+            className={`px-4 py-2 rounded-lg text-sm flex-shrink-0 sm:flex-shrink ${
               selectedCategory === category.name
                 ? "bg-purple-100 text-purple-600"
                 : "text-gray-600"
