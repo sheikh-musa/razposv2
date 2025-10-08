@@ -31,6 +31,7 @@ export default function Orders() {
   const editOrder = searchParams?.get("order") || null;
   const router = useRouter();
   const width = useBreakpoint("md");
+  const mobile = useBreakpoint("sm");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [orderToUpdate, setOrderToUpdate] = useState<any>(null);
   const [itemCategories, setItemCategories] = useState<ItemCategory[]>([]);
@@ -309,10 +310,10 @@ export default function Orders() {
       </div>
       <hr className="my-4" />
       {/* Main content wrapper */}
-      <div className="flex gap-4 sm:relative">
+      <div className="flex items-start gap-4 relative min-h-screen">
         {/* Product Grid */}
         <div
-          className={`grid grid-cols-1 ${
+          className={`grid grid-cols-1 sm:z-0 ${
             showOrderSummary ? "md:grid-cols-2" : "md:grid-cols-3"
           } gap-3 flex-1`}
         >
@@ -328,7 +329,7 @@ export default function Orders() {
 
         {/* Order Summary Side Panel */}
         {showOrderSummary && (
-          <div className="w-80 flex-shrink-0 sm:fixed sm:absolute sm:z-50 sm:top-0 sm:right-0">
+          <div className={`w-80 flex-shrink-0 ${mobile ? "sticky top-4 self-start z-50" : "absolute right-0 top-0 h-screen overflow-y-auto z-50 h-fit"}`}>
             <OrderSummary
               onClose={() => setShowOrderSummary(false)}
               orderToUpdate={orderToUpdate}

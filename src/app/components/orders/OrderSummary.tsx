@@ -22,7 +22,6 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
   const [paymentComplete, setPaymentComplete] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(orderToUpdate?.additional_discount_percentage || 0);
   const [discountError, setDiscountError] = useState<string>('');
-
 //   const shippingFee = 3.99;
 
   const getCurrentDate = () => {
@@ -78,7 +77,7 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
 
   return (
     <>
-      <div className="bg-white border-solid border p-4 rounded-lg shadow-md h-[calc(100vh-7rem)] sticky top-0 relative">
+      <div className="bg-white border-solid border p-4 rounded-lg shadow-md h-[calc(100vh-7rem)]">
       {/* Scrollable content */}
       <div className="overflow-y-auto h-[calc(100%-8rem)]">
         {/* Header */}
