@@ -1,2 +1,2 @@
 # Ignore all files in the src/components directory
-src/components/base/input/input-group.tsx
+src/components/*
