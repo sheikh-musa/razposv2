@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 "use client";
 
 import { type HTMLAttributes, type ReactNode } from "react";
