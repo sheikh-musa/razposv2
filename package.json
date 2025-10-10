@@ -11,9 +11,13 @@
   "dependencies": {
     "@types/react-datepicker": "^7.0.0",
     "@untitledui/icons": "^0.0.19",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.23.11",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
+    "lucide-react": "^0.545.0",
+    "motion": "^12.23.22",
     "next": "15.0.4",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
@@ -22,8 +26,10 @@
     "react-datepicker": "^7.6.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.1",
+    "react-use-measure": "^2.1.7",
     "recharts": "^2.15.0",
     "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
     "workbox-webpack-plugin": "^7.3.0"
   },
   "devDependencies": {

@@ -81,9 +81,9 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                         <h3 className="font-semibold text-sm text-black">{item.item_code}</h3>
                         <p className="text-xs text-gray-600">{item.item_name}</p>
                       </div>
-                      <div className='flex h-full items-center justify-center w-1/3'>
-                      <div className='border rounded-md'>
-                      <button className="p-1 hover:bg-gray-200 text-black border-r">
+                      <div className='flex h-full items-center justify-center w-1/3 text-sm'>
+                      {/* <div className='border rounded-md text-sm'> */}
+                      {/* <button className="p-1 hover:bg-gray-200 text-black border-r">
                         <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
                         </svg>
@@ -93,8 +93,9 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                         <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                         </svg>
-                      </button>
-                      </div>
+                      </button> */}
+                      {/* </div> */}
+                      Qty: {item.qty}
                       </div>
                       <div className="text-right w-1/3">
                         <p className="text-sm text-black">${item.rate.toFixed(2)}/ea</p>
