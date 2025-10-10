@@ -79,7 +79,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                     <div className="flex items-start mb-2 h-8">
                       <div className='w-1/3'>
                         <h3 className="font-semibold text-sm text-black">{item.item_code}</h3>
-                        <p className="text-xs text-gray-600">{item.item_name}</p>
+                        {/* <p className="text-xs text-gray-600">{item.item_name}</p> */}
                       </div>
                       <div className='flex h-full items-center justify-center w-1/3 text-sm'>
                       {/* <div className='border rounded-md text-sm'> */}
@@ -99,11 +99,11 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                       </div>
                       <div className="text-right w-1/3">
                         <p className="text-sm text-black">${item.rate.toFixed(2)}/ea</p>
-                        <button className="ml-auto text-black">
+                        {/* <button className="ml-auto text-black">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                      </button>
+                      </button> */}
                       </div>
                     </div>
                         <div className="items-center bg-gray-50 rounded-lg py-2 text-end">
