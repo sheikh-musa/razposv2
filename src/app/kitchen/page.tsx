@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useApi } from "../context/ApiContext";
 import { SalesOrders } from "../context/types/ERPNext";
 import KitchenOrderCard from "@/app/components/kitchen/KitchenOrderCard";
+import { Spinner } from "@/components/ui/shadcn-io/spinner/index";
 
 export default function Kitchen() {
   const { fetchKitchenOrderNames, fetchKitchenOrderDetails } = useApi();
@@ -75,7 +76,7 @@ export default function Kitchen() {
     );
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="flex flex-col justify-center items-center h-full"><Spinner className="text-purple-500" variant="circle" size="64"/>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (

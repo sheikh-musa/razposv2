@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { Input } from "@/components/base/input/input";
 import { useBreakpoint } from "@/hooks/use-breakpoint";
+import { Spinner } from "@/components/ui/shadcn-io/spinner/index";
 
 export default function Orders() {
   const { fetchItems, fetchItemDetails, fetchItemPrice, fetchKitchenOrderDetails, getItemCategories } = useApi();
@@ -222,7 +223,7 @@ export default function Orders() {
     }))
     .filter((product) => product.variants.length > 0);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="flex flex-col justify-center items-center h-full"><Spinner className="text-purple-500" variant="circle" size="64"/>Loading...</div>;;
   if (error) return <div>Error: {error}</div>;
 
   return (
