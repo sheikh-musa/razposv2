@@ -183,9 +183,9 @@ export default function Home() {
       {/* Transaction History and Recent Activity - Mobile: Stack vertically, Desktop: Side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:-mt-6 lg:h-[300px]">
         <div className="lg:h-2/3">
-          <h3 className="text-lg font-semibold mb-4 lg:hidden" style={{ color: "var(--color-fg-primary)" }}>
+          {/* <h3 className="text-lg font-semibold mb-4 lg:hidden" style={{ color: "var(--color-fg-primary)" }}>
             Transaction History
-          </h3>
+          </h3> */}
           <TransactionHistory />
         </div>
         <div className="lg:col-span-2 lg:h-2/3">
