@@ -5,6 +5,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { SalesHistoryOrder, TransactionHistoryItem } from "@/app/context/types/ERPNext";
 import { useApi } from "@/app/context/ApiContext";
+import { useBreakpoint } from "@/hooks/use-breakpoint";
+import { Select } from "@/components/base/select/select";
+import { SelectItem } from "@/components/base/select/select-item";
 
 export default function TransactionHistory() {
   const { getCompletedSalesOrderItems, getCompletedSalesOrder } = useApi();
@@ -17,6 +20,7 @@ export default function TransactionHistory() {
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
+  const mobile = useBreakpoint("sm");
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState({
@@ -245,7 +249,7 @@ export default function TransactionHistory() {
     <div>
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: "var(--color-fg-primary)" }}>
+        <h1 className="lg:text-2xl text-xl font-bold ml-3 lg:ml-0" style={{ color: "var(--color-fg-primary)" }}>
           Transaction History
         </h1>
         <div className="flex gap-2">
@@ -278,8 +282,8 @@ export default function TransactionHistory() {
 
       {/* Time Range Filters */}
       <div className="flex justify-between mb-8">
-        <div className="flex gap-2">
-          {["All", "Today", "7 days", "30 days", "6 months"].map((range) => (
+        <div className="flex gap-2 ml-3 lg:mx-0">
+          {mobile ? (["All", "Today", "7 days", "30 days", "6 months"].map((range) => (
             <button
               key={range}
               className={`px-4 py-2 rounded-lg text-sm ${timeRange === range ? "bg-purple-100 text-purple-600" : "text-gray-600"}`}
@@ -287,7 +291,21 @@ export default function TransactionHistory() {
             >
               {range}
             </button>
-          ))}
+          ))):(
+          <Select
+            isRequired
+            size="sm"
+            placeholder={timeRange}
+            selectedKey={timeRange}
+            onSelectionChange={(value) => handleTimeRangeChange(value as string)}
+            items={[{id: "All", label: "All"}, {id: "Today", label: "Today"}, {id: "7 days", label: "7 days"}, {id: "30 days", label: "30 days"}, {id: "6 months", label: "6 months"}]}
+        >
+            {(item) => (
+                <SelectItem id={item.id}>
+                    {item.label}
+                </SelectItem>
+            )}
+          </Select>)}
         </div>
         <div className="flex gap-2">
           <div className="relative" ref={datePickerContainerRef}>
@@ -303,7 +321,7 @@ export default function TransactionHistory() {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              {selectedDate ? selectedDate.toLocaleDateString() : "Select dates"}
+              {selectedDate ? selectedDate.toLocaleDateString() : mobile ? ( "Select dates") :("")}
             </button>
             {isDatePickerOpen && (
               <div className="absolute right-0 mt-1 z-10">
@@ -319,7 +337,7 @@ export default function TransactionHistory() {
           </div>
           <div className="relative" ref={filterContainerRef}>
             <button
-              className="px-4 py-2 border rounded-lg text-sm text-gray-600 border-gray-300 flex items-center gap-2"
+              className="px-4 py-2 border rounded-lg text-sm text-gray-600 border-gray-300 flex items-center gap-2 mr-3 lg:mr-0"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,7 +348,7 @@ export default function TransactionHistory() {
                   d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
                 />
               </svg>
-              Filters
+              {mobile ? ("Filters") :("")}
             </button>
             {isFilterOpen && (
               <div className="absolute right-0 mt-2 w-80 bg-white border rounded-lg shadow-lg z-20 p-4 text-black">
@@ -415,9 +433,9 @@ export default function TransactionHistory() {
       </div>
 
       {/* Transaction Table */}
-      <div className="bg-white rounded-lg">
-        <table className="w-full">
-          <thead>
+      <div className="bg-white rounded-lg overflow-x-auto border border-gray-200 mx-3 lg:mx-0">
+        <table className="w-full min-w-max">
+          <thead className="border-rounded-lg">
             <tr className="border-b">
               <th className="text-left p-3 text-xs text-gray-500">Transaction Order</th>
               <th className="text-left p-3 text-xs text-gray-500">Amount</th>
