@@ -92,7 +92,7 @@ export default function Kitchen() {
         <h3 className="font-semibold mb-3" style={{ color: "var(--color-fg-primary)" }}>
           Summary item count ({Object.keys(itemSummary).length})
         </h3>
-        <div className="grid grid-cols-1 overflow-y-auto h-64 lg:grid-cols-1 lg:flex lg:overflow-x-auto gap-2 lg:gap-0">
+        <div className="grid grid-cols-1 overflow-y-auto h-64 lg:h-auto lg:grid-cols-1 lg:flex lg:overflow-x-auto gap-2 lg:gap-0">
           {Object.entries(itemSummary).map(([key, count]) => (
             <div
               key={key}
