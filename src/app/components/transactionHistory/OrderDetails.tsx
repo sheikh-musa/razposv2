@@ -81,7 +81,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                         <h3 className="font-semibold text-sm text-black">{item.item_code}</h3>
                         {/* <p className="text-xs text-gray-600">{item.item_name}</p> */}
                       </div>
-                      <div className='flex h-full items-center justify-center w-1/3 text-sm'>
+                      <div className='flex h-full justify-center w-1/3 text-sm'>
                       {/* <div className='border rounded-md text-sm'> */}
                       {/* <button className="p-1 hover:bg-gray-200 text-black border-r">
                         <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,6 +119,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
         {/* Payment Section */}
         <div className="border-t bg-white p-3">
           <div className="space-y-3">
+            {order.docstatus !== 0 ?
             <div>
               <label className="block text-xs text-gray-600 mb-1 font-semibold">Payment</label>
               <select 
@@ -132,7 +133,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
                 <option>NETS</option>
                 <option>CDC</option>
               </select>
-            </div>
+            </div> : null }
             {order.docstatus === 0 ? 
             <button
             className="w-full py-1 bg-white border border-purple-600 text-purple-600 text-sm rounded-lg hover:bg-purple-100 disabled:bg-gray-100 disabled:text-gray-400"
