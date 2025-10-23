@@ -548,9 +548,9 @@ export default function Inventory() {
       </div>
 
       {/* Pagination - Mobile: Stack, Desktop: Inline */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
+      <div className="flex flex-row justify-between items-center mt-4 gap-4">
         <button
-          className="flex items-center justify-center gap-2 text-gray-600 w-full sm:w-auto py-2 px-4 border rounded-md sm:border-0"
+          className="flex items-center justify-center gap-2 text-gray-600 w-auto py-1 px-2 sm:py-2 sm:px-4 sm:border-0"
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
         >
@@ -567,7 +567,7 @@ export default function Inventory() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          Previous
+          <span className="hidden sm:inline">Previous</span>
         </button>
 
         {/* Page Numbers - Horizontal scroll on mobile */}
@@ -588,13 +588,13 @@ export default function Inventory() {
         </div>
 
         <button
-          className="flex items-center justify-center gap-2 text-gray-600 w-full sm:w-auto py-2 px-4 border rounded-md sm:border-0"
+          className="flex items-center justify-center gap-2 text-gray-600 w-auto py-1 px-2 sm:py-2 sm:px-4 sm:border-0"
           onClick={() =>
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
           disabled={currentPage === totalPages}
         >
-          Next
+          <span className="hidden sm:inline">Next</span>
           <svg
             className="w-4 h-4"
             fill="none"

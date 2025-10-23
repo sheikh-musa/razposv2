@@ -23,6 +23,7 @@ export default function OrderSummary() {
     amount: number;
   }>>([{ method: 'cash', amount: 0 }]);
 
+
   // Update payment methods when multiplePaymentMode changes
   useEffect(() => {
     if (order) {
@@ -89,7 +90,7 @@ export default function OrderSummary() {
 
     try {
       console.log('handleCompletePayment'); // ! console log
-      await completeOpenTicket(orderDetails.name);
+      await completeOpenTicket(orderDetails.name); // ! sent payment modes
       const companyName = await getCompanyName();
       //@ts-expect-error company name is a string
       const companyNameString = companyName.charAt(0);
@@ -163,6 +164,8 @@ export default function OrderSummary() {
           toast.success('Payment processed successfully!');
           setShowSendReceiptModal(true);
           setIsPaymentOpen(false);
+          router.push('/tickets');
+          
     } catch (error) {
       console.error('Error completing payment:', error);
       toast.error('Failed to complete payment. Please try again.');

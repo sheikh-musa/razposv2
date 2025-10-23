@@ -138,7 +138,6 @@ export default function InventoryTable({
                   />
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                    <p className="text-sm text-gray-500">{item.item_name}</p>
                   </div>
                 </div>
 
