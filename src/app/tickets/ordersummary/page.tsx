@@ -8,6 +8,7 @@ import { SalesOrders, SalesInvoicePayload, PaymentEntryPayload } from "../../con
 import { SlideoutMenu } from "@/components/application/slideout-menus/slideout-menu";
 import SendReceiptModal from "@/app/components/modals/order/SendReceiptModal";
 import { Button } from "@/components/base/buttons/button"
+import Link from "next/link";
 
 export default function OrderSummary() {
   const searchParams = useSearchParams();
@@ -233,6 +234,12 @@ export default function OrderSummary() {
             <></>
           )}
           <div className="flex justify-end gap-2 w-full">
+            <Link href={{pathname: `/tickets/ordersummary/editorder`, query: { object: JSON.stringify(orderDetails) }}} >
+              <Button className="mt-2 px-6 py-3 secondary text-black border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              size="md"
+              >Customize
+              </Button>
+            </Link>
             {/* Payment Button */}
             <Button
               onClick={() => setIsPaymentOpen(true)}
