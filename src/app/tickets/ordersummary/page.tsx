@@ -104,7 +104,9 @@ export default function OrderSummary() {
 
     try {
       console.log('handleCompletePayment'); // ! console log
-      await completeOpenTicket(orderDetails.name); // ! sent payment modes
+      const completeOpenTicketResponse = await completeOpenTicket(orderDetails.name, discount); // ! sent payment modes
+      const completeOpenTicketData = await completeOpenTicketResponse.json();
+      console.log('completeOpenTicketData', completeOpenTicketData); // ! console log
       const companyName = await getCompanyName();
       //@ts-expect-error company name is a string
       const companyNameString = companyName.charAt(0);
@@ -119,7 +121,7 @@ export default function OrderSummary() {
                     income_account: `Sales Income - ${companyNameString}`,
                     sales_order: orderDetails.name,
                 })),
-                additional_discount_percentage: orderDetails.additional_discount_percentage,
+                additional_discount_percentage: discount,
                 update_stock: 1,
                 disable_rounded_total: 1,
                 docstatus: 1
@@ -333,7 +335,9 @@ export default function OrderSummary() {
                     <input id="switch-component-on" type="checkbox"
                     className="peer appearance-none w-11 h-5 bg-purple-100 rounded-full checked:bg-purple-500 cursor-pointer transition-colors duration-300"
                     checked={discountEnabled}
-                    onChange={() => setDiscountEnabled(!discountEnabled)}
+                    onChange={() => 
+                      (setDiscountEnabled(!discountEnabled),
+                       setDiscount(0))}
                     />
                     <label
                       className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-6 peer-checked:border-slate-800 cursor-pointer"
@@ -436,6 +440,7 @@ export default function OrderSummary() {
                       </label>
                       <input
                         type="number"
+                        min="0"
                         placeholder="0.00"
                         value={payment.amount || ""}
                         onChange={(e) =>
