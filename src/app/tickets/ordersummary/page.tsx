@@ -23,6 +23,19 @@ export default function OrderSummary() {
     method: string;
     amount: number;
   }>>([{ method: 'cash', amount: 0 }]);
+  const [discountEnabled, setDiscountEnabled] = useState<boolean>(false);
+  const [discount, setDiscount] = useState(0);
+  const [orderNetTotal, setOrderNetTotal] = useState(orderDetails?.net_total || 0);
+
+  // Calculate orderNetTotal based on discount
+  useEffect(() => {
+    if (orderDetails?.net_total) {
+      const originalTotal = orderDetails.net_total;
+      const discountAmount = (originalTotal * discount) / 100;
+      const discountedTotal = originalTotal - discountAmount;
+      setOrderNetTotal(discountedTotal);
+    }
+  }, [discount, orderDetails?.net_total]);
 
 
   // Update payment methods when multiplePaymentMode changes
@@ -56,7 +69,7 @@ export default function OrderSummary() {
 
   const calculateChange = () => {
     if (!orderDetails) return 0;
-    return calculateTotalReceived() - orderDetails.net_total;
+    return calculateTotalReceived() - orderNetTotal;
   };
 
   const fetchOrderDetails = async () => {
@@ -234,10 +247,17 @@ export default function OrderSummary() {
             <></>
           )}
           <div className="flex justify-end gap-2 w-full">
-            <Link href={{pathname: `/tickets/ordersummary/editorder`, query: { object: JSON.stringify(orderDetails) }}} >
-              <Button className="mt-2 px-6 py-3 secondary text-black border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              size="md"
-              >Customize
+            <Link
+              href={{
+                pathname: `/tickets/ordersummary/editorder`,
+                query: { object: JSON.stringify(orderDetails) },
+              }}
+            >
+              <Button
+                className="mt-2 px-6 py-3 secondary text-black border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                size="md"
+              >
+                Customize
               </Button>
             </Link>
             {/* Payment Button */}
@@ -260,7 +280,7 @@ export default function OrderSummary() {
             </h2>
           </SlideoutMenu.Header>
 
-          <div className="flex-1 p-6 text-black">
+          <div className="flex-1 p-4 text-black">
             <div className="space-y-6">
               {/* Order Summary */}
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -273,9 +293,29 @@ export default function OrderSummary() {
                     </div>
                   ))}
                   <hr className="my-2" />
+                  {discount > 0 && (
+                    <div className="flex justify-between text-sm text-gray-600 mb-2">
+                      <span>Original Total</span>
+                      <span>
+                        ${orderDetails?.net_total?.toFixed(2) || "0.00"}
+                      </span>
+                    </div>
+                  )}
+                  {discount > 0 && (
+                    <div className="flex justify-between text-sm text-red-600 mb-2">
+                      <span>Discount ({discount}%)</span>
+                      <span>
+                        -$
+                        {(
+                          ((orderDetails?.net_total || 0) * discount) /
+                          100
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between font-medium">
                     <span>Total</span>
-                    <span>${orderDetails?.net_total.toFixed(2) || 0}</span>
+                    <span>${orderNetTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -283,6 +323,41 @@ export default function OrderSummary() {
               {/* Payment Form */}
               <div className="space-y-4">
                 <h3 className="font-medium">Payment Information</h3>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium">
+                      Discount (%):
+                    </label>
+                  <label className="text-slate-600 text-sm cursor-pointer">No</label>
+
+                  <div className="relative inline-block w-11 h-5">
+                    <input id="switch-component-on" type="checkbox"
+                    className="peer appearance-none w-11 h-5 bg-purple-100 rounded-full checked:bg-purple-500 cursor-pointer transition-colors duration-300"
+                    checked={discountEnabled}
+                    onChange={() => setDiscountEnabled(!discountEnabled)}
+                    />
+                    <label
+                      className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-6 peer-checked:border-slate-800 cursor-pointer"
+                    ></label>
+                  </div>
+                  <label className="text-slate-600 text-sm cursor-pointer">Yes</label>
+                </div>
+                {discountEnabled && (
+                  <input
+                    type="number"
+                    placeholder="0"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={discount || ""}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value) || 0;
+                      // Clamp the value between 0 and 100
+                      const clampedValue = Math.min(Math.max(value, 0), 100);
+                      setDiscount(clampedValue);
+                    }}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                )}
                 <label className="block text-sm font-medium mb-2">
                   Split payment
                 </label>
@@ -416,7 +491,9 @@ export default function OrderSummary() {
             </button> */}
 
               <Button
-                color="primary" size="md" onClick={() => {
+                color="primary"
+                size="md"
+                onClick={() => {
                   setIsPaymentOpen(false);
                   setShowSendReceiptModal(false);
                 }}
