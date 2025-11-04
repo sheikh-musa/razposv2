@@ -18,6 +18,7 @@ export default function OrderSummary() {
   const [orderDetails, setOrderDetails] = useState<SalesOrders | null>(null);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [showSendReceiptModal, setShowSendReceiptModal] = useState(false);
+  const [splitPaymentEnabled, setSplitPaymentEnabled] = useState(false);
   const [multiplePaymentMode, setMultiplePaymentMode] = useState(1);
   const [paymentMethods, setPaymentMethods] = useState<Array<{
     method: string;
@@ -362,9 +363,24 @@ export default function OrderSummary() {
                     className="w-full p-3 border border-gray-300 rounded-lg"
                   />
                 )}
-                <label className="block text-sm font-medium mb-2">
-                  Split payment
-                </label>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium">
+                    Split payment
+                  </label>
+                  <label className="text-slate-600 text-sm cursor-pointer">No</label>
+                  <div className="relative inline-block w-11 h-5">
+                    <input id="switch-component-on" type="checkbox"
+                    className="peer appearance-none w-11 h-5 bg-purple-100 rounded-full checked:bg-purple-500 cursor-pointer transition-colors duration-300"
+                    checked={splitPaymentEnabled}
+                    onChange={() => setSplitPaymentEnabled(!splitPaymentEnabled)}
+                    />
+                    <label
+                      className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-6 peer-checked:border-slate-800 cursor-pointer"
+                    ></label>
+                  </div>
+                  <label className="text-slate-600 text-sm cursor-pointer">Yes</label>
+                </div>
+                {splitPaymentEnabled && (
                 <div className="flex items-center gap-2 w-1/6 text-sm">
                   {multiplePaymentMode === 1 ? (
                     <button
@@ -404,6 +420,7 @@ export default function OrderSummary() {
                     </button>
                   )}
                 </div>
+                )}
 
                 {/* Render payment method components based on multiplePaymentMode */}
                 {paymentMethods.map((payment, index) => (
