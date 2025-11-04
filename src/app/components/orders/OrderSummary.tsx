@@ -18,10 +18,10 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
   const [dineIn, setDineIn] = useState(true);
   const [buzzerNumber, setBuzzerNumber] = useState(orderToUpdate?.custom_buzzer_number || '');
   const [remark, setRemark] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState(orderToUpdate?.custom_payment_mode || 'Cash');
-  const [paymentComplete, setPaymentComplete] = useState<number>(0);
-  const [discount, setDiscount] = useState<number>(orderToUpdate?.additional_discount_percentage || 0);
-  const [discountError, setDiscountError] = useState<string>('');
+  // const [paymentMethod, setPaymentMethod] = useState(orderToUpdate?.custom_payment_mode || 'Cash');
+  // const [paymentComplete, setPaymentComplete] = useState<number>(0);
+  // const [discount, setDiscount] = useState<number>(orderToUpdate?.additional_discount_percentage || 0);
+  // const [discountError, setDiscountError] = useState<string>('');
 //   const shippingFee = 3.99;
 
   const getCurrentDate = () => {
@@ -54,12 +54,12 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
       status: 'To Deliver and Bill',
       custom_kitchen_status: 'preparing',
       custom_remarks: remark,
-      custom_payment_mode: paymentMethod,
+      // custom_payment_mode: paymentMethod,
       custom_order_complete: 0,
-      custom_payment_complete: paymentComplete,
+      // custom_payment_complete: paymentComplete,
       custom_buzzer_number: buzzerNumber,
       docstatus: 0,
-      ...(discount > 0 && { additional_discount_percentage: discount }),
+      // ...(discount > 0 && { additional_discount_percentage: discount }),
     };
   
     console.log('payload', JSON.stringify(payload, null, 2));
@@ -197,9 +197,9 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
               placeholder="Add special instructions"
             />
           </div>
-
+          {/* //! Payment Method is now handled in the ticket summary page */}
           {/* Payment Method */}
-          <div>
+          {/* <div>
             <label className="block text-sm mb-1">Payment Method</label>
             <select
               value={paymentMethod}
@@ -212,10 +212,10 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
               <option value="NETS">NETS</option>
               <option value="CDC">CDC</option>
             </select>
-          </div>
-
+          </div> */}
+          {/* //! Payment Method is now handled in the ticket summary page */}
           {/* Payment Status */}
-          <div>
+          {/* <div>
             <label className="block text-sm mb-1">Payment status</label>
             <select
               value={paymentComplete}
@@ -225,10 +225,10 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
               <option value="0">Pending</option>
               <option value="1">Paid</option>
             </select>
-          </div>
-
+          </div> */}
+          {/* //! Discount is now handled in the ticket summary page */}
           {/* Discount */}
-          <div>
+          {/* <div>
             <label className="block text-sm mb-1">Discount (%)</label>
             <input 
               type="number" 
@@ -249,7 +249,7 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
             />
             <p className="text-xs text-gray-400">Please enter percentage between 0 to 100</p>
             {discountError && <p className="text-xs text-red-500">{discountError}</p>}
-          </div>
+          </div> */}
          {/* //! to remove receipt portion */}
           {/* <div className='text-black text-sm mb-4'>
                     <span className='mr-2'>Receipt:</span>
@@ -273,10 +273,10 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
             <span className="font-medium">${(total).toFixed(2)}</span>
           </div>
         </div>
-        {discount > 0 && <div className="flex justify-between text-sm">
+        {/* {discount > 0 && <div className="flex justify-between text-sm">
             <span>Less {discount}% discount</span>
             <span className="font-medium">${(total * (1 - discount / 100)).toFixed(2)}</span>
-          </div>}
+          </div>} */}
           {orderToUpdate ? (
             <button 
               onClick={handleConfirm}

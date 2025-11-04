@@ -139,6 +139,7 @@ export type SalesOrderItem = {
     price_list_rate?: number;
 }
 
+//! commented out payment related fields as it's handled in ticket summary page instead of the order summary page
 export type SalesOrderPayload = {
     customer: string;
     delivery_date: string;
@@ -147,11 +148,11 @@ export type SalesOrderPayload = {
     status: string;
     custom_kitchen_status: string;
     custom_remarks: string;
-    custom_payment_mode: string;
+    // custom_payment_mode: string;
     custom_order_complete: number;
-    custom_payment_complete: number;
+    // custom_payment_complete: number;
     docstatus: number;
-    additional_discount_percentage?: number;
+    // additional_discount_percentage?: number;
     custom_buzzer_number?: string;
   }
 
