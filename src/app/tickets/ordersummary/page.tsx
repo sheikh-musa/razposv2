@@ -13,6 +13,7 @@ import Link from "next/link";
 export default function OrderSummary() {
   const searchParams = useSearchParams();
   const order = searchParams?.get('order') || '';
+  const isCustomerView = searchParams?.get('view') === 'customer';
   const { fetchKitchenOrderDetails, createSalesInvoice, createPaymentEntry, getCompanyName, completeOpenTicket } = useApi();
   const router = useRouter();
   const [orderDetails, setOrderDetails] = useState<SalesOrders | null>(null);
@@ -249,6 +250,7 @@ export default function OrderSummary() {
           ) : (
             <></>
           )}
+          {!isCustomerView && (
           <div className="flex justify-end gap-2 w-full">
             <Link
               href={{
@@ -271,10 +273,14 @@ export default function OrderSummary() {
               Process Payment
             </Button>
           </div>
+          )}
         </div>
       )}
 
+      
+
       {/* Payment Slideout */}
+      {!isCustomerView && (
       <SlideoutMenu isOpen={isPaymentOpen} onOpenChange={setIsPaymentOpen}>
         <SlideoutMenu.Content>
           <SlideoutMenu.Header onClose={() => setIsPaymentOpen(false)}>
@@ -538,8 +544,9 @@ export default function OrderSummary() {
           </SlideoutMenu.Footer>
         </SlideoutMenu.Content>
       </SlideoutMenu>
+      )}
 
-      {showSendReceiptModal && (
+      {showSendReceiptModal && !isCustomerView && (
         <SendReceiptModal
           isOpen={showSendReceiptModal}
           onClose={() => setShowSendReceiptModal(false)}
