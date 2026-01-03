@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { useApi } from '../../../context/ApiContext';
 import QRCodeGenerator from '@/app/utils/QRCodeGenerator';
 import { generateReceipt } from '@/app/utils/receiptUtils';
+import { useRouter } from 'next/navigation';
 
 interface SendReceiptModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
   const { sendEmail } = useApi();
   const [showQR, setShowQR] = useState(false);
   const [qrData, setQrData] = useState<string>('');
+  const router = useRouter();
 
 
   // Generate receipt data (PDF or HTML)
@@ -98,6 +100,7 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
       toast.error('Failed to send receipt');
     } finally {
       setIsLoading(false);
+      router.push('/tickets');
     }
   };
 
@@ -172,6 +175,7 @@ const generateQRData = async () => {
   const handleSkip = () => {
     onSkip?.();
     onClose();
+    router.push('/tickets');
   };
 
   // Generate QR data when QR section is shown

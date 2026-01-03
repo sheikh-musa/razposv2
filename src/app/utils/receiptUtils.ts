@@ -193,6 +193,7 @@ export const generateReceipt = async (options: GenerateReceiptOptions): Promise<
     
     // Only show toast on client side
     if (!isServer) {
+      doc.save(`Receipt-${order.name}.pdf`);
       toast.success('Receipt generated successfully!');
     }
     onSuccess?.();

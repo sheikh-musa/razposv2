@@ -182,7 +182,7 @@ export default function OrderSummary() {
           toast.success('Payment processed successfully!');
           setShowSendReceiptModal(true);
           setIsPaymentOpen(false);
-          router.push('/tickets');
+          // router.push('/tickets');
           
     } catch (error) {
       console.error('Error completing payment:', error);
@@ -549,9 +549,9 @@ export default function OrderSummary() {
       {showSendReceiptModal && !isCustomerView && (
         <SendReceiptModal
           isOpen={showSendReceiptModal}
-          onClose={() => setShowSendReceiptModal(false)}
+          onClose={() => { setShowSendReceiptModal(false); router.push('/tickets'); }}
           order={orderDetails}
-          onSkip={() => setShowSendReceiptModal(false)}
+          onSkip={() => { setShowSendReceiptModal(false); router.push('/tickets'); }}
         />
       )}
     </div>
