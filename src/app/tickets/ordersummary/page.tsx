@@ -549,9 +549,9 @@ export default function OrderSummary() {
       {showSendReceiptModal && !isCustomerView && (
         <SendReceiptModal
           isOpen={showSendReceiptModal}
-          onClose={() => { setShowSendReceiptModal(false); router.push('/tickets'); }}
+          onClose={() => { setShowSendReceiptModal(false); router.back(); }}
           order={orderDetails}
-          onSkip={() => { setShowSendReceiptModal(false); router.push('/tickets'); }}
+          onSkip={() => { setShowSendReceiptModal(false); router.back(); }}
         />
       )}
     </div>

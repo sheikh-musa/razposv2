@@ -100,7 +100,7 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
       toast.error('Failed to send receipt');
     } finally {
       setIsLoading(false);
-      router.push('/tickets');
+      router.back();
     }
   };
 

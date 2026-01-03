@@ -49,6 +49,7 @@ export interface GenerateReceiptOptions {
  * });
  */
 export const generateReceipt = async (options: GenerateReceiptOptions): Promise<Blob | null> => {
+
   const {
     order,
     companyName = 'RAZPOS',
@@ -193,7 +194,7 @@ export const generateReceipt = async (options: GenerateReceiptOptions): Promise<
     
     // Only show toast on client side
     if (!isServer) {
-      doc.save(`Receipt-${order.name}.pdf`);
+      // doc.save(`Receipt-${order.name}.pdf`); // Uncomment to trigger download
       toast.success('Receipt generated successfully!');
     }
     onSuccess?.();

@@ -4,6 +4,8 @@ import { SalesHistoryOrder } from '@/app/context/types/ERPNext';
 import { Toaster } from 'react-hot-toast';
 import { generateReceipt } from '@/app/utils/receiptUtils';
 import { useRouter } from 'next/navigation';
+import SendReceiptModal from '../modals/order/SendReceiptModal';
+import { set } from 'react-datepicker/dist/date_utils';
 
 
 type OrderDetailsProps = {
@@ -14,6 +16,7 @@ type OrderDetailsProps = {
 export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [showSendReceiptModal, setShowSendReceiptModal] = useState(false);
   // const [paymentMethod, setPaymentMethod] = useState(order?.custom_payment_mode || 'Cash');
   // const [paymentStatus, setPaymentStatus] = useState(order?.custom_payment_complete ? 'Paid' : 'Unpaid');
 
@@ -22,7 +25,7 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
   const handleGenerateReceipt = async () => {
     try {
       setLoading(true);
-      
+      setShowSendReceiptModal(true);
       await generateReceipt({
         order,
         onSuccess: () => {
@@ -166,6 +169,14 @@ export default function OrderDetails({ order, onClose }: OrderDetailsProps) {
           </div>
         </div>
       </div>
+      {showSendReceiptModal && (
+        <SendReceiptModal 
+          isOpen={showSendReceiptModal} 
+          onClose={() => setShowSendReceiptModal(false)} 
+          onSkip={()=> setShowSendReceiptModal(false)}
+          order={order}
+        />
+      )}
     </>
   );
 }
