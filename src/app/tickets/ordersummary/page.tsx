@@ -217,13 +217,13 @@ export default function OrderSummary() {
           {orderDetails.items.map((item) => (
             <div
               key={item.item_code}
-              className="flex items-center gap-2 justify-between w-full mb-2 text-medium"
+              className="grid grid-cols-12 items-center gap-2 w-full mb-2 text-medium"
             >
-              <p className="text-sm text-gray-500 font-medium">
+              <p className="col-span-6 text-sm text-gray-500 font-medium truncate">
                 {item.item_code}
               </p>
-              <p className="text-sm text-gray-500">Qty: {item.qty}</p>
-              <div>
+              <p className="col-span-2 text-sm text-gray-500">Qty: {item.qty}</p>
+              <div className="col-span-4 text-right">
                 {/* eslint-disable-next-line */}
                 <p className="text-sm text-gray-500">
                   {item.price_list_rate?.toFixed(2)} ea
