@@ -1,11 +1,10 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 // import { ReceiptOrder } from '../../../utils/receiptUtils';
 import { useApi } from '../../../context/ApiContext';
 import QRCodeGenerator from '@/app/utils/QRCodeGenerator';
 import { generateReceipt } from '@/app/utils/receiptUtils';
-import { useRouter } from 'next/navigation';
 
 interface SendReceiptModalProps {
   isOpen: boolean;
@@ -19,21 +18,27 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
-  const { sendEmail } = useApi();
+  const { sendEmail, uploadReceipt } = useApi();
   const [showQR, setShowQR] = useState(false);
   const [qrData, setQrData] = useState<string>('');
-  const router = useRouter();
 
+
+  useEffect(() => {
+    if (isOpen) {
+      console.log('Order data for receipt:', order);
+    }
+  }, [isOpen]);
 
   // Generate receipt data (PDF or HTML)
-  const generateReceiptData = async () => {
+  const generateReceiptData = async (showNotifications = true) => {
     try {
-      setIsLoading(true);
+      if (showNotifications) setIsLoading(true);
       
       const receipt = await generateReceipt({
         order,
         onSuccess: () => {
           // Optional: Add any additional success handling
+          if (showNotifications) toast.success('Receipt generated successfully!');
         },
         onError: (error) => {
           console.error('Receipt generation failed:', error);
@@ -45,7 +50,7 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
     } catch (error) {
       console.error('Error generating receipt:', error);
     } finally {
-      setIsLoading(false);
+      if (showNotifications) setIsLoading(false);
     }
     return null;
   };
@@ -75,8 +80,42 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
     setIsLoading(true);
     try {
       // Generate receipt for email attachment
-      await generateReceiptData();
+      const receiptBlob = await generateReceiptData(false);
 
+      // @ts-expect-error PDF blob type
+      let attachments = [];
+      if (receiptBlob) {
+        const base64Content = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64String = reader.result as string;
+            resolve(base64String.split(',')[1]);
+          };
+          reader.readAsDataURL(receiptBlob);
+        });
+
+        // For previewing the receipt in a new tab (optional)
+        // const pdfUrl = URL.createObjectURL(receiptBlob);
+        // window.open(pdfUrl, '_blank');
+
+        // attachments = [{
+        //   filename: `Receipt-${order.name}.pdf`,
+        //   content: base64Content
+        // }];
+
+        // Upload receipt to ERPNext and link to order
+        const response = await uploadReceipt(
+          new File([receiptBlob], `Receipt-${order.name}.pdf`, { type: 'application/pdf' }),
+          order.name
+        );
+        if (!response.ok) {
+          throw new Error('Failed to upload receipt');
+        }
+        const data = await response.json();
+        console.log('Receipt uploaded successfully', data);
+        // @ts-expect-error attachments type
+        attachments = `[\"${data.message.name}\"]`;
+      }
       // Send email with receipt
       const response = await sendEmail({
         recipients: email,
@@ -86,7 +125,8 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
         name: order.name,
         send_email: 1,
         docstatus: 1,
-        now: 1
+        now: 1,
+        attachments: attachments
       });
       
       if (response.ok) {
@@ -100,7 +140,6 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
       toast.error('Failed to send receipt');
     } finally {
       setIsLoading(false);
-      router.back();
     }
   };
 
@@ -175,7 +214,6 @@ const generateQRData = async () => {
   const handleSkip = () => {
     onSkip?.();
     onClose();
-    router.push('/tickets');
   };
 
   // Generate QR data when QR section is shown

@@ -47,6 +47,7 @@ interface ApiContextType {
     createGuestCustomer: () => Promise<Response>;
     initializeModeOfPayment: () => Promise<void>;
     sendEmail: (payload: EmailPayload) => Promise<Response>;
+    uploadReceipt: (file: File, docname: string) => Promise<Response>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -1011,6 +1012,30 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return response;
     }
 
+    const uploadReceipt = async (file: File, orderName: string) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('doctype', 'Sales Order');
+        formData.append('docname', orderName);
+        formData.append('is_private', '1');
+        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/method/upload_file`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${process.env.NEXT_PUBLIC_API_TOKEN}:${process.env.NEXT_PUBLIC_API_SECRET}`,
+            },
+            body: formData
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to upload file: ${JSON.stringify(errorData)}`);
+        }
+        
+        return response;
+    }
+
     //* -------------------------------------------------------------------------- */
     //*                             API calls for Custom Fields                     */
     //* -------------------------------------------------------------------------- */
@@ -1301,7 +1326,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
             checkGuestCustomerExists,
             createGuestCustomer,
             initializeModeOfPayment,
-            sendEmail
+            sendEmail,
+            uploadReceipt
         }}>
             {children}
         </ApiContext.Provider>

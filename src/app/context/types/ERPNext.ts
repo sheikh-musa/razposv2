@@ -315,4 +315,8 @@ export type EmailPayload = {
     send_email: number;
     docstatus: number;
     now: number;
+    attachments?: {
+        filename: string;
+        content: string; // base64 encoded content
+    }[];
 }
