@@ -28,7 +28,7 @@ interface ApiContextType {
     completeKitchenOrder: (orderName: string, payload: SalesOrderUpdatePayload) => Promise<Response>;
     updateKitchenOrderItem: (SalesOrderItemName: string, customItemDone: number) => Promise<Response>;
     fetchOpenTickets: () => Promise<SalesOrders[]>;
-    completeOpenTicket: (orderName: string, discount: number) => Promise<Response>;
+    completeOpenTicket: (orderName: string, discount: number, paymentMethod: string) => Promise<Response>;
     deleteOpenTicket: (orderName: string) => Promise<Response>;
     createSalesInvoice: (payload: SalesInvoicePayload) => Promise<Response>;
     createPaymentEntry: (payload: PaymentEntryPayload) => Promise<Response>;
@@ -758,7 +758,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return data.data;
     }
 
-    const completeOpenTicket = async (orderName: string, discount: number) => {
+    const completeOpenTicket = async (orderName: string, discount: number, paymentMethod: string) => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resource/Sales Order/${orderName}`, {
             method: 'PUT',
             headers: {
@@ -766,7 +766,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({docstatus: 1, additional_discount_percentage: discount})
+            body: JSON.stringify({docstatus: 1, additional_discount_percentage: discount, custom_payment_mode: paymentMethod})
         });
         if (!response.ok) {
             const errorData = await response.json();

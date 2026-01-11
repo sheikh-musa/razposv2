@@ -24,7 +24,7 @@ export default function OrderSummary() {
   const [paymentMethods, setPaymentMethods] = useState<Array<{
     method: string;
     amount: number;
-  }>>([{ method: 'cash', amount: 0 }]);
+  }>>([{ method: 'Cash', amount: 0 }]);
   const [discountEnabled, setDiscountEnabled] = useState<boolean>(false);
   const [discount, setDiscount] = useState(0);
   const [orderNetTotal, setOrderNetTotal] = useState(orderDetails?.net_total || 0);
@@ -50,7 +50,7 @@ export default function OrderSummary() {
       router.push('/');
     }
     const newPaymentMethods = Array.from({ length: multiplePaymentMode }, (_, index) => 
-      paymentMethods[index] || { method: 'cash', amount: 0 }
+      paymentMethods[index] || { method: 'Cash', amount: 0 }
     );
     setPaymentMethods(newPaymentMethods);
   }, [multiplePaymentMode]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -106,7 +106,7 @@ export default function OrderSummary() {
 
     try {
       console.log('handleCompletePayment'); // ! console log
-      const completeOpenTicketResponse = await completeOpenTicket(orderDetails.name, discount); // ! sent payment modes
+      const completeOpenTicketResponse = await completeOpenTicket(orderDetails.name, discount, paymentMethods.map(payment => payment.method).toString()); // ! sent payment modes
       const completeOpenTicketData = await completeOpenTicketResponse.json();
       console.log('completeOpenTicketData', completeOpenTicketData); // ! console log
       const companyName = await getCompanyName();
