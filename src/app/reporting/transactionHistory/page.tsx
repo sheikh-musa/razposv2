@@ -475,7 +475,13 @@ export default function TransactionHistory() {
                         : "bg-gray-100 text-gray-600"
                     }`}
                   >
-                    {order.custom_payment_mode}
+                    {order.custom_payment_mode && order.custom_payment_mode.includes(',') ? 
+                    order.custom_payment_mode.split(',').map((mode, index) => (
+                      <span key={index} className="px-2 py-1 rounded-full text-xs">
+                      {mode}
+                    </span>
+                    ))
+                    : order.custom_payment_mode}
                   </span>
                 </td>
                 <td className="p-3">
