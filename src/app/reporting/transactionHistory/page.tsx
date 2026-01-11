@@ -459,30 +459,34 @@ export default function TransactionHistory() {
                   <div>{order.date}</div>
                   <div className="text-sm text-gray-500">{order.time}</div>
                 </td>
-                <td className="p-1 w-[120px]">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                      order.custom_payment_mode === "Debit/Credit Card"
-                        ? "bg-blue-100 text-blue-600"
-                        : order.custom_payment_mode === "NETS"
-                        ? "bg-green-100 text-green-600"
-                        : order.custom_payment_mode === "PayNow"
-                        ? "bg-red-100 text-red-600"
-                        : order.custom_payment_mode === "Cash"
-                        ? "bg-yellow-100 text-yellow-600"
-                        : order.custom_payment_mode === "CDC"
-                        ? "bg-purple-100 text-purple-600"
-                        : "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {order.custom_payment_mode && order.custom_payment_mode.includes(',') ? 
-                    order.custom_payment_mode.split(',').map((mode, index) => (
-                      <span key={index} className="px-2 py-1 rounded-full text-xs">
-                      {mode}
-                    </span>
-                    ))
-                    : order.custom_payment_mode}
-                  </span>
+                <td className="p-1 w-[140px]">
+                  <div className="flex flex-wrap gap-1">
+                    {order.custom_payment_mode &&
+                      order.custom_payment_mode.split(",").map((mode, index) => {
+                        const trimmedMode = mode.trim();
+                        const colorClass =
+                          trimmedMode === "Debit/Credit Card"
+                            ? "bg-blue-100 text-blue-600"
+                            : trimmedMode === "NETS"
+                            ? "bg-green-100 text-green-600"
+                            : trimmedMode === "PayNow"
+                            ? "bg-red-100 text-red-600"
+                            : trimmedMode === "Cash"
+                            ? "bg-yellow-100 text-yellow-600"
+                            : trimmedMode === "CDC"
+                            ? "bg-purple-100 text-purple-600"
+                            : "bg-gray-100 text-gray-600";
+
+                        return (
+                          <span
+                            key={index}
+                            className={`px-2 py-1 rounded-full text-xs ${colorClass}`}
+                          >
+                            {trimmedMode}
+                          </span>
+                        );
+                      })}
+                  </div>
                 </td>
                 <td className="p-3">
                   <div className="flex gap-1 flex-wrap">
