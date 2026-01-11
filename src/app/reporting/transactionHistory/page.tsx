@@ -57,6 +57,7 @@ export default function TransactionHistory() {
           hour: '2-digit',
           minute: '2-digit'
         });
+        console.log(orderDetails)
 
         return {
           name: orderDetails.name,

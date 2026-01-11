@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 // import { ReceiptOrder } from '../../../utils/receiptUtils';
 import { useApi } from '../../../context/ApiContext';
@@ -21,13 +21,6 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
   const { sendEmail, uploadReceipt } = useApi();
   const [showQR, setShowQR] = useState(false);
   const [qrData, setQrData] = useState<string>('');
-
-
-  useEffect(() => {
-    if (isOpen) {
-      console.log('Order data for receipt:', order);
-    }
-  }, [isOpen]);
 
   // Generate receipt data (PDF or HTML)
   const generateReceiptData = async (showNotifications = true) => {
@@ -82,26 +75,12 @@ export default function SendReceiptModal({ isOpen, onClose, onSkip, order }: Sen
       // Generate receipt for email attachment
       const receiptBlob = await generateReceiptData(false);
 
-      // @ts-expect-error PDF blob type
       let attachments = [];
       if (receiptBlob) {
-        const base64Content = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const base64String = reader.result as string;
-            resolve(base64String.split(',')[1]);
-          };
-          reader.readAsDataURL(receiptBlob);
-        });
 
         // For previewing the receipt in a new tab (optional)
         // const pdfUrl = URL.createObjectURL(receiptBlob);
         // window.open(pdfUrl, '_blank');
-
-        // attachments = [{
-        //   filename: `Receipt-${order.name}.pdf`,
-        //   content: base64Content
-        // }];
 
         // Upload receipt to ERPNext and link to order
         const response = await uploadReceipt(
