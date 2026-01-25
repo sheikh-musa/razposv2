@@ -10,6 +10,7 @@ import SendReceiptModal from "@/app/components/modals/order/SendReceiptModal";
 import { Button } from "@/components/base/buttons/button"
 import Link from "next/link";
 import { useStripeTerminal } from "@/app/context/PaymentContext"
+import QRCode from "qrcode";
 
 export default function OrderSummary() {
   const searchParams = useSearchParams();
@@ -31,6 +32,9 @@ export default function OrderSummary() {
   const [orderNetTotal, setOrderNetTotal] = useState(orderDetails?.net_total || 0);
   const { processPayment, connectToReader, isReaderConnected } = useStripeTerminal();
   const [status, setStatus] = useState("Idle");
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const [payNowIntentId, setPayNowIntentId] = useState<string | null>(null);
+  const [testSimulationUrl, setTestSimulationUrl] = useState<string | null>(null);
 
   // Calculate orderNetTotal based on discount
   useEffect(() => {
@@ -57,6 +61,30 @@ export default function OrderSummary() {
     );
     setPaymentMethods(newPaymentMethods);
   }, [multiplePaymentMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+        let interval: NodeJS.Timeout;
+        console.log(payNowIntentId)
+        if (payNowIntentId) {
+            interval = setInterval(async () => {
+                const res = await fetch(`/api/payment/paynow/status?id=${payNowIntentId}`);
+                const data = await res.json();
+                console.log("paynow status", data)
+                
+                if (data.status === "succeeded") {
+                    setStatus("PayNow Payment Received!");
+                    clearInterval(interval);
+                    setQrCodeUrl(null);
+                    setTestSimulationUrl(null);
+                    setPayNowIntentId(null);
+                    
+                    // Trigger ERPNext sync
+                    // await finalizeOrder("SAL-ORD-2024-001", 15.00, "PayNow", payNowIntentId);
+                }
+            }, 2000); // Check every 2 seconds
+        }
+        return () => clearInterval(interval);
+    }, [payNowIntentId]);
 
   const updatePaymentMethod = (index: number, field: 'method' | 'amount', value: string | number) => {
     setPaymentMethods(prev => 
@@ -97,6 +125,76 @@ export default function OrderSummary() {
       }
     }
   }
+  // ---------------------------------------------------------
+    // 1. CARD PAYMENT (PayWave / Credit / Debit)
+    // ---------------------------------------------------------
+    // const handleCardPayment = async (orderName: string, amount: number) => {
+    //     try {
+    //         setStatus("Please Tap, Insert, or Swipe Card on Terminal...");
+    //         setQrCodeUrl(null); // Clear any QR codes
+            
+    //         // This triggers the physical reader
+    //         const result = await processPayment(amount);
+
+    //         if (result.status === "succeeded") {
+    //             await finalizeOrder(orderName, amount, "Credit Card", result.id);
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //         setStatus("Card Payment Failed");
+    //     }
+    // };
+  // ---------------------------------------------------------
+  // 2. PAYNOW PAYMENT (QR Code)
+  // ---------------------------------------------------------
+  const handlePayNowPayment = async (orderName: any, amount: any) => {
+        try {
+            setStatus("Generating PayNow QR...");
+            
+            // A. Call our new API to get the PayNow Intent
+            const res = await fetch('/api/payment/paynow', {
+                method: 'POST',
+                body: JSON.stringify({ amount }),
+            });
+            const data = await res.json();
+            
+            // B. Generate QR Code Image from the "next_action" data
+            // Note: Stripe PayNow intents usually return a 'next_action' with a hosted instructions URL,
+            // but often it's easier to use the Stripe Elements or just render the data if provided.
+            // *Simpler approach for custom POS*: Use the 'next_action.paynow_display_qr_code.data' string 
+            // from the retrieved intent (handled below via Stripe.js or manually).
+            
+            // For simplicity in this example, we assume we fetch the intent and get the "hosted_instructions_url" or raw data.
+            // However, a cleaner way without the full Stripe Elements UI is to just display the QR string:
+            
+            // Let's assume the API returns the clientSecret. We use Stripe.js to retrieve the full intent to get the QR string.
+            // (Simulated here for clarity - in production, your API should return the QR string directly)
+            console.log("paynow intent:", data)
+            setPayNowIntentId(data.id);
+            // 2. Display QR Code (for real usage/production)
+            if (data.qrCodeData) {
+                const url = await QRCode.toDataURL(data.qrCodeData);
+                setQrCodeUrl(url);
+            }
+
+            // 3. Set Simulation URL (for development testing)
+            if (data.hostedUrl) {
+                setTestSimulationUrl(data.hostedUrl);
+            }
+            setStatus("Waiting for Customer to Scan PayNow...");
+            
+            // In a real app, your API would return the `next_action.paynow_display_qr_code.data` 
+            // string. We turn that into an image:
+            // const qrCodeData = data.next_action?.paynow_display_qr_code?.data;
+            // const url = await QRCode.toDataURL(qrCodeData);
+            // setQrCodeUrl(url);
+
+            // Start Polling for success
+        } catch (error) {
+            console.error(error);
+            setStatus("PayNow Generation Failed");
+        }
+    };
   const handleCompletePayment = async () => {
     if (!orderDetails) {
       toast.error('No order details available');
@@ -110,12 +208,13 @@ export default function OrderSummary() {
     try {
       setStatus("Waiting for Card Tap...");
             
-            // 1. Process via Stripe (Physical Terminal)
-            const paymentIntent = await processPayment(orderDetails.net_total);
-            console.log('paymentIntent', paymentIntent);
+      // 1. Process via Stripe (Physical Terminal)
+      const paymentIntent = await processPayment(orderDetails.net_total);
+      console.log('paymentIntent', paymentIntent);
             
-            if (paymentIntent.status === "succeeded") {
-                setStatus("Payment Success! Syncing to ERPNext...");
+      if (paymentIntent.status === "succeeded") {
+      setStatus("Payment Success! Syncing to ERPNext...");
+
       const completeOpenTicketResponse = await completeOpenTicket(orderDetails.name, discount, paymentMethods.map(payment => payment.method).toString()); // ! sent payment modes
       const completeOpenTicketData = await completeOpenTicketResponse.json();
       console.log('completeOpenTicketData', completeOpenTicketData); // ! console log
@@ -516,6 +615,49 @@ export default function OrderSummary() {
                 {!isReaderConnected && <button onClick={connectToReader}>Connect Terminal</button>}
                 <p>{`Pay ${orderDetails?.net_total} via Card`}</p>
               <p>Status: {status}</p>
+              <div className="flex gap-4 justify-center">
+                {/* Card Button */}
+                <button 
+                    onClick={() => handleCardPayment(orderDetails?.name, orderDetails?.net_total)}
+                    className="bg-blue-600 text-white px-6 py-3 rounded shadow hover:bg-blue-700"
+                >
+                    Pay by Card / PayWave
+                </button>
+
+                {/* PayNow Button */}
+                <button 
+                    onClick={() => handlePayNowPayment(orderDetails?.name, orderDetails?.net_total)}
+                    className="bg-purple-600 text-white px-6 py-3 rounded shadow hover:bg-purple-700"
+                >
+                    PayNow (QR)
+                </button>
+            </div>
+
+            {/* Display QR Code if active */}
+            {qrCodeUrl && (
+                <div className="mt-6 flex flex-col items-center">
+                    <p className="mb-2 font-semibold">Scan with Banking App</p>
+                    <img src={qrCodeUrl} alt="PayNow QR" width={200} height={200} />
+                </div>
+            )}
+            {/* TEST MODE: Simulation Button */}
+            {testSimulationUrl && (
+                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center max-w-md">
+                    <p className="text-sm font-bold text-yellow-800 mb-2">DEV MODE: Simulate Customer Scan</p>
+                    <a 
+                        href={testSimulationUrl} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="inline-block bg-yellow-500 text-white px-4 py-2 rounded text-sm hover:bg-yellow-600"
+                    >
+                        Open Stripe Test Page &rarr;
+                    </a>
+                    <p className="text-xs text-gray-500 mt-2">
+                        Click the link above, then click <strong>Authorize Test Payment</strong>. 
+                        This page will automatically detect the payment.
+                    </p>
+                </div>
+            )}
               </div>
             </div>
           </div>
