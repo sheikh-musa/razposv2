@@ -52,9 +52,9 @@ export const generateReceipt = async (options: GenerateReceiptOptions): Promise<
 
   const {
     order,
-    companyName = 'RAZPOS',
-    companyAddress = '200, Jurong West Street 61, #01-355\nSingapore 640200',
-    taxRate = 0.07,
+    companyName = process.env.NEXT_PUBLIC_COMPANY_NAME || 'RAZPOS',
+    companyAddress = process.env.NEXT_PUBLIC_COMPANY_ADDRESS || '123 Main St, City, State',
+    taxRate = process.env.NEXT_PUBLIC_TAX_RATE || 0.08,
     onSuccess,
     onError
   } = options;
@@ -161,7 +161,7 @@ export const generateReceipt = async (options: GenerateReceiptOptions): Promise<
     // Calculate totals
     const subtotal = order.items?.reduce((sum: number, item: ReceiptItem) => 
       sum + ((item.qty || 0) * (item.rate || 0)), 0) || 0;
-    const tax = subtotal * taxRate;
+    const tax = subtotal * Number(taxRate);;
     const total = subtotal + tax;
     
     // Totals section
@@ -171,7 +171,7 @@ export const generateReceipt = async (options: GenerateReceiptOptions): Promise<
     doc.text('Subtotal:', 140, finalY);
     doc.text(`$${subtotal.toFixed(2)}`, 170, finalY);
     
-    doc.text(`GST (${(taxRate * 100).toFixed(0)}%):`, 140, finalY + 10);
+    doc.text(`GST (${(Number(taxRate) * 100).toFixed(0)}%):`, 140, finalY + 10);
     doc.text(`$${tax.toFixed(2)}`, 170, finalY + 10);
     
     doc.setFontSize(12);

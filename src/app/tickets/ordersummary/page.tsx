@@ -9,6 +9,7 @@ import { SlideoutMenu } from "@/components/application/slideout-menus/slideout-m
 import SendReceiptModal from "@/app/components/modals/order/SendReceiptModal";
 import { Button } from "@/components/base/buttons/button"
 import Link from "next/link";
+import { useStripeTerminal } from "@/app/context/PaymentContext"
 
 export default function OrderSummary() {
   const searchParams = useSearchParams();
@@ -28,6 +29,8 @@ export default function OrderSummary() {
   const [discountEnabled, setDiscountEnabled] = useState<boolean>(false);
   const [discount, setDiscount] = useState(0);
   const [orderNetTotal, setOrderNetTotal] = useState(orderDetails?.net_total || 0);
+  const { processPayment, connectToReader, isReaderConnected } = useStripeTerminal();
+  const [status, setStatus] = useState("Idle");
 
   // Calculate orderNetTotal based on discount
   useEffect(() => {
@@ -105,7 +108,14 @@ export default function OrderSummary() {
     }
 
     try {
-      console.log('handleCompletePayment'); // ! console log
+      setStatus("Waiting for Card Tap...");
+            
+            // 1. Process via Stripe (Physical Terminal)
+            const paymentIntent = await processPayment(orderDetails.net_total);
+            console.log('paymentIntent', paymentIntent);
+            
+            if (paymentIntent.status === "succeeded") {
+                setStatus("Payment Success! Syncing to ERPNext...");
       const completeOpenTicketResponse = await completeOpenTicket(orderDetails.name, discount, paymentMethods.map(payment => payment.method).toString()); // ! sent payment modes
       const completeOpenTicketData = await completeOpenTicketResponse.json();
       console.log('completeOpenTicketData', completeOpenTicketData); // ! console log
@@ -183,6 +193,7 @@ export default function OrderSummary() {
           setShowSendReceiptModal(true);
           setIsPaymentOpen(false);
           // router.push('/tickets');
+            }
           
     } catch (error) {
       console.error('Error completing payment:', error);
@@ -502,6 +513,9 @@ export default function OrderSummary() {
                     readOnly
                   />
                 </div>
+                {!isReaderConnected && <button onClick={connectToReader}>Connect Terminal</button>}
+                <p>{`Pay ${orderDetails?.net_total} via Card`}</p>
+              <p>Status: {status}</p>
               </div>
             </div>
           </div>
