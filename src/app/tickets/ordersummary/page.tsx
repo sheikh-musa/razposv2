@@ -11,6 +11,7 @@ import { Button } from "@/components/base/buttons/button"
 import Link from "next/link";
 import { useStripeTerminal } from "@/app/context/PaymentContext"
 import QRCode from "qrcode";
+import { setTime } from "react-datepicker/dist/date_utils";
 
 export default function OrderSummary() {
   const searchParams = useSearchParams();
@@ -82,6 +83,13 @@ export default function OrderSummary() {
                     // await finalizeOrder("SAL-ORD-2024-001", 15.00, "PayNow", payNowIntentId);
                 }
             }, 2000); // Check every 2 seconds
+            setTimeout(() => {
+                clearInterval(interval);
+                setStatus("PayNow Payment Timeout. Please try again.");
+                setQrCodeUrl(null);
+                setTestSimulationUrl(null);
+                setPayNowIntentId(null);
+            }, 2 * 60 * 1000); // Timeout after 2 minutes
         }
         return () => clearInterval(interval);
     }, [payNowIntentId]);
@@ -617,20 +625,23 @@ export default function OrderSummary() {
               <p>Status: {status}</p>
               <div className="flex gap-4 justify-center">
                 {/* Card Button */}
-                <button 
+                {paymentMethods.some(pm => pm.method === 'Debit/Credit Card' || pm.method === 'NETS') && 
+                  <button 
                     onClick={() => handleCardPayment(orderDetails?.name, orderDetails?.net_total)}
                     className="bg-blue-600 text-white px-6 py-3 rounded shadow hover:bg-blue-700"
                 >
                     Pay by Card / PayWave
-                </button>
+                </button>}
 
                 {/* PayNow Button */}
+                {paymentMethods.some(pm => pm.method === 'Paynow') && 
                 <button 
                     onClick={() => handlePayNowPayment(orderDetails?.name, orderDetails?.net_total)}
                     className="bg-purple-600 text-white px-6 py-3 rounded shadow hover:bg-purple-700"
                 >
-                    PayNow (QR)
+                    Generate PayNow QR
                 </button>
+                }
             </div>
 
             {/* Display QR Code if active */}
