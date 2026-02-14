@@ -31,7 +31,7 @@ export default function OrderSummary() {
   const [discountEnabled, setDiscountEnabled] = useState<boolean>(false);
   const [discount, setDiscount] = useState(0);
   const [orderNetTotal, setOrderNetTotal] = useState(orderDetails?.net_total || 0);
-  const { processPayment, connectToReader, isReaderConnected } = useStripeTerminal();
+  const { processPayment, connectToReader, isReaderConnected, readerStatus } = useStripeTerminal();
   const [status, setStatus] = useState("Idle");
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [payNowIntentId, setPayNowIntentId] = useState<string | null>(null);
@@ -136,22 +136,25 @@ export default function OrderSummary() {
   // ---------------------------------------------------------
     // 1. CARD PAYMENT (PayWave / Credit / Debit)
     // ---------------------------------------------------------
-    // const handleCardPayment = async (orderName: string, amount: number) => {
-    //     try {
-    //         setStatus("Please Tap, Insert, or Swipe Card on Terminal...");
-    //         setQrCodeUrl(null); // Clear any QR codes
+    const handleCardPayment = async (orderName: string, amount: number) => {
+        try {
+          console.log('Initiating card payment for amount:', amount);
+            setStatus("Please Tap, Insert, or Swipe Card on Terminal...");
+            setQrCodeUrl(null); // Clear any QR codes
             
-    //         // This triggers the physical reader
-    //         const result = await processPayment(amount);
+            // This triggers the physical reader
+            const result = await processPayment(amount);
 
-    //         if (result.status === "succeeded") {
-    //             await finalizeOrder(orderName, amount, "Credit Card", result.id);
-    //         }
-    //     } catch (error) {
-    //         console.error(error);
-    //         setStatus("Card Payment Failed");
-    //     }
-    // };
+            if (result.status === "succeeded") {
+                setStatus("Card Payment Successful!");
+                // Proceed to complete the order in ERPNext
+                // await finalizeOrder(orderName, amount, "Card", result.id);
+            }
+        } catch (error) {
+            console.error(error);
+            setStatus("Card Payment Failed");
+        }
+    };
   // ---------------------------------------------------------
   // 2. PAYNOW PAYMENT (QR Code)
   // ---------------------------------------------------------
@@ -620,14 +623,13 @@ export default function OrderSummary() {
                     readOnly
                   />
                 </div>
-                {!isReaderConnected && <button onClick={connectToReader}>Connect Terminal</button>}
-                <p>{`Pay ${orderDetails?.net_total} via Card`}</p>
               <p>Status: {status}</p>
+              {paymentMethods.some(pm => pm.method === 'Debit/Credit Card' || pm.method === 'NETS') && !isReaderConnected && <button onClick={() => { connectToReader(); setStatus(readerStatus); }} >Connect Terminal</button>}
               <div className="flex gap-4 justify-center">
                 {/* Card Button */}
                 {paymentMethods.some(pm => pm.method === 'Debit/Credit Card' || pm.method === 'NETS') && 
                   <button 
-                    onClick={() => handleCardPayment(orderDetails?.name, orderDetails?.net_total)}
+                    onClick={() => { handleCardPayment(orderDetails?.name, orderDetails?.net_total);}}
                     className="bg-blue-600 text-white px-6 py-3 rounded shadow hover:bg-blue-700"
                 >
                     Pay by Card / PayWave

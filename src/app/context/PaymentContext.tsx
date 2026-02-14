@@ -1,11 +1,13 @@
 // src/hooks/useStripeTerminal.ts
 import { useState, useEffect } from 'react';
 import { loadStripeTerminal } from '@stripe/terminal-js';
+import { set } from 'react-datepicker/dist/date_utils';
 
 export const useStripeTerminal = () => {
     
     const [terminal, setTerminal] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
     const [isReaderConnected, setIsReaderConnected] = useState(false);
+    const [readerStatus, setReaderStatus] = useState('');
 
     useEffect(() => {
         const initTerminal = async () => {
@@ -25,9 +27,10 @@ export const useStripeTerminal = () => {
     }, []);
 
     const connectToReader = async () => {
-        console.log('connectToReader');
+        console.log('connecting to reader...');
         if (!terminal) return;
         // Discover readers on your local network (simulated for dev, real for prod)
+        setReaderStatus('Connecting to reader...');
         const config = { simulated: true }; 
         const discoverResult = await terminal.discoverReaders(config);
         
@@ -35,9 +38,12 @@ export const useStripeTerminal = () => {
             const reader = discoverResult.discoveredReaders[0];
             await terminal.connectReader(reader);
             setIsReaderConnected(true);
+            setReaderStatus('Reader connected');
+            console.log('Reader connected:', reader);
         }
         else {
             setIsReaderConnected(false);
+            setReaderStatus('No readers found');
             console.log('No readers found')
         }
     };
@@ -65,5 +71,5 @@ export const useStripeTerminal = () => {
         return processResult.paymentIntent;
     };
 
-    return { isReaderConnected, connectToReader, processPayment };
+    return { isReaderConnected, connectToReader, processPayment, readerStatus };
 };
