@@ -150,8 +150,22 @@ export default function OrderSummary() {
 
             if (result.status === "succeeded") {
                 setStatus("Card Payment Successful!");
-                // Proceed to complete the order in ERPNext
-                // await finalizeOrder(orderName, amount, "Card", result.id);
+                
+                // Update payment method with the amount BEFORE calling handleCompletePayment
+                const index = paymentMethods.findIndex(pm => pm.method === 'Debit/Credit Card' || pm.method === 'NETS');
+                
+                if (index !== -1) {
+                    // Update the state and wait for next render
+                    setPaymentMethods(prev => 
+                      prev.map((payment, i) => i === index ? { ...payment, amount: amount } : payment)
+                    );
+                    paymentMethods[index].amount = amount; // Update the amount for the card payment method
+                    console.log('Updated paymentMethods:', paymentMethods); // Log the updated payment methods
+                    // Wait a tick for state to update, then complete payment
+                    handleCompletePayment();
+                } else {
+                  toast.error('Payment method not found');
+                }
             }
         } catch (error) {
             console.error(error);
@@ -220,15 +234,6 @@ export default function OrderSummary() {
     }
 
     try {
-      setStatus("Waiting for Card Tap...");
-            
-      // 1. Process via Stripe (Physical Terminal)
-      const paymentIntent = await processPayment(orderDetails.net_total);
-      console.log('paymentIntent', paymentIntent);
-            
-      if (paymentIntent.status === "succeeded") {
-      setStatus("Payment Success! Syncing to ERPNext...");
-
       const completeOpenTicketResponse = await completeOpenTicket(orderDetails.name, discount, paymentMethods.map(payment => payment.method).toString()); // ! sent payment modes
       const completeOpenTicketData = await completeOpenTicketResponse.json();
       console.log('completeOpenTicketData', completeOpenTicketData); // ! console log
@@ -306,7 +311,6 @@ export default function OrderSummary() {
           setShowSendReceiptModal(true);
           setIsPaymentOpen(false);
           // router.push('/tickets');
-            }
           
     } catch (error) {
       console.error('Error completing payment:', error);
