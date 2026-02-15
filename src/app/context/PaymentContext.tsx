@@ -27,13 +27,13 @@ export const useStripeTerminal = () => {
     }, []);
 
     const connectToReader = async () => {
+        setReaderStatus('Connecting to reader...');
         console.log('connecting to reader...');
         if (!terminal) return;
         // Discover readers on your local network (simulated for dev, real for prod)
-        setReaderStatus('Connecting to reader...');
         const config = { simulated: true }; 
         const discoverResult = await terminal.discoverReaders(config);
-        
+
         if (discoverResult.discoveredReaders.length > 0) {
             const reader = discoverResult.discoveredReaders[0];
             await terminal.connectReader(reader);
@@ -71,5 +71,5 @@ export const useStripeTerminal = () => {
         return processResult.paymentIntent;
     };
 
-    return { isReaderConnected, connectToReader, processPayment, readerStatus };
+    return { isReaderConnected, connectToReader, processPayment, readerStatus, setReaderStatus };
 };
