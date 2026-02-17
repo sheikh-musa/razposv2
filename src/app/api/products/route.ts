@@ -1,5 +1,15 @@
 import { NextResponse } from "next/server";
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 type Variant = {
   id: number;
   name: string;
@@ -71,7 +81,7 @@ const products: Product[] = [
 
 
 export async function GET() {
-  return NextResponse.json(products);
+  return NextResponse.json(products, { headers: corsHeaders });
 }
 
 // POST method (Add a new product)
@@ -80,7 +90,7 @@ export async function POST(req: Request) {
   const { type, variants } = body;
 
   if (!type || !variants) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400, headers: corsHeaders });
   }
 
   const newProduct: Product = {
@@ -90,7 +100,7 @@ export async function POST(req: Request) {
   };
 
   products.push(newProduct); // Add to the in-memory list
-  return NextResponse.json(newProduct, { status: 201 });
+  return NextResponse.json(newProduct, { status: 201, headers: corsHeaders });
 }
 
 // PUT method (Update a product by ID)
@@ -99,19 +109,19 @@ export async function PUT(req: Request) {
   const { id, type, variants } = body;
 
   if (!id || (!type && !variants)) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400, headers: corsHeaders });
   }
 
   const product = products.find((p) => p.id === id);
   if (!product) {
-    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    return NextResponse.json({ error: "Product not found" }, { status: 404, headers: corsHeaders });
   }
 
   // Update fields
   if (type) product.type = type;
   if (variants) product.variants = variants;
 
-  return NextResponse.json(product, { status: 200 });
+  return NextResponse.json(product, { status: 200, headers: corsHeaders });
 }
 
 // DELETE method (Delete a product by ID)
@@ -120,14 +130,14 @@ export async function DELETE(req: Request) {
   const id = parseInt(searchParams.get("id") || "0", 10);
 
   if (!id) {
-    return NextResponse.json({ error: "Missing required product ID" }, { status: 400 });
+    return NextResponse.json({ error: "Missing required product ID" }, { status: 400, headers: corsHeaders });
   }
 
   const productIndex = products.findIndex((p) => p.id === id);
   if (productIndex === -1) {
-    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    return NextResponse.json({ error: "Product not found" }, { status: 404, headers: corsHeaders });
   }
 
   products.splice(productIndex, 1); // Remove the product
-  return NextResponse.json({ message: "Product deleted successfully" }, { status: 200 });
+  return NextResponse.json({ message: "Product deleted successfully" }, { status: 200, headers: corsHeaders });
 }

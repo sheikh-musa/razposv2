@@ -1,5 +1,15 @@
 import { NextResponse } from "next/server";
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 type VariantSale = {
     quantity: number;
     revenue: number;
@@ -149,5 +159,5 @@ const mockSalesData: MonthlySales[] = Array.from({ length: 12 }, (_, monthIndex)
 });
 
 export async function GET() {
-    return NextResponse.json(mockSalesData);
+    return NextResponse.json(mockSalesData, { headers: corsHeaders });
 }

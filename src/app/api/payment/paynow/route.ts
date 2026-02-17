@@ -6,6 +6,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-11-20.acacia",
 });
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export async function POST(req: Request) {
   try {
     const { amount } = await req.json();
@@ -43,9 +53,9 @@ export async function POST(req: Request) {
       id: paymentIntent.id,
       hostedUrl: hostedUrl, // <--- Pass this to the frontend
       qrCodeData: qrCodeData
-    });
+    }, { headers: corsHeaders });
     // eslint-disable-next-line
   } catch (error: any) { 
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
   }
 }

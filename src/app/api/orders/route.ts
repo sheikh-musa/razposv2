@@ -1,5 +1,15 @@
 import { NextResponse } from "next/server";
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 // Define types
 type Variant = {
     productId: number;
@@ -180,7 +190,7 @@ orders.push({
 const orders = generateOrders();
 
 export async function GET() {
-    return NextResponse.json(orders);
+    return NextResponse.json(orders, { headers: corsHeaders });
 }
 
 
