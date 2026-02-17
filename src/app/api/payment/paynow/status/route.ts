@@ -21,6 +21,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ 
       status: paymentIntent.status, 
     });
+    // eslint-disable-next-line
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

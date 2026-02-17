@@ -11,6 +11,7 @@ import { Button } from "@/components/base/buttons/button"
 import Link from "next/link";
 import { useStripeTerminal } from "@/app/context/PaymentContext"
 import QRCode from "qrcode";
+import Image from "next/image";
 
 export default function OrderSummary() {
   const searchParams = useSearchParams();
@@ -657,7 +658,8 @@ export default function OrderSummary() {
             {qrCodeUrl && (
                 <div className="mt-6 flex flex-col items-center">
                     <p className="mb-2 font-semibold">Scan with Banking App</p>
-                    <img src={qrCodeUrl} alt="PayNow QR" width={200} height={200} />
+                    {/* <img src={qrCodeUrl} alt="PayNow QR" width={200} height={200} /> */}
+                    <Image src={qrCodeUrl} alt="PayNow QR" width={200} height={200} />
                 </div>
             )}
             {/* TEST MODE: Simulation Button */}

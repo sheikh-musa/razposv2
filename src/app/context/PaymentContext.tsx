@@ -1,7 +1,7 @@
 // src/hooks/useStripeTerminal.ts
 import { useState, useEffect } from 'react';
 import { loadStripeTerminal } from '@stripe/terminal-js';
-import { set } from 'react-datepicker/dist/date_utils';
+// import { set } from 'react-datepicker/dist/date_utils';
 
 export const useStripeTerminal = () => {
     
