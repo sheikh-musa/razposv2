@@ -87,8 +87,19 @@ export default function OrderSummary() {
                     
                     // Trigger ERPNext sync
                     // await finalizeOrder("SAL-ORD-2024-001", 15.00, "PayNow", payNowIntentId);
+                    const index = paymentMethods.findIndex(pm => pm.method === 'Paynow');
+                    console.log('PayNow payment method index:', index);
+                    if (index !== -1) {
+                        setPaymentMethods(prev => 
+                      prev.map((payment, i) => i === index ? { ...payment, amount: orderDetails?.net_total || 0 } : payment)
+                    );
+                    paymentMethods[index].amount = orderDetails?.net_total || 0; // Update the amount for the card payment method
+                    console.log('Updated paymentMethods:', paymentMethods); // Log the updated payment methods
+                    // Wait a tick for state to update, then complete payment
+                    handleCompletePayment();
+                  }
                 }
-            }, 2000); // Check every 2 seconds
+                }, 2000); // Check every 2 seconds
             setTimeout(() => {
                 clearInterval(interval);
                 setStatus("PayNow Payment Timeout. Please try again.");
