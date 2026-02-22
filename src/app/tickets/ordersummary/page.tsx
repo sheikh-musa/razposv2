@@ -109,6 +109,7 @@ export default function OrderSummary() {
             }, 2 * 60 * 1000); // Timeout after 2 minutes
         }
         return () => clearInterval(interval);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [payNowIntentId]);
 
   const updatePaymentMethod = (index: number, field: 'method' | 'amount', value: string | number) => {
