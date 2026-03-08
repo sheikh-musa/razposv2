@@ -31,17 +31,68 @@ export default function OrderSummary() {
   const [discountEnabled, setDiscountEnabled] = useState<boolean>(false);
   const [discount, setDiscount] = useState(0);
   const [orderNetTotal, setOrderNetTotal] = useState(orderDetails?.net_total || 0);
-  const { processPayment, connectToReader, isReaderConnected, readerStatus } = useStripeTerminal();
-  const [status, setStatus] = useState("Idle");
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-  const [payNowIntentId, setPayNowIntentId] = useState<string | null>(null);
-  const [testSimulationUrl, setTestSimulationUrl] = useState<string | null>(null);
+  const [hitpayLoading, setHitpayLoading] = useState(false);
 
-  useEffect(() => {
-    if (readerStatus) {
-      setStatus(readerStatus);
-    }
-  }, [readerStatus]);
+  // =====================================================
+  // Stripe Terminal states
+  // =====================================================
+  // const { processPayment, connectToReader, isReaderConnected, readerStatus } = useStripeTerminal();
+  // const [status, setStatus] = useState("Idle");
+  // const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  // const [payNowIntentId, setPayNowIntentId] = useState<string | null>(null);
+  // const [testSimulationUrl, setTestSimulationUrl] = useState<string | null>(null);
+
+  // ==========================================================
+  // STRIPE TERMINAL PAYMENT HANDLERS
+  // ==========================================================
+  // useEffect(() => {
+  //   if (readerStatus) {
+  //     setStatus(readerStatus);
+  //   }
+  // }, [readerStatus]);
+
+  // useEffect(() => {
+  //       let interval: NodeJS.Timeout;
+  //       console.log(payNowIntentId)
+  //       if (payNowIntentId) {
+  //           interval = setInterval(async () => {
+  //               const res = await fetch(`/api/payment/paynow/status?id=${payNowIntentId}`);
+  //               const data = await res.json();
+  //               console.log("paynow status", data)
+                
+  //               if (data.status === "succeeded") {
+  //                   setStatus("PayNow Payment Received!");
+  //                   clearInterval(interval);
+  //                   setQrCodeUrl(null);
+  //                   setTestSimulationUrl(null);
+  //                   setPayNowIntentId(null);
+                    
+  //                   // Trigger ERPNext sync
+  //                   // await finalizeOrder("SAL-ORD-2024-001", 15.00, "PayNow", payNowIntentId);
+  //                   const index = paymentMethods.findIndex(pm => pm.method === 'Paynow');
+  //                   console.log('PayNow payment method index:', index);
+  //                   if (index !== -1) {
+  //                       setPaymentMethods(prev => 
+  //                     prev.map((payment, i) => i === index ? { ...payment, amount: orderDetails?.net_total || 0 } : payment)
+  //                   );
+  //                   paymentMethods[index].amount = orderDetails?.net_total || 0; // Update the amount for the card payment method
+  //                   console.log('Updated paymentMethods:', paymentMethods); // Log the updated payment methods
+  //                   // Wait a tick for state to update, then complete payment
+  //                   handleCompletePayment();
+  //                 }
+  //               }
+  //               }, 2000); // Check every 2 seconds
+  //           setTimeout(() => {
+  //               clearInterval(interval);
+  //               setStatus("PayNow Payment Timeout. Please try again.");
+  //               setQrCodeUrl(null);
+  //               setTestSimulationUrl(null);
+  //               setPayNowIntentId(null);
+  //           }, 2 * 60 * 1000); // Timeout after 2 minutes
+  //       }
+  //       return () => clearInterval(interval);
+  //       // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   }, [payNowIntentId]);
 
   // Calculate orderNetTotal based on discount
   useEffect(() => {
@@ -69,49 +120,7 @@ export default function OrderSummary() {
     setPaymentMethods(newPaymentMethods);
   }, [multiplePaymentMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-        let interval: NodeJS.Timeout;
-        console.log(payNowIntentId)
-        if (payNowIntentId) {
-            interval = setInterval(async () => {
-                const res = await fetch(`/api/payment/paynow/status?id=${payNowIntentId}`);
-                const data = await res.json();
-                console.log("paynow status", data)
-                
-                if (data.status === "succeeded") {
-                    setStatus("PayNow Payment Received!");
-                    clearInterval(interval);
-                    setQrCodeUrl(null);
-                    setTestSimulationUrl(null);
-                    setPayNowIntentId(null);
-                    
-                    // Trigger ERPNext sync
-                    // await finalizeOrder("SAL-ORD-2024-001", 15.00, "PayNow", payNowIntentId);
-                    const index = paymentMethods.findIndex(pm => pm.method === 'Paynow');
-                    console.log('PayNow payment method index:', index);
-                    if (index !== -1) {
-                        setPaymentMethods(prev => 
-                      prev.map((payment, i) => i === index ? { ...payment, amount: orderDetails?.net_total || 0 } : payment)
-                    );
-                    paymentMethods[index].amount = orderDetails?.net_total || 0; // Update the amount for the card payment method
-                    console.log('Updated paymentMethods:', paymentMethods); // Log the updated payment methods
-                    // Wait a tick for state to update, then complete payment
-                    handleCompletePayment();
-                  }
-                }
-                }, 2000); // Check every 2 seconds
-            setTimeout(() => {
-                clearInterval(interval);
-                setStatus("PayNow Payment Timeout. Please try again.");
-                setQrCodeUrl(null);
-                setTestSimulationUrl(null);
-                setPayNowIntentId(null);
-            }, 2 * 60 * 1000); // Timeout after 2 minutes
-        }
-        return () => clearInterval(interval);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [payNowIntentId]);
-
+  
   const updatePaymentMethod = (index: number, field: 'method' | 'amount', value: string | number) => {
     setPaymentMethods(prev => 
       prev.map((payment, i) => i === index ? { ...payment, [field]: value }
@@ -150,54 +159,54 @@ export default function OrderSummary() {
     }
   }
   // ---------------------------------------------------------
-    // 1. CARD PAYMENT (PayWave / Credit / Debit)
+    // 1. CARD PAYMENT (PayWave / Credit / Debit) (Stripe Terminal)
     // ---------------------------------------------------------
-    const handleCardPayment = async (amount: number) => {
-        try {
-          console.log('Initiating card payment for amount:', amount);
-            setStatus("Please Tap, Insert, or Swipe Card on Terminal...");
-            setQrCodeUrl(null); // Clear any QR codes
+    // const handleCardPayment = async (amount: number) => {
+    //     try {
+    //       console.log('Initiating card payment for amount:', amount);
+    //         setStatus("Please Tap, Insert, or Swipe Card on Terminal...");
+    //         setQrCodeUrl(null); // Clear any QR codes
             
-            // This triggers the physical reader
-            const result = await processPayment(amount);
+    //         // This triggers the physical reader
+    //         const result = await processPayment(amount);
 
-            if (result.status === "succeeded") {
-                setStatus("Card Payment Successful!");
+    //         if (result.status === "succeeded") {
+    //             setStatus("Card Payment Successful!");
                 
-                // Update payment method with the amount BEFORE calling handleCompletePayment
-                const index = paymentMethods.findIndex(pm => pm.method === 'Debit/Credit Card' || pm.method === 'NETS');
+    //             // Update payment method with the amount BEFORE calling handleCompletePayment
+    //             const index = paymentMethods.findIndex(pm => pm.method === 'Debit/Credit Card' || pm.method === 'NETS');
                 
-                if (index !== -1) {
-                    // Update the state and wait for next render
-                    setPaymentMethods(prev => 
-                      prev.map((payment, i) => i === index ? { ...payment, amount: amount } : payment)
-                    );
-                    paymentMethods[index].amount = amount; // Update the amount for the card payment method
-                    console.log('Updated paymentMethods:', paymentMethods); // Log the updated payment methods
-                    // Wait a tick for state to update, then complete payment
-                    handleCompletePayment();
-                } else {
-                  toast.error('Payment method not found');
-                }
-            }
-        } catch (error) {
-            console.error(error);
-            setStatus("Card Payment Failed");
-        }
-    };
+    //             if (index !== -1) {
+    //                 // Update the state and wait for next render
+    //                 setPaymentMethods(prev => 
+    //                   prev.map((payment, i) => i === index ? { ...payment, amount: amount } : payment)
+    //                 );
+    //                 paymentMethods[index].amount = amount; // Update the amount for the card payment method
+    //                 console.log('Updated paymentMethods:', paymentMethods); // Log the updated payment methods
+    //                 // Wait a tick for state to update, then complete payment
+    //                 handleCompletePayment();
+    //             } else {
+    //               toast.error('Payment method not found');
+    //             }
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //         setStatus("Card Payment Failed");
+    //     }
+    // };
   // ---------------------------------------------------------
-  // 2. PAYNOW PAYMENT (QR Code)
+  // 2. PAYNOW PAYMENT (QR Code) (Stripe Payment Intents + Custom API)
   // ---------------------------------------------------------
-  const handlePayNowPayment = async (amount: number) => {
-        try {
-            setStatus("Generating PayNow QR...");
+  // const handlePayNowPayment = async (amount: number) => {
+  //       try {
+  //           setStatus("Generating PayNow QR...");
             
-            // A. Call our new API to get the PayNow Intent
-            const res = await fetch('/api/payment/paynow', {
-                method: 'POST',
-                body: JSON.stringify({ amount }),
-            });
-            const data = await res.json();
+  //           // A. Call our new API to get the PayNow Intent
+  //           const res = await fetch('/api/payment/paynow', {
+  //               method: 'POST',
+  //               body: JSON.stringify({ amount }),
+  //           });
+  //           const data = await res.json();
             
             // B. Generate QR Code Image from the "next_action" data
             // Note: Stripe PayNow intents usually return a 'next_action' with a hosted instructions URL,
@@ -210,19 +219,19 @@ export default function OrderSummary() {
             
             // Let's assume the API returns the clientSecret. We use Stripe.js to retrieve the full intent to get the QR string.
             // (Simulated here for clarity - in production, your API should return the QR string directly)
-            console.log("paynow intent:", data)
-            setPayNowIntentId(data.id);
+            // console.log("paynow intent:", data)
+            // setPayNowIntentId(data.id);
             // 2. Display QR Code (for real usage/production)
-            if (data.qrCodeData) {
-                const url = await QRCode.toDataURL(data.qrCodeData);
-                setQrCodeUrl(url);
-            }
+            // if (data.qrCodeData) {
+                // const url = await QRCode.toDataURL(data.qrCodeData);
+                // setQrCodeUrl(url);
+            // }
 
             // 3. Set Simulation URL (for development testing)
-            if (data.hostedUrl) {
-                setTestSimulationUrl(data.hostedUrl);
-            }
-            setStatus("Waiting for Customer to Scan PayNow...");
+            // if (data.hostedUrl) {
+            //     setTestSimulationUrl(data.hostedUrl);
+            // }
+            // setStatus("Waiting for Customer to Scan PayNow...");
             
             // In a real app, your API would return the `next_action.paynow_display_qr_code.data` 
             // string. We turn that into an image:
@@ -231,11 +240,38 @@ export default function OrderSummary() {
             // setQrCodeUrl(url);
 
             // Start Polling for success
+        // } catch (error) {
+            // console.error(error);
+            // setStatus("PayNow Generation Failed");
+        // }
+    // };
+const handleHitPayCheckout = async (orderName: string, amount: number, payment_methods: string[]) => {
+        setHitpayLoading(true);
+        try {
+            // 1. Ask our backend to generate a HitPay Link
+            const res = await fetch('/api/payment/hitpay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount, orderName, payment_methods }),
+            });
+            
+            const data = await res.json();
+            console.log('HitPay response:', data);
+            if (data.url) {
+                // 2. Redirect the browser! 
+                // If on mobile, this automatically opens the HitPay App.
+                // If on desktop, it opens a standard HitPay QR code web checkout.
+                window.location.href = data.url;
+            } else {
+                alert("Failed to create HitPay link");
+            }
         } catch (error) {
             console.error(error);
-            setStatus("PayNow Generation Failed");
+        } finally {
+            setHitpayLoading(false);
         }
     };
+    
   const handleCompletePayment = async () => {
     if (!orderDetails) {
       toast.error('No order details available');
@@ -644,12 +680,12 @@ export default function OrderSummary() {
                   />
                 </div>
               <p>Status: {status}</p>
-              {paymentMethods.some(pm => pm.method === 'Debit/Credit Card' || pm.method === 'NETS') && !isReaderConnected && <button onClick={() => { connectToReader(); }} >Connect Terminal</button>}
+              {/* {paymentMethods.some(pm => pm.method === 'Debit/Credit Card' || pm.method === 'NETS') && !isReaderConnected && <button onClick={() => { connectToReader(); }} >Connect Terminal</button>} */}
               <div className="flex gap-4 justify-center">
                 {/* Card Button */}
                 {paymentMethods.some(pm => pm.method === 'Debit/Credit Card' || pm.method === 'NETS') && 
                   <button 
-                    onClick={() => { handleCardPayment(orderDetails?.net_total || 0);}}
+                    onClick={() => { handleHitPayCheckout(orderDetails?.name || '', orderDetails?.net_total || 0, ['card']); }}
                     className="bg-blue-600 text-white px-6 py-3 rounded shadow hover:bg-blue-700"
                 >
                     Pay by Card / PayWave
@@ -658,24 +694,23 @@ export default function OrderSummary() {
                 {/* PayNow Button */}
                 {paymentMethods.some(pm => pm.method === 'Paynow') && 
                 <button 
-                    onClick={() => handlePayNowPayment(orderDetails?.net_total || 0)}
+                    onClick={() => { handleHitPayCheckout(orderDetails?.name || '', orderDetails?.net_total || 0, ['paynow_online']); }}
                     className="bg-purple-600 text-white px-6 py-3 rounded shadow hover:bg-purple-700"
                 >
-                    Generate PayNow QR
+                    Pay by PayNow
                 </button>
                 }
             </div>
 
-            {/* Display QR Code if active */}
-            {qrCodeUrl && (
+            {/* Display QR Code if active (Stripe) */}
+            {/* {qrCodeUrl && (
                 <div className="mt-6 flex flex-col items-center">
                     <p className="mb-2 font-semibold">Scan with Banking App</p>
-                    {/* <img src={qrCodeUrl} alt="PayNow QR" width={200} height={200} /> */}
                     <Image src={qrCodeUrl} alt="PayNow QR" width={200} height={200} />
                 </div>
-            )}
-            {/* TEST MODE: Simulation Button */}
-            {testSimulationUrl && (
+            )} */}
+            {/* TEST MODE: Simulation Button (Stripe) */}
+            {/* {testSimulationUrl && (
                 <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center max-w-md">
                     <p className="text-sm font-bold text-yellow-800 mb-2">DEV MODE: Simulate Customer Scan</p>
                     <a 
@@ -691,7 +726,7 @@ export default function OrderSummary() {
                         This page will automatically detect the payment.
                     </p>
                 </div>
-            )}
+            )} */}
               </div>
             </div>
           </div>

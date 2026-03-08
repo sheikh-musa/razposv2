@@ -25,8 +25,7 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
 //   const shippingFee = 3.99;
 
   const getCurrentDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Singapore' });
   };
 // TODO: Add logic to check if the items are in stock
 // TODO: Add logic to change outstanding amount to 0 if paid
@@ -43,7 +42,7 @@ export default function OrderSummary({ onClose, orderToUpdate }: OrderSummaryPro
     }
     const payload: SalesOrderPayload = {
       customer: 'Guest',
-      delivery_date: getCurrentDate(), // TODO: Change to actual delivery date past 12am
+      delivery_date: getCurrentDate(), 
       custom_order_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: '2-digit' }).replace(' ', ''),
       items: items.map((item) => (
         { item_code: item.name,
