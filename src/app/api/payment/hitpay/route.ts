@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       currency: "SGD",
       reference_number: orderName, // Pass your ERPNext Order ID
       // Where HitPay should send the user back after paying
-      redirect_url: `${BASE_URL}/payment/callback`, 
+      redirect_url: `${BASE_URL}/tickets/ordersummary?order=${orderName}&isOpen=true`, 
       purpose: `Order ${orderName}`,
       "payment_methods[]": payment_methods
     };

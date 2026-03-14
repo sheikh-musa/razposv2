@@ -16,7 +16,8 @@ import Link from "next/link";
 export default function OrderSummary() {
   const searchParams = useSearchParams();
   const order = searchParams?.get('order') || '';
-  const isCustomerView = searchParams?.get('view') === 'customer';
+  const isOpen = searchParams?.get('isOpen') === 'true'; // default to false if not provided
+  const isCustomerView = searchParams?.get('view') === 'customer'; // customer view is read-only with no payment button
   const { fetchKitchenOrderDetails, createSalesInvoice, createPaymentEntry, getCompanyName, completeOpenTicket } = useApi();
   const router = useRouter();
   const [orderDetails, setOrderDetails] = useState<SalesOrders | null>(null);
@@ -110,6 +111,8 @@ export default function OrderSummary() {
   useEffect(() => {
     if (order) {
       fetchOrderDetails();
+      if (isOpen)
+        setIsPaymentOpen(true);
     }
     else {
       toast.error('No order found');
@@ -680,7 +683,7 @@ const handleHitPayCheckout = async (orderName: string, amount: number, payment_m
                     readOnly
                   />
                 </div>
-              <p>Status: {status}</p>
+              {/* <p>Status: {status}</p> */}
               {/* {paymentMethods.some(pm => pm.method === 'Debit/Credit Card' || pm.method === 'NETS') && !isReaderConnected && <button onClick={() => { connectToReader(); }} >Connect Terminal</button>} */}
               <div className="flex gap-4 justify-center">
                 {/* Card Button */}
