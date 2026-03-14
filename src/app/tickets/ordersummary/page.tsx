@@ -9,9 +9,9 @@ import { SlideoutMenu } from "@/components/application/slideout-menus/slideout-m
 import SendReceiptModal from "@/app/components/modals/order/SendReceiptModal";
 import { Button } from "@/components/base/buttons/button"
 import Link from "next/link";
-import { useStripeTerminal } from "@/app/context/PaymentContext"
-import QRCode from "qrcode";
-import Image from "next/image";
+// import { useStripeTerminal } from "@/app/context/PaymentContext"
+// import QRCode from "qrcode";
+// import Image from "next/image";
 
 export default function OrderSummary() {
   const searchParams = useSearchParams();
@@ -31,6 +31,7 @@ export default function OrderSummary() {
   const [discountEnabled, setDiscountEnabled] = useState<boolean>(false);
   const [discount, setDiscount] = useState(0);
   const [orderNetTotal, setOrderNetTotal] = useState(orderDetails?.net_total || 0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hitpayLoading, setHitpayLoading] = useState(false);
 
   // =====================================================
